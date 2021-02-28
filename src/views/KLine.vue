@@ -10,16 +10,28 @@ export default {
       baseUrl: process.env.BASE_URL,
       config: {
         'ZHAOBI': ['HOLD'],
+        'HUOBI':['HOLD'],
         'MT4': ['EASYFOREX', 'OANDA']
       }
     }
   },
   mounted() {
     let vm = this;
-    const symbolInfo = localStorage.getItem("SymbolInfo") && JSON.parse(localStorage.getItem("SymbolInfo")) || {name: "BTCUSDT", exchange: "ZHAOBI"};
+    const query=this.$route.query;
+    let symbolQuery={name:query.name,exchange:query.exchange}
+
+    if(symbolQuery.name&&!symbolQuery.exchange){
+      symbolQuery.exchange='ZHAOBI'
+    }
+    if(!symbolQuery.name){
+      symbolQuery=null;
+    }
+
+    const symbolInfo =symbolQuery || localStorage.getItem("SymbolInfo") && JSON.parse(localStorage.getItem("SymbolInfo")) ||  {name: "BTCUSDT", exchange: "ZHAOBI"};
+    console.log(symbolInfo);
     vm.widget = window.tvWidget = new TradingView.widget({
       autosize: true,
-      interval: "60",
+      interval: query.interval||"60",
       symbol: symbolInfo.name,
       container_id: "kline_container",
       // datafeed: new Datafeeds.UDFCompatibleDatafeed("http://172.16.103.31:15921/kdata",10000),
