@@ -1,13 +1,32 @@
 <template>
   <div id="app">
-    <k-line></k-line>
+    <k-line :symbol="item.symbol" :exchange="item.exchange" :interval="item.interval" :xkey="index" :key="index" v-for="item,index in list"></k-line>
   </div>
 </template>
 
 <script>
 import KLine from "./views/KLine";
 export default {
-  components: { KLine }
+  data(){
+    return{
+      list:[],
+    }
+  },
+  components: { KLine },
+  mounted() {
+    const query=this.$route.query;
+    console.log(query)
+    if(query.list){
+      try{
+        this.list=JSON.parse(query.list)
+      }catch (e) {
+        this.list=[];
+      }
+
+    }else{
+      this.list=[{symbol:query.name,exchange:query.exchange,interval:query.interval}]
+    }
+  }
 };
 </script>
 

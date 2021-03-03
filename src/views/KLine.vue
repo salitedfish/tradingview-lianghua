@@ -1,10 +1,11 @@
 <template>
   <div class="kline">
-    <div id="kline_container"></div>
+    <div class="kline_container" :id="'kline_container_'+xkey"></div>
   </div>
 </template>
 <script>
 export default {
+  props:['symbol','interval','exchange','xkey'],
   data() {
     return {
       baseUrl: process.env.BASE_URL,
@@ -17,26 +18,26 @@ export default {
   },
   mounted() {
     let vm = this;
-    const query=this.$route.query;
-    let symbolQuery={name:query.name,exchange:query.exchange}
+    // const query=this.$route.query;
+    // let symbolQuery={name:query.name,exchange:query.exchange}
+    //
+    // if(symbolQuery.name&&!symbolQuery.exchange){
+    //   symbolQuery.exchange='ZHAOBI'
+    // }
+    // if(!symbolQuery.name){
+    //   symbolQuery=null;
+    // }
 
-    if(symbolQuery.name&&!symbolQuery.exchange){
-      symbolQuery.exchange='ZHAOBI'
-    }
-    if(!symbolQuery.name){
-      symbolQuery=null;
-    }
-
-    const symbolInfo =symbolQuery || localStorage.getItem("SymbolInfo") && JSON.parse(localStorage.getItem("SymbolInfo")) ||  {name: "BTCUSDT", exchange: "ZHAOBI"};
+    const symbolInfo =this.symbol?{name:this.symbol,exchange:this.exchange||'ZHAOBI'} : {name: "BTCUSDT", exchange: "ZHAOBI"};
     console.log(symbolInfo);
     vm.widget = window.tvWidget = new TradingView.widget({
       autosize: true,
-      interval: query.interval||"60",
+      interval: this.interval||"60",
       symbol: symbolInfo.name,
-      container_id: "kline_container",
+      container_id: "kline_container_"+this.xkey,
       // datafeed: new Datafeeds.UDFCompatibleDatafeed("http://172.16.103.31:15921/kdata",10000),
       datafeed: new Datafeeds.UDFCompatibleDatafeed(
-        "https://api.33.cn/kdata",
+        "/api",
         // "https://kdata.zhaobi.tech/kdata",
         10000
       ),
@@ -185,22 +186,22 @@ export default {
       // vm.widget.chart().createStudy("Bollinger Bands",false,false,[200,2])
       // vm.widget.chart().createStudy("Bollinger Bands",false,false,[500,2])
      
-      this.config[symbolInfo.exchange] && this.config[symbolInfo.exchange].forEach( val => {
-        vm.widget.chart().createStudy('Overlay', false, false, [val + ':' + symbolInfo.name], (val)=>{
-          entityId.push(val);
-        });
-      })
+      // this.config[symbolInfo.exchange] && this.config[symbolInfo.exchange].forEach( val => {
+      //   vm.widget.chart().createStudy('Overlay', false, false, [val + ':' + symbolInfo.name], (val)=>{
+      //     entityId.push(val);
+      //   });
+      // })
       vm.widget.chart().onSymbolChanged().subscribe(null,(Subscription)=>{
         entityId.forEach(item => {
           vm.widget.chart().removeEntity(item)
         })
         entityId = [];
         localStorage.setItem('SymbolInfo', JSON.stringify(Subscription));
-        this.config[Subscription.exchange] && this.config[Subscription.exchange].forEach( val => {
-          vm.widget.chart().createStudy('Overlay', false, false, [val + ':' + Subscription.name], (val)=>{
-            entityId.push(val);
-          });
-        })
+        // this.config[Subscription.exchange] && this.config[Subscription.exchange].forEach( val => {
+        //   vm.widget.chart().createStudy('Overlay', false, false, [val + ':' + Subscription.name], (val)=>{
+        //     entityId.push(val);
+        //   });
+        // })
       },false)
     });
   },
@@ -215,7 +216,7 @@ export default {
 </script>
 <style>
 .kline,
-#kline_container {
+.kline_container {
   height: 100%;
 }
 </style>
