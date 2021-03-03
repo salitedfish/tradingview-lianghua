@@ -225,13 +225,13 @@
 
   }
 
-  .kline_container {
-    border: 1px solid black;
+  /*.kline_container {*/
+  /*  border: 1px solid black;*/
 
-    &:focus-within {
-      border-color: red;
-    }
-  }
+  /*  &:focus-within {*/
+  /*    border-color: red;*/
+  /*  }*/
+  /*}*/
 </style>
 
 
