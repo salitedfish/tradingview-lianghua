@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <k-line :symbol="item.symbol" :exchange="item.exchange" :interval="item.interval" :xkey="index" :key="index" v-for="item,index in list"></k-line>
+    <k-line class="k-line" :symbol="item.symbol" :exchange="item.exchange" :interval="item.interval" :xkey="index" :key="index" v-for="item,index in list"></k-line>
   </div>
 </template>
 
@@ -42,5 +42,15 @@ html, body {
   text-align: center;
   color: #2c3e50;
   height: 100%;
+  display: flex;
+  align-items: center;
+  flex-flow: row wrap;
+  .k-line{
+
+    /*border: 1px solid black;*/
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+  }
 }
 </style>
