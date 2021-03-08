@@ -11,7 +11,6 @@
         baseUrl: process.env.BASE_URL,
         config: {
           'ZHAOBI': ['HOLD'],
-          'HUOBI': ['HOLD'],
           'MT4': ['EASYFOREX', 'OANDA']
         }
       }
