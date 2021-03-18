@@ -13,8 +13,8 @@ function extractField(data, field, arrayIndex) {
  */
 var UDFCompatibleDatafeedBase = /** @class */ (function () {
     function UDFCompatibleDatafeedBase(datafeedURL, quotesProvider, requester, updateFrequency) {
-        if (updateFrequency === void 0) { updateFrequency = 10 * 1000; }
         var _this = this;
+        if (updateFrequency === void 0) { updateFrequency = 10 * 1000; }
         this._configuration = defaultConfiguration();
         this._symbolsStorage = null;
         this._datafeedURL = datafeedURL;
@@ -49,14 +49,14 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
     UDFCompatibleDatafeedBase.prototype.calculateHistoryDepth = function (resolution, resolutionBack, intervalBack) {
         return undefined;
     };
-    UDFCompatibleDatafeedBase.prototype.getMarks = function (symbolInfo, startDate, endDate, onDataCallback, resolution) {
+    UDFCompatibleDatafeedBase.prototype.getMarks = function (symbolInfo, from, to, onDataCallback, resolution) {
         if (!this._configuration.supports_marks) {
             return;
         }
         var requestParams = {
             symbol: symbolInfo.ticker || '',
-            from: startDate,
-            to: endDate,
+            from: from,
+            to: to,
             resolution: resolution,
         };
         this._send('marks', requestParams)
@@ -83,14 +83,14 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
             onDataCallback([]);
         });
     };
-    UDFCompatibleDatafeedBase.prototype.getTimescaleMarks = function (symbolInfo, startDate, endDate, onDataCallback, resolution) {
+    UDFCompatibleDatafeedBase.prototype.getTimescaleMarks = function (symbolInfo, from, to, onDataCallback, resolution) {
         if (!this._configuration.supports_timescale_marks) {
             return;
         }
         var requestParams = {
             symbol: symbolInfo.ticker || '',
-            from: startDate,
-            to: endDate,
+            from: from,
+            to: to,
             resolution: resolution,
         };
         this._send('timescale_marks', requestParams)
@@ -161,8 +161,9 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
                 .catch(onResult.bind(null, []));
         }
     };
-    UDFCompatibleDatafeedBase.prototype.resolveSymbol = function (symbolName, onResolve, onError) {
+    UDFCompatibleDatafeedBase.prototype.resolveSymbol = function (symbolName, onResolve, onError, extension) {
         logMessage('Resolve requested');
+        var currencyCode = extension && extension.currencyCode;
         var resolveRequestStartTime = Date.now();
         function onResultReady(symbolInfo) {
             logMessage("Symbol resolved: " + (Date.now() - resolveRequestStartTime) + "ms");
@@ -172,6 +173,9 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
             var params = {
                 symbol: symbolName,
             };
+            if (currencyCode !== undefined) {
+                params.currencyCode = currencyCode;
+            }
             this._send('symbols', params)
                 .then(function (response) {
                 if (response.s !== undefined) {
@@ -190,7 +194,7 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
             if (this._symbolsStorage === null) {
                 throw new Error('UdfCompatibleDatafeed: inconsistent configuration (symbols storage)');
             }
-            this._symbolsStorage.resolveSymbol(symbolName).then(onResultReady).catch(onError);
+            this._symbolsStorage.resolveSymbol(symbolName, currencyCode).then(onResultReady).catch(onError);
         }
     };
     UDFCompatibleDatafeedBase.prototype.getBars = function (symbolInfo, resolution, rangeStartDate, rangeEndDate, onResult, onError) {
@@ -236,7 +240,16 @@ function defaultConfiguration() {
     return {
         supports_search: false,
         supports_group_request: true,
-        supported_resolutions: ['1', '5', '15', '30', '60', '1D', '1W', '1M'],
+        supported_resolutions: [
+            '1',
+            '5',
+            '15',
+            '30',
+            '60',
+            '1D',
+            '1W',
+            '1M',
+        ],
         supports_marks: false,
         supports_timescale_marks: false,
     };

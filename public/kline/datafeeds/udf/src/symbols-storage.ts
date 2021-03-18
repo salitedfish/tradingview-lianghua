@@ -1,6 +1,7 @@
 import {
 	LibrarySymbolInfo,
 	SearchSymbolResultItem,
+	ResolutionString,
 } from '../../../charting_library/datafeed-api';
 
 import {
@@ -14,31 +15,7 @@ interface SymbolInfoMap {
 	[symbol: string]: LibrarySymbolInfo | undefined;
 }
 
-interface ExchangeDataResponseOptionalValues {
-	'ticker': string;
-
-	'minmov2': number;
-	'minmove2': number;
-
-	'minmov': number;
-	'minmovement': number;
-
-	'supported-resolutions': string[];
-
-	'force-session-rebuild': boolean;
-
-	'has-intraday': boolean;
-	'has-daily': boolean;
-	'has-weekly-and-monthly': boolean;
-	'has-empty-bars': boolean;
-	'has-no-volume': boolean;
-
-	'intraday-multipliers': string[];
-
-	'volume-precision': number;
-}
-
-interface ExchangeDataResponseMandatoryValues {
+interface ExchangeDataResponseSymbolData {
 	'type': string;
 	'timezone': LibrarySymbolInfo['timezone'];
 	'description': string;
@@ -51,26 +28,63 @@ interface ExchangeDataResponseMandatoryValues {
 	'fractional': boolean;
 
 	'pricescale': number;
+
+	'ticker'?: string;
+
+	'minmov2'?: number;
+	'minmove2'?: number;
+
+	'minmov'?: number;
+	'minmovement'?: number;
+
+	'force-session-rebuild'?: boolean;
+
+	'supported-resolutions'?: ResolutionString[];
+	'intraday-multipliers'?: string[];
+
+	'has-intraday'?: boolean;
+	'has-daily'?: boolean;
+	'has-weekly-and-monthly'?: boolean;
+	'has-empty-bars'?: boolean;
+	'has-no-volume'?: boolean;
+	'currency-code'?: string;
+	'original-currency-code'?: string;
+
+	'volume-precision'?: number;
 }
 
 // Here is some black magic with types to get compile-time checks of names and types
-type ValueOrArray<T> = T | T[];
+type PickArrayedObjectFields<T> = Pick<T, {
+	// tslint:disable-next-line:no-any
+	[K in keyof T]-?: NonNullable<T[K]> extends any[] ? K : never;
+}[keyof T]>;
+
+type ExchangeDataResponseArrayedSymbolData = PickArrayedObjectFields<ExchangeDataResponseSymbolData>;
+type ExchangeDataResponseNonArrayedSymbolData = Pick<ExchangeDataResponseSymbolData, Exclude<keyof ExchangeDataResponseSymbolData, keyof ExchangeDataResponseArrayedSymbolData>>;
+
 type ExchangeDataResponse =
 	{
 		symbol: string[];
 	} &
 	{
-		[K in keyof ExchangeDataResponseMandatoryValues]: ValueOrArray<ExchangeDataResponseMandatoryValues[K]>;
-	} &
-	{
-		[K in keyof ExchangeDataResponseOptionalValues]?: ValueOrArray<ExchangeDataResponseOptionalValues[K]>;
+		[K in keyof ExchangeDataResponseSymbolData]: ExchangeDataResponseSymbolData[K] | NonNullable<ExchangeDataResponseSymbolData[K]>[];
 	};
 
-function extractField<Field extends keyof ExchangeDataResponseMandatoryValues>(data: ExchangeDataResponse, field: Field, arrayIndex: number): ExchangeDataResponseMandatoryValues[Field];
-function extractField<Field extends keyof ExchangeDataResponseOptionalValues>(data: ExchangeDataResponse, field: Field, arrayIndex: number): ExchangeDataResponseOptionalValues[Field] | undefined;
-function extractField<Field extends keyof ExchangeDataResponseMandatoryValues>(data: ExchangeDataResponse, field: Field, arrayIndex: number): (ExchangeDataResponseMandatoryValues & ExchangeDataResponseOptionalValues)[Field] | undefined {
-	const value = data[field];
-	return Array.isArray(value) ? value[arrayIndex] : value;
+function extractField<Field extends keyof ExchangeDataResponseNonArrayedSymbolData>(data: ExchangeDataResponse, field: Field, arrayIndex: number): ExchangeDataResponseNonArrayedSymbolData[Field];
+function extractField<Field extends keyof ExchangeDataResponseArrayedSymbolData>(data: ExchangeDataResponse, field: Field, arrayIndex: number, valueIsArray: true): ExchangeDataResponseArrayedSymbolData[Field];
+function extractField<Field extends keyof ExchangeDataResponseSymbolData>(data: ExchangeDataResponse, field: Field, arrayIndex: number, valueIsArray?: boolean): ExchangeDataResponseSymbolData[Field] {
+	const value: ExchangeDataResponse[keyof ExchangeDataResponseSymbolData] = data[field];
+
+	if (Array.isArray(value) && (!valueIsArray || Array.isArray(value[0]))) {
+		return value[arrayIndex] as ExchangeDataResponseSymbolData[Field];
+	}
+
+	return value as ExchangeDataResponseSymbolData[Field];
+}
+
+function symbolWithCurrencyKey(symbol: string, currency?: string): string {
+	// here we're using a separator that quite possible shouldn't be in a real symbol name
+	return symbol + (currency !== undefined ? '_%|#|%_' + currency : '');
 }
 
 export class SymbolsStorage {
@@ -79,24 +93,25 @@ export class SymbolsStorage {
 	private readonly _symbolsList: string[] = [];
 	private readonly _datafeedUrl: string;
 	private readonly _readyPromise: Promise<void>;
-	private readonly _datafeedSupportedResolutions: string[];
+	private readonly _datafeedSupportedResolutions: ResolutionString[];
 	private readonly _requester: Requester;
 
-	public constructor(datafeedUrl: string, datafeedSupportedResolutions: string[], requester: Requester) {
+	public constructor(datafeedUrl: string, datafeedSupportedResolutions: ResolutionString[], requester: Requester) {
 		this._datafeedUrl = datafeedUrl;
 		this._datafeedSupportedResolutions = datafeedSupportedResolutions;
 		this._requester = requester;
 		this._readyPromise = this._init();
 		this._readyPromise.catch((error: Error) => {
 			// seems it is impossible
+			// tslint:disable-next-line:no-console
 			console.error(`SymbolsStorage: Cannot init, error=${error.toString()}`);
 		});
 	}
 
 	// BEWARE: this function does not consider symbol's exchange
-	public resolveSymbol(symbolName: string): Promise<LibrarySymbolInfo> {
+	public resolveSymbol(symbolName: string, currencyCode?: string): Promise<LibrarySymbolInfo> {
 		return this._readyPromise.then(() => {
-			const symbolInfo = this._symbolsInfo[symbolName];
+			const symbolInfo = this._symbolsInfo[symbolWithCurrencyKey(symbolName, currencyCode)];
 			if (symbolInfo === undefined) {
 				return Promise.reject('invalid symbol');
 			}
@@ -220,6 +235,7 @@ export class SymbolsStorage {
 				const listedExchange = extractField(data, 'exchange-listed', symbolIndex);
 				const tradedExchange = extractField(data, 'exchange-traded', symbolIndex);
 				const fullName = tradedExchange + ':' + symbolName;
+				const currencyCode = extractField(data, 'currency-code', symbolIndex);
 
 				const ticker = tickerPresent ? (extractField(data, 'ticker', symbolIndex) as string) : symbolName;
 
@@ -230,6 +246,8 @@ export class SymbolsStorage {
 					full_name: fullName,
 					listed_exchange: listedExchange,
 					exchange: tradedExchange,
+					currency_code: currencyCode,
+					original_currency_code: extractField(data, 'original-currency-code', symbolIndex),
 					description: extractField(data, 'description', symbolIndex),
 					has_intraday: definedValueOrDefault(extractField(data, 'has-intraday', symbolIndex), false),
 					has_no_volume: definedValueOrDefault(extractField(data, 'has-no-volume', symbolIndex), false),
@@ -240,18 +258,24 @@ export class SymbolsStorage {
 					type: extractField(data, 'type', symbolIndex),
 					session: extractField(data, 'session-regular', symbolIndex),
 					timezone: extractField(data, 'timezone', symbolIndex),
-					supported_resolutions: definedValueOrDefault(extractField(data, 'supported-resolutions', symbolIndex), this._datafeedSupportedResolutions),
+					supported_resolutions: definedValueOrDefault(extractField(data, 'supported-resolutions', symbolIndex, true), this._datafeedSupportedResolutions),
 					force_session_rebuild: extractField(data, 'force-session-rebuild', symbolIndex),
 					has_daily: definedValueOrDefault(extractField(data, 'has-daily', symbolIndex), true),
-					intraday_multipliers: definedValueOrDefault(extractField(data, 'intraday-multipliers', symbolIndex), ['1', '5', '15', '30', '60']),
+					intraday_multipliers: definedValueOrDefault(extractField(data, 'intraday-multipliers', symbolIndex, true), ['1', '5', '15', '30', '60']),
 					has_weekly_and_monthly: extractField(data, 'has-weekly-and-monthly', symbolIndex),
 					has_empty_bars: extractField(data, 'has-empty-bars', symbolIndex),
 					volume_precision: definedValueOrDefault(extractField(data, 'volume-precision', symbolIndex), 0),
+					format: 'price',
 				};
 
 				this._symbolsInfo[ticker] = symbolInfo;
 				this._symbolsInfo[symbolName] = symbolInfo;
 				this._symbolsInfo[fullName] = symbolInfo;
+				if (currencyCode !== undefined) {
+					this._symbolsInfo[symbolWithCurrencyKey(ticker, currencyCode)] = symbolInfo;
+					this._symbolsInfo[symbolWithCurrencyKey(symbolName, currencyCode)] = symbolInfo;
+					this._symbolsInfo[symbolWithCurrencyKey(fullName, currencyCode)] = symbolInfo;
+				}
 
 				this._symbolsList.push(symbolName);
 			}
