@@ -11,6 +11,7 @@ function extractField(data, field, arrayIndex) {
  * This class implements interaction with UDF-compatible datafeed.
  * See UDF protocol reference at https://github.com/tradingview/charting_library/wiki/UDF
  */
+
 var UDFCompatibleDatafeedBase = /** @class */ (function () {
     function UDFCompatibleDatafeedBase(datafeedURL, quotesProvider, requester, updateFrequency) {
         var _this = this;

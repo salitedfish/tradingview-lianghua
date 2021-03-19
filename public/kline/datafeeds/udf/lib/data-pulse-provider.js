@@ -101,7 +101,9 @@ function periodLengthSeconds(resolution, requiredPeriodsCount) {
         daysCount = 7 * requiredPeriodsCount;
     }
     else {
+        //如果resolution是分钟，也就是15、30、60等，那就执行下面这个
         daysCount = requiredPeriodsCount * parseInt(resolution) / (24 * 60);
     }
     return daysCount * 24 * 60 * 60;
 }
+

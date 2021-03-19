@@ -42,20 +42,18 @@ const createTradingView = (vm, config = {}) => {
         debug: false,
         // loading_screen: { backgroundColor: "#000000", foregroundColor: "#000000", },//todo:do it
         allow_symbol_change: true,
-        // theme: "Dark",
+        theme: "Dark",
         timeframe: "1m",//设置初始的时间展示范围
         // toolbar_bg: "#222",
         //点击改变周期，将周期转化为resolution写的周期
         time_frames: [
-            { text: "1y", resolution: "1W" },
-            { text: "6m", resolution: "2D" },
-            { text: "3m", resolution: "1D" },
-            { text: "1m", resolution: "1D" },
-            { text: "7d", resolution: "60" },
-            { text: "3d", resolution: "30" },
-            { text: "1d", resolution: "15" },
-            { text: "6h", resolution: "15" },
-            { text: "3h", resolution: "5" }
+            { text: "1y", resolution: "2D", title: "1年" },
+            { text: "6m", resolution: "2D", title: "6个月" },
+            { text: "3m", resolution: "1D", title: "3个月" },
+            { text: "1m", resolution: "1D", title: "1个月" },
+            { text: "7d", resolution: "60", title: "7天" },
+            { text: "3d", resolution: "15", title: "3天" },
+            { text: "1d", resolution: "1", title: "1天" },
         ]
         ,
 
@@ -65,7 +63,7 @@ const createTradingView = (vm, config = {}) => {
             // "header_widget",
             // "left_toolbar",
             // "edit_buttons_in_legend",
-            // "use_localstorage_for_settings",
+            "use_localstorage_for_settings",//禁用此功能，否则更改图表一些样式无法及时生效
             // "timeframes_toolbar",
             // "display_market_status",
             // "border_around_the_chart",
@@ -86,16 +84,20 @@ const createTradingView = (vm, config = {}) => {
         ],
 
         overrides: {
-            "mainSeriesProperties.style": 3, // k线图
+            "mainSeriesProperties.style": 1, // k线图
             // "paneProperties.background": "rgb(27,34,63)", // 背景色透明
-            "paneProperties.background": "#000000",
-            "paneProperties.vertGridProperties.color": "transparent", // 垂直分割线透明
+            // "paneProperties.background": "#000000",
+            // "paneProperties.background": "#ffffff",
+            "paneProperties.vertGridProperties.color": "transparent", // 垂直分割线
             "paneProperties.horzGridProperties.color": "rgb(47, 55, 89)", // 水平分割线
-            "paneProperties.vertGridProperties.style": 2, //分割线 solid = 0; dotted = 1; dashed = 2; large dashed = 3
-            "paneProperties.horzGridProperties.style": 2,
+            "paneProperties.vertGridProperties.style": 1, //分割线 solid = 0; dotted = 1; dashed = 2; large dashed = 3
+            "paneProperties.horzGridProperties.style": 1,
+            "scalesProperties.lineColor": "#767D99", //每个panel之间的分割线的颜色
+            "scalesProperties.textColor": "#767D99",
+            "scalesProperties.fontSize": 12,//改变坐标线的字体大小
 
-            // 'paneProperties.legendProperties.showSeriesTitle': false, // 图表标题
-            // 'mainSeriesProperties.lineStyle.color':'rgb(100,22,44)',
+            // 'paneProperties.legendProperties.showSeriesTitle': true, // 图表标题
+            // 'mainSeriesProperties.lineStyle.color':'#fff',
 
             //这些是k线图 mainSeriesProperties为1时生效
             "mainSeriesProperties.candleStyle.upColor": "#B4525E", // 蜡烛图阳线颜色
@@ -107,8 +109,6 @@ const createTradingView = (vm, config = {}) => {
 
             //这些是空心k线图 mainSeriesProperties为9时生效
             "mainSeriesProperties.showPriceLine": 1, // 是否显示当前价格线
-            "scalesProperties.lineColor": "rgb(255, 77, 107)", //每个panel之间的分割线的颜色
-            "scalesProperties.textColor": "#767D99",
             "mainSeriesProperties.hollowCandleStyle.upColor": "#B4525E",
             "mainSeriesProperties.hollowCandleStyle.downColor": "#5FBD7B",
             "mainSeriesProperties.hollowCandleStyle.wickUpColor": "#B4525E",
@@ -123,7 +123,7 @@ const createTradingView = (vm, config = {}) => {
             "volume.volume.color.0": "rgba(95,189,123,.6)",//设置成交量的颜色，0代表跌的时候
             "volume.volume.color.1": "rgba(180,82,94,.6)",//设置成交量颜色，1代表涨的时候
             // "volume.volume.transparency": 100
-            //对比K线样式
+            // 对比K线样式
             "Overlay.style": 1, // k线图
             "Overlay.candleStyle.upColor": "#B4525E", // 蜡烛图阳线颜色
             "Overlay.candleStyle.borderUpColor": "#B4525E", // 阳线边框颜色
@@ -131,31 +131,16 @@ const createTradingView = (vm, config = {}) => {
             "Overlay.candleStyle.downColor": "#5FBD7B", // 蜡烛图阴线颜色
             "Overlay.candleStyle.borderDownColor": "#5FBD7B", // 阴线边框颜色
             "Overlay.candleStyle.wickDownColor": "#5FBD7B", // 阴线的影线颜色
+
             // "bollinger bands.upper.linewidth": 10,//用来设置布林带的上规宽度
             // "bollinger bands.lower.linewidth": 10,
             // "Moving Average.plot.color": "#333333",//设置全部均线的默认颜色，后续每次创建均线指标时可以覆盖
-        },
-
-
-        scalesProperties: {
-            // showLeftScale: 1,
-            // showRightScale: !0,
-            // backgroundColor: "#fff",
-            // lineColor: "#fff",
-            // textColor: "#fff",
-            // fontSize: 11,
-            // scaleSeriesOnly: !1,
-            // showSeriesLastValue: !0,
-            // showSeriesPrevCloseValue: !1,
-            // showStudyLastValue: !1,
-            // showSymbolLabels: !1,
-            // showStudyPlotLabels: !1
         },
     }
     //将用户配置与默认参数合并
     const currentConfig = {}
     Object.assign(currentConfig, defaultConfig, config)
-    console.log('cc',currentConfig)
+    console.log('cc', currentConfig)
     //返回tradingview实例
     return new TradingView.widget(currentConfig);
 
