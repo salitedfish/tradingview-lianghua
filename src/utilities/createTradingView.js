@@ -44,7 +44,7 @@ const createTradingView = (vm, config = {}) => {
         allow_symbol_change: true,
         theme: "Dark",
         timeframe: "1m",//设置初始的时间展示范围
-        // toolbar_bg: "#222",
+        // toolbar_bg: "#FFF",
         //点击改变周期，将周期转化为resolution写的周期
         time_frames: [
             { text: "1y", resolution: "2D", title: "1年" },
@@ -84,6 +84,7 @@ const createTradingView = (vm, config = {}) => {
         ],
 
         overrides: {
+
             "mainSeriesProperties.style": 1, // k线图
             // "paneProperties.background": "rgb(27,34,63)", // 背景色透明
             // "paneProperties.background": "#000000",
@@ -95,6 +96,7 @@ const createTradingView = (vm, config = {}) => {
             "scalesProperties.lineColor": "#767D99", //每个panel之间的分割线的颜色
             "scalesProperties.textColor": "#767D99",
             "scalesProperties.fontSize": 12,//改变坐标线的字体大小
+
 
             // 'paneProperties.legendProperties.showSeriesTitle': true, // 图表标题
             // 'mainSeriesProperties.lineStyle.color':'#fff',
@@ -116,6 +118,7 @@ const createTradingView = (vm, config = {}) => {
             "mainSeriesProperties.hollowCandleStyle.drawBorder": false,
             "mainSeriesProperties.hollowCandleStyle.borderUpColor": "#B4525E",
             "mainSeriesProperties.hollowCandleStyle.borderDownColor": "#5FBD7B",
+
         },
 
         //统一设置指标的属性
@@ -140,7 +143,7 @@ const createTradingView = (vm, config = {}) => {
     //将用户配置与默认参数合并
     const currentConfig = {}
     Object.assign(currentConfig, defaultConfig, config)
-    console.log('cc', currentConfig)
+    // console.log('cc', currentConfig)
     //返回tradingview实例
     return new TradingView.widget(currentConfig);
 

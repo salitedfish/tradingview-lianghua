@@ -11,7 +11,7 @@ export default {
   props: ["symbol", "interval", "exchange", "xkey"],
   data() {
     return {
-      widget:null,
+      widget: null,
       baseUrl: process.env.BASE_URL,
       config: {
         ZHAOBI: ["HOLD"],
@@ -21,7 +21,7 @@ export default {
   },
   mounted() {
     let vm = this;
-    console.log(this.baseUrl)
+    console.log(this.baseUrl);
     // const query=this.$route.query;
     // let symbolQuery={name:query.name,exchange:query.exchange}
     //
@@ -87,6 +87,22 @@ export default {
       createStudy(vm.widget, "Bollinger Bands", false, false, [50, 2]);
       createStudy(vm.widget, "Bollinger Bands", false, false, [100, 2]);
       createStudy(vm.widget, "Volume", false, false, [100, 4]);
+
+      // vm.widget.activeChart().createShape(
+      //   [
+      //     { time: Date.now() / 1000 - 500 * 24 * 3600 * 1000, price: 150 },
+      //     { time: Date.now() / 1000, price: 150 },
+      //   ],
+      //   {
+      //     shape: "trend_line",
+      //     lock: true,
+      //     disableSelection: true,
+      //     disableSave: true,
+      //     disableUndo: true,
+      //     text: "text",
+      //     backgroundColor: "red"
+      //   }
+      // );
       // vm.widget.chart().createStudy("Bollinger Bands",false,false,[200,2])
       // vm.widget.chart().createStudy("Bollinger Bands",false,false,[500,2])
 
@@ -132,6 +148,14 @@ export default {
           false
         );
     });
+    // vm.widget.headerReady().then(function () {
+    //   var button = vm.widget.createButton();
+    //   button.setAttribute("title", "My custom button tooltip");
+    //   button.addEventListener("click", function () {
+    //     alert("My custom button pressed!");
+    //   });
+    //   button.textContent = "葛晓康自定义按钮";
+    // });
   },
   beforeDestroy() {
     for (let id of window.KLINEINTERVALS) {
