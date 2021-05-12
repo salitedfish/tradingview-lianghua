@@ -1,10 +1,8 @@
 <template>
   <div id="app">
     <div id="banner-box">
-      <span @click="RowCount = 1">一列</span>
-      <span @click="RowCount = 2">两列</span>
-      <span @click="RowCount = 3">三列</span>
-      <span @click="RowCount = 4">四列</span>
+      <span @click="changeRowCount('less')">减一列</span>
+      <span @click="changeRowCount('more')">加一列</span>
       <span @click="changeLineCount('less')">减一行</span>
       <span @click="changeLineCount('more')">加一行</span>
     </div>
@@ -92,13 +90,18 @@ export default {
   },
   methods: {
     changeLineCount(type) {
-      if (type == "less") {
+      if (this.list.length >= 2 && type == "less") {
         this.list.pop();
-      } else if (this.list.length >= 4 && type == "more") {
-        console.log("对不起,超出最大行数~");
-      } else {
+      } else if (this.list.length <= 3 && type == "more") {
         this.list.push({});
-      }
+      } 
+    },
+    changeRowCount(type) {
+      if (this.RowCount >= 2 && type == "less") {
+        this.RowCount --;
+      } else if (this.RowCount <= 3 && type == "more") {
+        this.RowCount ++;
+      } 
     },
   },
 };

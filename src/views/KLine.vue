@@ -86,7 +86,7 @@ export default {
       createStudy(vm.widget, "Bollinger Bands", false, false, [20, 2]);
       createStudy(vm.widget, "Bollinger Bands", false, false, [50, 2]);
       createStudy(vm.widget, "Bollinger Bands", false, false, [100, 2]);
-      // createStudy(vm.widget, "Volume", false, false, [100, 4]);
+      createStudy(vm.widget, "Volume", false, false, [100, 4]);
 
       // vm.widget.activeChart().createShape(
       //   [
