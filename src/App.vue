@@ -136,7 +136,7 @@ body {
   }
   #kline-box {
     height: 96%;
-    display:flex .line-one {
+    .line-one {
       width: 100%;
       height: 100%;
       display: flex;
