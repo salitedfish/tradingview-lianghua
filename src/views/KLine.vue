@@ -21,7 +21,7 @@ export default {
   },
   mounted() {
     let vm = this;
-    console.log(this.baseUrl);
+    // console.log(this.baseUrl);
     // const query=this.$route.query;
     // let symbolQuery={name:query.name,exchange:query.exchange}
     //
@@ -86,7 +86,7 @@ export default {
       createStudy(vm.widget, "Bollinger Bands", false, false, [20, 2]);
       createStudy(vm.widget, "Bollinger Bands", false, false, [50, 2]);
       createStudy(vm.widget, "Bollinger Bands", false, false, [100, 2]);
-      createStudy(vm.widget, "Volume", false, false, [100, 4]);
+      // createStudy(vm.widget, "Volume", false, false, [100, 4]);
 
       // vm.widget.activeChart().createShape(
       //   [
@@ -158,10 +158,10 @@ export default {
     // });
   },
   beforeDestroy() {
-    for (let id of window.KLINEINTERVALS) {
-      clearInterval(id);
-    }
-    window.KLINEINTERVALS = [];
+    // for (let id of window.KLINEINTERVALS) {
+    //   clearInterval(id);
+    // }
+    // window.KLINEINTERVALS = [];
   },
 };
 </script>

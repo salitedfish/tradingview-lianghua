@@ -1,24 +1,49 @@
 <template>
   <div id="app">
+    <div id="banner-box">
+      <span @click="RowCount=1">一列</span>
+      <span @click="RowCount=2">两列</span>
+      <span @click="RowCount=3">三列</span>
+      <span @click="RowCount=4">四列</span>
+      <span @click="changeLineCount('less')">减一行</span>
+      <span @click="changeLineCount('more')">加一行</span>
+    </div>
     <!-- 通过list循环展示k线图 -->
-    <k-line
-      :class="switchKline"
-      :symbol="item.symbol"
-      :exchange="item.exchange"
-      :interval="item.interval"
-      :xkey="index"
-      :key="index"
-      v-for="(item, index) in list"
-    ></k-line>
+    <div id="kline-box">
+      <div
+        v-for="(SymbolItem, SymbolIndex) in list"
+        :key="SymbolIndex"
+        :class="lineClassByCount"
+      >
+      <!-- 注意要保证每个k-line的xkey值不相同,不然会挂载在同一个地方 -->
+        <k-line
+          :class="lineClassByCount + '-item'"
+          :symbol="SymbolItem.symbol"
+          :exchange="SymbolItem.exchange"
+          :interval="item"
+          :xkey="SymbolItem.symbol + index.toString() + SymbolIndex.toString()"
+          v-for="(item, index) in RowListDate[RowCount-1]"
+          :key="item"
+        ></k-line>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import KLine from "./views/KLine";
+const RowListDate = [
+  ['15'],
+  ['15','60'],
+  ['15','60','240'],
+  ['15','60','240','1D']
+]
 export default {
   data() {
     return {
       list: [],
+      RowCount: 3,
+      RowListDate
     };
   },
   components: { KLine },
@@ -44,29 +69,43 @@ export default {
     }
   },
   computed: {
-    switchKline() {
-      let lineType = "";
+    lineClassByCount() {
+      let lineType = "line-one";
       switch (this.list.length) {
         case 1:
-          lineType = "k-line-large";
+          lineType = "line-one";
           break;
         case 2:
-          lineType = "k-line-middle";
+          lineType = "line-two";
           break;
         case 3:
-          lineType = "k-line-small";
+          lineType = "line-three";
+          break;
+        case 4:
+          lineType = "line-four";
           break;
         default:
-          lineType = "k-line-supersmall";
+          lineType = "line-one";
       }
       return lineType;
     },
   },
+  methods:{
+    changeLineCount(type){
+      if(type == 'less'){
+        this.list.pop()
+      }else if(this.list.length >= 4 && type == 'more') {
+        console.log('对不起,超出最大行数~')
+      }else {
+        this.list.push({})
+      }
+    }
+  }
 };
 </script>
 
 
-<style lang="less">
+<style lang="less" scope>
 html,
 body {
   height: 100%;
@@ -78,35 +117,70 @@ body {
   text-align: center;
   color: #2c3e50;
   height: 100%;
-  display: flex;
-  // align-items: center;
-  flex-flow: wrap;
-  //根据图表数量的不同添加不同的class以充满屏幕
-  .k-line-supersmall {
-    /*border: 1px solid black;*/
-    width: 50%;
-    height: 50%;
-    flex-shrink: 1;
-  }
-  .k-line-small {
-    width: 50%;
-    height: 50%;
-    flex-shrink: 1;
-    &:nth-child(3) {
-      width: 100%;
+  #banner-box {
+    background-color: #131722;
+    color: #787b86;
+    height: 4%;
+    padding-top: 16px;
+    border-bottom: 1px solid #787b86;
+    span {
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+      cursor: pointer;
+      border: 1px solid #787b86;
+      border-radius: 3px;
+      margin-left: 20px;
     }
   }
-  .k-line-middle {
-    /*border: 1px solid black;*/
-    width: 50%;
-    height: 100%;
-    flex-shrink: 1;
-  }
-  .k-line-large {
-    /*border: 1px solid black;*/
-    width: 100%;
-    height: 100%;
-    flex-shrink: 1;
+  #kline-box {
+    height: 96%;
+    display:flex
+    .line-one {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      // flex-shrink: 1;
+      &-item {
+        height: 100%;
+        flex: 1;
+        // width: 100%;
+      }
+    }
+    .line-two {
+      /*border: 1px solid black;*/
+      width: 100%;
+      height: 50%;
+      display: flex;
+      // flex-shrink: 1;
+      &-item {
+        height: 100%;
+        flex: 1;
+        // width: 50%;
+      }
+    }
+    .line-three {
+      /*border: 1px solid black;*/
+      width: 100%;
+      height: 33.333%;
+      display: flex;
+      // flex-shrink: 1;
+      &-item {
+        height: 100%;
+        flex: 1;
+      }
+    }
+    .line-four {
+      /*border: 1px solid black;*/
+      width: 100%;
+      height: 25%;
+      display: flex;
+      // flex-shrink: 1;
+      &-item {
+        height: 100%;
+        flex: 1;
+      }
+    }
   }
 }
 </style>

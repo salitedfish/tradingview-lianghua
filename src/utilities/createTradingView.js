@@ -27,8 +27,10 @@ const createTradingView = (vm, config = {}) => {
         // datafeed: new Datafeeds.UDFCompatibleDatafeed("http://172.16.103.31:15921/kdata",10000),
         //采用接口提供数据
         datafeed: new Datafeeds.UDFCompatibleDatafeed(
-            "/api",
+            // "/api",
             // "https://api.33.cn/kdata",
+            "http://47.56.83.226:5062",//GoLang 
+            // "http://119.8.239.24:5062",//PHP
             // "https://kdata.zhaobi.tech/kdata",
             10000
         ),
@@ -43,7 +45,7 @@ const createTradingView = (vm, config = {}) => {
         // loading_screen: { backgroundColor: "#000000", foregroundColor: "#000000", },//todo:do it
         allow_symbol_change: true,
         theme: "Dark",
-        timeframe: "1m",//设置初始的时间展示范围
+        timeframe: "1w",//设置初始的时间展示范围
         // toolbar_bg: "#FFF",
         //点击改变周期，将周期转化为resolution写的周期
         time_frames: [
@@ -53,7 +55,7 @@ const createTradingView = (vm, config = {}) => {
             { text: "1m", resolution: "1D", title: "1个月" },
             { text: "7d", resolution: "60", title: "7天" },
             { text: "3d", resolution: "15", title: "3天" },
-            { text: "1d", resolution: "1", title: "1天" },
+            { text: "1d", resolution: "5", title: "1天" },
         ]
         ,
 
@@ -75,6 +77,7 @@ const createTradingView = (vm, config = {}) => {
             // "volume_force_overlay",
             // "remove_library_container_border",
             // "fundamental_widget",
+            "volume_force_overlay",
             // "control_bar", //控制图表工具栏（鼠标移至底部会出现）
         ],
 
@@ -84,6 +87,9 @@ const createTradingView = (vm, config = {}) => {
         ],
 
         overrides: {
+            // "has_no_volume":false,
+            "volumePaneSize":"small",
+            "paneProperties.legendProperties.showLegend": false,
 
             "mainSeriesProperties.style": 1, // k线图
             // "paneProperties.background": "rgb(27,34,63)", // 背景色透明
@@ -119,12 +125,15 @@ const createTradingView = (vm, config = {}) => {
             "mainSeriesProperties.hollowCandleStyle.borderUpColor": "#B4525E",
             "mainSeriesProperties.hollowCandleStyle.borderDownColor": "#5FBD7B",
 
+            
+
         },
 
         //统一设置指标的属性
         studies_overrides: {
             "volume.volume.color.0": "rgba(95,189,123,.6)",//设置成交量的颜色，0代表跌的时候
             "volume.volume.color.1": "rgba(180,82,94,.6)",//设置成交量颜色，1代表涨的时候
+            
             // "volume.volume.transparency": 100
             // 对比K线样式
             "Overlay.style": 1, // k线图
