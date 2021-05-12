@@ -27,9 +27,9 @@ const createTradingView = (vm, config = {}) => {
         // datafeed: new Datafeeds.UDFCompatibleDatafeed("http://172.16.103.31:15921/kdata",10000),
         //采用接口提供数据
         datafeed: new Datafeeds.UDFCompatibleDatafeed(
-            // "/api",
+            "/api",
             // "https://api.33.cn/kdata",
-            "http://47.56.83.226:5062",//GoLang 
+            // "http://47.56.83.226:5062",//GoLang 
             // "http://119.8.239.24:5062",//PHP
             // "https://kdata.zhaobi.tech/kdata",
             10000

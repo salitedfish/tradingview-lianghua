@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <div id="banner-box">
-      <span @click="RowCount=1">一列</span>
-      <span @click="RowCount=2">两列</span>
-      <span @click="RowCount=3">三列</span>
-      <span @click="RowCount=4">四列</span>
+      <span @click="RowCount = 1">一列</span>
+      <span @click="RowCount = 2">两列</span>
+      <span @click="RowCount = 3">三列</span>
+      <span @click="RowCount = 4">四列</span>
       <span @click="changeLineCount('less')">减一行</span>
       <span @click="changeLineCount('more')">加一行</span>
     </div>
@@ -15,14 +15,14 @@
         :key="SymbolIndex"
         :class="lineClassByCount"
       >
-      <!-- 注意要保证每个k-line的xkey值不相同,不然会挂载在同一个地方 -->
+        <!-- 注意要保证每个k-line的xkey值不相同,不然会挂载在同一个地方 -->
         <k-line
           :class="lineClassByCount + '-item'"
           :symbol="SymbolItem.symbol"
           :exchange="SymbolItem.exchange"
           :interval="item"
           :xkey="SymbolItem.symbol + index.toString() + SymbolIndex.toString()"
-          v-for="(item, index) in RowListDate[RowCount-1]"
+          v-for="(item, index) in RowListDate[RowCount - 1]"
           :key="item"
         ></k-line>
       </div>
@@ -33,17 +33,17 @@
 <script>
 import KLine from "./views/KLine";
 const RowListDate = [
-  ['15'],
-  ['15','60'],
-  ['15','60','240'],
-  ['15','60','240','1D']
-]
+  ["15"],
+  ["15", "60"],
+  ["15", "60", "240"],
+  ["15", "60", "240", "1D"],
+];
 export default {
   data() {
     return {
       list: [],
       RowCount: 3,
-      RowListDate
+      RowListDate,
     };
   },
   components: { KLine },
@@ -90,17 +90,17 @@ export default {
       return lineType;
     },
   },
-  methods:{
-    changeLineCount(type){
-      if(type == 'less'){
-        this.list.pop()
-      }else if(this.list.length >= 4 && type == 'more') {
-        console.log('对不起,超出最大行数~')
-      }else {
-        this.list.push({})
+  methods: {
+    changeLineCount(type) {
+      if (type == "less") {
+        this.list.pop();
+      } else if (this.list.length >= 4 && type == "more") {
+        console.log("对不起,超出最大行数~");
+      } else {
+        this.list.push({});
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -117,6 +117,7 @@ body {
   text-align: center;
   color: #2c3e50;
   height: 100%;
+  // background-color: #131722;
   #banner-box {
     background-color: #131722;
     color: #787b86;
@@ -135,8 +136,7 @@ body {
   }
   #kline-box {
     height: 96%;
-    display:flex
-    .line-one {
+    display:flex .line-one {
       width: 100%;
       height: 100%;
       display: flex;
