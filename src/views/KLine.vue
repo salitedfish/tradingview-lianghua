@@ -33,7 +33,7 @@ export default {
     // }
 
     //在index.html里面已经引入了tradingView,可以直接使用
-    vm.widget = window.tvWidget = createTradingView(vm);
+    vm.widget = createTradingView(vm);
 
     //当图表准备就绪时调用回调
     vm.widget.onChartReady(() => {

@@ -1,10 +1,12 @@
 <template>
   <div id="app">
     <div id="banner-box">
-      <span @click="changeRowCount('less')">减一列</span>
-      <span @click="changeRowCount('more')">加一列</span>
-      <span @click="changeLineCount('less')">减一行</span>
-      <span @click="changeLineCount('more')">加一行</span>
+      <div class="center-container">
+        <span @click="changeRowCount('less')">减一列</span>
+        <span @click="changeRowCount('more')">加一列</span>
+        <span @click="changeLineCount('less')">减一行</span>
+        <span @click="changeLineCount('more')">加一行</span>
+      </div>
     </div>
     <!-- 通过list循环展示k线图 -->
     <div id="kline-box">
@@ -29,7 +31,6 @@
 </template>
 
 <script>
-import KLine from "./views/KLine";
 const RowListDate = [
   ["15"],
   ["15", "60"],
@@ -40,11 +41,15 @@ export default {
   data() {
     return {
       list: [],
-      RowCount: 3,
+      RowCount: 2,
       RowListDate,
     };
   },
-  components: { KLine },
+  components: {
+    KLine: () => {
+      return import("./views/KLine");
+    },
+  },
   mounted() {
     //从其他页面跳转过来的路由获取参数
     const query = this.$route.query;
@@ -94,14 +99,14 @@ export default {
         this.list.pop();
       } else if (this.list.length <= 3 && type == "more") {
         this.list.push({});
-      } 
+      }
     },
     changeRowCount(type) {
       if (this.RowCount >= 2 && type == "less") {
-        this.RowCount --;
+        this.RowCount--;
       } else if (this.RowCount <= 3 && type == "more") {
-        this.RowCount ++;
-      } 
+        this.RowCount++;
+      }
     },
   },
 };
@@ -125,16 +130,20 @@ body {
     background-color: #131722;
     color: #787b86;
     height: 4%;
-    padding-top: 16px;
+    // padding: 10px;
     border-bottom: 1px solid #787b86;
+    .center-container {
+      width: 20%;
+      height: 100%;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-around;
+      align-items: center
+    }
     span {
-      display: inline-block;
-      width: 40px;
-      height: 20px;
       cursor: pointer;
       border: 1px solid #787b86;
       border-radius: 3px;
-      margin-left: 20px;
     }
   }
   #kline-box {
