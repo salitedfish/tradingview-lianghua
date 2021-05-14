@@ -6,6 +6,7 @@
         <span @click="changeRowCount('more')">加一列</span>
         <span @click="changeLineCount('less')">减一行</span>
         <span @click="changeLineCount('more')">加一行</span>
+        <input type="text" class="input-box" placeholder="请输入要添加的币种..." v-model="addSymbol"/>
       </div>
     </div>
     <!-- 通过list循环展示k线图 -->
@@ -43,6 +44,7 @@ export default {
       list: [],
       RowCount: 2,
       RowListDate,
+      addSymbol: ""
     };
   },
   components: {
@@ -98,7 +100,7 @@ export default {
       if (this.list.length >= 2 && type == "less") {
         this.list.pop();
       } else if (this.list.length <= 3 && type == "more") {
-        this.list.push({});
+        this.list.push({symbol:this.addSymbol});
       }
     },
     changeRowCount(type) {
@@ -133,12 +135,18 @@ body {
     // padding: 10px;
     border-bottom: 1px solid #787b86;
     .center-container {
-      width: 20%;
+      width: 30%;
       height: 100%;
       margin: 0 auto;
       display: flex;
       justify-content: space-around;
-      align-items: center
+      align-items: center;
+      .input-box {
+        background-color: #131722;
+        border: 1px solid #787b86;
+        border-radius: 3px;
+        padding-left: 5px;
+      }
     }
     span {
       cursor: pointer;

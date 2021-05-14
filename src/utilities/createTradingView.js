@@ -79,6 +79,8 @@ const createTradingView = (vm, config = {}) => {
             // "fundamental_widget",
             "volume_force_overlay",
             // "control_bar", //控制图表工具栏（鼠标移至底部会出现）
+            // "legend_widget"
+            // "show_chart_property_page"
         ],
 
         //设置开启哪些特性
@@ -108,22 +110,26 @@ const createTradingView = (vm, config = {}) => {
             // 'mainSeriesProperties.lineStyle.color':'#fff',
 
             //这些是k线图 mainSeriesProperties为1时生效
-            "mainSeriesProperties.candleStyle.upColor": "#B4525E", // 蜡烛图阳线颜色
-            "mainSeriesProperties.candleStyle.borderUpColor": "#B4525E", // 阳线边框颜色
-            "mainSeriesProperties.candleStyle.wickUpColor": "#B4525E", // 阳线的影线颜色
-            "mainSeriesProperties.candleStyle.downColor": "#5FBD7B", // 蜡烛图阴线颜色
-            "mainSeriesProperties.candleStyle.borderDownColor": "#5FBD7B", // 阴线边框颜色
-            "mainSeriesProperties.candleStyle.wickDownColor": "#5FBD7B", // 阴线的影线颜色
+            "mainSeriesProperties.candleStyle.upColor": "#5FBD7B", // 蜡烛图阳线颜色
+            "mainSeriesProperties.candleStyle.borderUpColor": "#5FBD7B", // 阳线边框颜色
+            "mainSeriesProperties.candleStyle.wickUpColor": "#5FBD7B", // 阳线的影线颜色
+
+            "mainSeriesProperties.candleStyle.downColor": "#B4525E", // 蜡烛图阴线颜色
+            "mainSeriesProperties.candleStyle.borderDownColor": "#B4525E", // 阴线边框颜色
+            "mainSeriesProperties.candleStyle.wickDownColor": "#B4525E", // 阴线的影线颜色
 
             //这些是空心k线图 mainSeriesProperties为9时生效
             "mainSeriesProperties.showPriceLine": 1, // 是否显示当前价格线
-            "mainSeriesProperties.hollowCandleStyle.upColor": "#B4525E",
-            "mainSeriesProperties.hollowCandleStyle.downColor": "#5FBD7B",
-            "mainSeriesProperties.hollowCandleStyle.wickUpColor": "#B4525E",
-            "mainSeriesProperties.hollowCandleStyle.wickDownColor": "#5FBD7B",
+            "mainSeriesProperties.hollowCandleStyle.upColor": "#5FBD7B",
+            "mainSeriesProperties.hollowCandleStyle.borderUpColor": "#5FBD7B",
+            "mainSeriesProperties.hollowCandleStyle.wickUpColor": "#5FBD7B",
+
+            "mainSeriesProperties.hollowCandleStyle.downColor": "#B4525E",
+            "mainSeriesProperties.hollowCandleStyle.wickDownColor": "#B4525E",
+            "mainSeriesProperties.hollowCandleStyle.borderDownColor": "#B4525E",
+
             "mainSeriesProperties.hollowCandleStyle.drawBorder": false,
-            "mainSeriesProperties.hollowCandleStyle.borderUpColor": "#B4525E",
-            "mainSeriesProperties.hollowCandleStyle.borderDownColor": "#5FBD7B",
+
 
             
 
@@ -131,18 +137,19 @@ const createTradingView = (vm, config = {}) => {
 
         //统一设置指标的属性
         studies_overrides: {
-            "volume.volume.color.0": "rgba(95,189,123,.6)",//设置成交量的颜色，0代表跌的时候
-            "volume.volume.color.1": "rgba(180,82,94,.6)",//设置成交量颜色，1代表涨的时候
+            "volume.volume.color.0": "rgba(180,82,94,.6)",//设置成交量的颜色，0代表跌的时候
+            "volume.volume.color.1": "rgba(95,189,123,.6)",//设置成交量颜色，1代表涨的时候
             
             // "volume.volume.transparency": 100
             // 对比K线样式
             "Overlay.style": 1, // k线图
-            "Overlay.candleStyle.upColor": "#B4525E", // 蜡烛图阳线颜色
-            "Overlay.candleStyle.borderUpColor": "#B4525E", // 阳线边框颜色
-            "Overlay.candleStyle.wickUpColor": "#B4525E", // 阳线的影线颜色
-            "Overlay.candleStyle.downColor": "#5FBD7B", // 蜡烛图阴线颜色
-            "Overlay.candleStyle.borderDownColor": "#5FBD7B", // 阴线边框颜色
-            "Overlay.candleStyle.wickDownColor": "#5FBD7B", // 阴线的影线颜色
+            "Overlay.candleStyle.upColor": "#5FBD7B", // 蜡烛图阳线颜色
+            "Overlay.candleStyle.borderUpColor": "#5FBD7B", // 阳线边框颜色
+            "Overlay.candleStyle.wickUpColor": "#5FBD7B", // 阳线的影线颜色
+
+            "Overlay.candleStyle.downColor": "#B4525E", // 蜡烛图阴线颜色
+            "Overlay.candleStyle.borderDownColor": "#B4525E", // 阴线边框颜色
+            "Overlay.candleStyle.wickDownColor": "#B4525E", // 阴线的影线颜色
 
             // "bollinger bands.upper.linewidth": 10,//用来设置布林带的上规宽度
             // "bollinger bands.lower.linewidth": 10,
