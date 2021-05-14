@@ -6,7 +6,12 @@
         <span @click="changeRowCount('more')">加一列</span>
         <span @click="changeLineCount('less')">减一行</span>
         <span @click="changeLineCount('more')">加一行</span>
-        <input type="text" class="input-box" placeholder="请输入要添加的币种..." v-model="addSymbol"/>
+        <input
+          type="text"
+          class="input-box"
+          placeholder="请输入要添加的币种..."
+          v-model="addSymbol"
+        />
       </div>
     </div>
     <!-- 通过list循环展示k线图 -->
@@ -25,6 +30,7 @@
           :xkey="SymbolItem.symbol + index.toString() + SymbolIndex.toString()"
           v-for="(item, index) in RowListDate[RowCount - 1]"
           :key="item"
+          :createDelay="KLineDelayTime(index, SymbolIndex)"
         ></k-line>
       </div>
     </div>
@@ -42,9 +48,10 @@ export default {
   data() {
     return {
       list: [],
-      RowCount: 2,
+      RowCount: 3,
       RowListDate,
-      addSymbol: ""
+      addSymbol: "",
+      addSymbolCase: "",
     };
   },
   components: {
@@ -100,14 +107,27 @@ export default {
       if (this.list.length >= 2 && type == "less") {
         this.list.pop();
       } else if (this.list.length <= 3 && type == "more") {
-        this.list.push({symbol:this.addSymbol});
+        this.addSymbolCase = "addLine";
+        this.list.push({ symbol: this.addSymbol });
       }
     },
     changeRowCount(type) {
       if (this.RowCount >= 2 && type == "less") {
         this.RowCount--;
       } else if (this.RowCount <= 3 && type == "more") {
+        this.addSymbolCase = "addRow";
         this.RowCount++;
+      }
+    },
+    //设置kline的延时创建时间,同时加载太多有可能会丢失样式覆盖
+    KLineDelayTime(index, SymbolIndex) {
+      switch (this.addSymbolCase) {
+        case "":
+          return index * 200 + SymbolIndex * 500;
+        case "addLine":
+          return index * 200;
+        case "addRow":
+          return SymbolIndex * 200;
       }
     },
   },

@@ -8,7 +8,7 @@
 import { createTradingView } from "../utilities/createTradingView";
 import { createStudy } from "../utilities/createStudy";
 export default {
-  props: ["symbol", "interval", "exchange", "xkey"],
+  props: ["symbol", "interval", "exchange", "xkey","createDelay"],
   data() {
     return {
       widget: null,
@@ -31,8 +31,8 @@ export default {
     // if(!symbolQuery.name){
     //   symbolQuery=null;
     // }
-
-    //在index.html里面已经引入了tradingView,可以直接使用
+    setTimeout(()=>{
+      //在index.html里面已经引入了tradingView,可以直接使用
     vm.widget = createTradingView(vm);
 
     //当图表准备就绪时调用回调
@@ -156,6 +156,9 @@ export default {
     //   });
     //   button.textContent = "葛晓康自定义按钮";
     // });
+
+    },this.createDelay)
+    
   },
   beforeDestroy() {
     // for (let id of window.KLINEINTERVALS) {
