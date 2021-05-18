@@ -42,7 +42,7 @@ const createTradingView = (vm, config = {}) => {
         client_id: "tradingview.com",
         user_id: "public_user_id",
         debug: false,
-        // loading_screen: { backgroundColor: "#000000", foregroundColor: "#000000", },//todo:do it
+        loading_screen: { backgroundColor: "#000000", foregroundColor: "#000000", },//todo:do it
         allow_symbol_change: true,
         theme: "Dark",
         timeframe: "1w",//设置初始的时间展示范围
@@ -65,7 +65,7 @@ const createTradingView = (vm, config = {}) => {
             // "header_widget",
             // "left_toolbar",
             // "edit_buttons_in_legend",
-            "use_localstorage_for_settings",//禁用此功能，否则更改图表一些样式无法及时生效
+            // "use_localstorage_for_settings",//禁用此功能，否则更改图表一些样式无法及时生效
             // "timeframes_toolbar",
             // "display_market_status",
             // "border_around_the_chart",
@@ -110,23 +110,23 @@ const createTradingView = (vm, config = {}) => {
             // 'mainSeriesProperties.lineStyle.color':'#fff',
 
             //这些是k线图 mainSeriesProperties为1时生效
-            "mainSeriesProperties.candleStyle.upColor": "#5FBD7B", // 蜡烛图阳线颜色
-            "mainSeriesProperties.candleStyle.borderUpColor": "#5FBD7B", // 阳线边框颜色
-            "mainSeriesProperties.candleStyle.wickUpColor": "#5FBD7B", // 阳线的影线颜色
+            // "mainSeriesProperties.candleStyle.upColor": "#5FBD7B", // 蜡烛图阳线颜色
+            // "mainSeriesProperties.candleStyle.borderUpColor": "#5FBD7B", // 阳线边框颜色
+            // "mainSeriesProperties.candleStyle.wickUpColor": "#5FBD7B", // 阳线的影线颜色
 
-            "mainSeriesProperties.candleStyle.downColor": "#B4525E", // 蜡烛图阴线颜色
-            "mainSeriesProperties.candleStyle.borderDownColor": "#B4525E", // 阴线边框颜色
-            "mainSeriesProperties.candleStyle.wickDownColor": "#B4525E", // 阴线的影线颜色
+            // "mainSeriesProperties.candleStyle.downColor": "#B4525E", // 蜡烛图阴线颜色
+            // "mainSeriesProperties.candleStyle.borderDownColor": "#B4525E", // 阴线边框颜色
+            // "mainSeriesProperties.candleStyle.wickDownColor": "#B4525E", // 阴线的影线颜色
 
             //这些是空心k线图 mainSeriesProperties为9时生效
             "mainSeriesProperties.showPriceLine": 1, // 是否显示当前价格线
-            "mainSeriesProperties.hollowCandleStyle.upColor": "#5FBD7B",
-            "mainSeriesProperties.hollowCandleStyle.borderUpColor": "#5FBD7B",
-            "mainSeriesProperties.hollowCandleStyle.wickUpColor": "#5FBD7B",
+            // "mainSeriesProperties.hollowCandleStyle.upColor": "#5FBD7B",
+            // "mainSeriesProperties.hollowCandleStyle.borderUpColor": "#5FBD7B",
+            // "mainSeriesProperties.hollowCandleStyle.wickUpColor": "#5FBD7B",
 
-            "mainSeriesProperties.hollowCandleStyle.downColor": "#B4525E",
-            "mainSeriesProperties.hollowCandleStyle.wickDownColor": "#B4525E",
-            "mainSeriesProperties.hollowCandleStyle.borderDownColor": "#B4525E",
+            // "mainSeriesProperties.hollowCandleStyle.downColor": "#B4525E",
+            // "mainSeriesProperties.hollowCandleStyle.wickDownColor": "#B4525E",
+            // "mainSeriesProperties.hollowCandleStyle.borderDownColor": "#B4525E",
 
             "mainSeriesProperties.hollowCandleStyle.drawBorder": false,
 

@@ -48,7 +48,7 @@ export default {
   data() {
     return {
       list: [],
-      RowCount: 3,
+      RowCount: 2,
       RowListDate,
       addSymbol: "",
       addSymbolCase: "",
