@@ -2,6 +2,8 @@
   <div id="app">
     <div id="banner-box">
       <div class="center-container">
+        <span @click="changeTheme('light')">明亮</span>
+        <span @click="changeTheme('dark')">暗黑</span>
         <span @click="changeRowCount('less')">减一列</span>
         <span @click="changeRowCount('more')">加一列</span>
         <span @click="changeLineCount('less')">减一行</span>
@@ -31,6 +33,7 @@
           v-for="(item, index) in RowListDate[RowCount - 1]"
           :key="item"
           :createDelay="KLineDelayTime(index, SymbolIndex)"
+          ref="kLine"
         ></k-line>
       </div>
     </div>
@@ -130,6 +133,12 @@ export default {
           return SymbolIndex * 200;
       }
     },
+    //改变总主题
+    changeTheme(theme) {
+      for(let kLineItem of this.$refs.kLine) {
+        kLineItem.changeTheme(theme)
+      }
+    },
   },
 };
 </script>
@@ -161,6 +170,9 @@ body {
       display: flex;
       justify-content: space-around;
       align-items: center;
+      span {
+        padding: 0 5px;
+      }
       .input-box {
         background-color: #131722;
         border: 1px solid #787b86;
@@ -223,4 +235,6 @@ body {
     }
   }
 }
+
+
 </style>
