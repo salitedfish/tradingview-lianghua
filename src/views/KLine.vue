@@ -9,7 +9,7 @@ import { createTradingView } from "../utilities/createTradingView";
 import { createStudy } from "../utilities/createStudy";
 import overrides from "../utilities/overrides";
 export default {
-  props: ["symbol", "interval", "exchange", "xkey", "createDelay"],
+  props: ["symbol", "interval", "exchange", "xkey", "createDelay",'yIndex','xIndex'],
   data() {
     return {
       widget: null,
@@ -141,6 +141,9 @@ export default {
           .subscribe(
             null,
             (Subscription) => {
+              // console.log(vm.widget.activeChart().symbolExt().description)
+              const changedSymbol = vm.widget.activeChart().symbolExt().description
+              this.$emit('symbolChanged',{symbol:changedSymbol,index:this.yIndex})
               //当商品更改时，便利entityId，移除item
               entityId.forEach((item) => {
                 vm.widget.chart().removeEntity(item);

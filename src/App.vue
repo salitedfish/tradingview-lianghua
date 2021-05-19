@@ -1,143 +1,31 @@
 <template>
   <div id="app">
-    <div id="banner-box">
-      <div class="center-container">
-        <span @click="changeTheme('light')">明亮</span>
-        <span @click="changeTheme('dark')">暗黑</span>
-        <span @click="changeRowCount('less')">减一列</span>
-        <span @click="changeRowCount('more')">加一列</span>
-        <span @click="changeLineCount('less')">减一行</span>
-        <span @click="changeLineCount('more')">加一行</span>
-        <input
-          type="text"
-          class="input-box"
-          placeholder="请输入要添加的币种..."
-          v-model="addSymbol"
-        />
-      </div>
-    </div>
-    <!-- 通过list循环展示k线图 -->
-    <div id="kline-box">
-      <div
-        v-for="(SymbolItem, SymbolIndex) in list"
-        :key="SymbolIndex"
-        :class="lineClassByCount"
-      >
-        <!-- 注意要保证每个k-line的xkey值不相同,不然会挂载在同一个地方 -->
-        <k-line
-          :class="lineClassByCount + '-item'"
-          :symbol="SymbolItem.symbol"
-          :exchange="SymbolItem.exchange"
-          :interval="item"
-          :xkey="SymbolItem.symbol + index.toString() + SymbolIndex.toString()"
-          v-for="(item, index) in RowListDate[RowCount - 1]"
-          :key="item"
-          :createDelay="KLineDelayTime(index, SymbolIndex)"
-          ref="kLine"
-        ></k-line>
-      </div>
-    </div>
+    <k-line-page-custom @changeMode="changeMode" v-show="showMode == 'custom'">
+    </k-line-page-custom>
+    <k-line-page-screen @changeMode="changeMode" v-show="showMode == 'screen'"></k-line-page-screen>
   </div>
 </template>
 
 <script>
-const RowListDate = [
-  ["15"],
-  ["15", "60"],
-  ["15", "60", "240"],
-  ["15", "60", "240", "1D"],
-];
 export default {
+  name: "app",
   data() {
     return {
-      list: [],
-      RowCount: 2,
-      RowListDate,
-      addSymbol: "",
-      addSymbolCase: "",
+      showMode: "custom",
     };
   },
   components: {
-    KLine: () => {
-      return import("./views/KLine");
+    KLinePageA: () => {
+      return import("./views/KLinePageCustom");
     },
-  },
-  mounted() {
-    //从其他页面跳转过来的路由获取参数
-    const query = this.$route.query;
-    //如果路由中list存在
-    if (query.list) {
-      try {
-        this.list = JSON.parse(query.list);
-      } catch (e) {
-        this.list = [];
-      }
-    } else {
-      //如果路由中list不存在
-      this.list = [
-        {
-          symbol: query.name,
-          exchange: query.exchange,
-          interval: query.interval,
-        },
-      ];
-    }
-  },
-  computed: {
-    lineClassByCount() {
-      let lineType = "line-one";
-      switch (this.list.length) {
-        case 1:
-          lineType = "line-one";
-          break;
-        case 2:
-          lineType = "line-two";
-          break;
-        case 3:
-          lineType = "line-three";
-          break;
-        case 4:
-          lineType = "line-four";
-          break;
-        default:
-          lineType = "line-one";
-      }
-      return lineType;
+    KLinePage: () => {
+      return import("./views/KLinePageScreen");
     },
   },
   methods: {
-    changeLineCount(type) {
-      if (this.list.length >= 2 && type == "less") {
-        this.list.pop();
-      } else if (this.list.length <= 3 && type == "more") {
-        this.addSymbolCase = "addLine";
-        this.list.push({ symbol: this.addSymbol });
-      }
-    },
-    changeRowCount(type) {
-      if (this.RowCount >= 2 && type == "less") {
-        this.RowCount--;
-      } else if (this.RowCount <= 3 && type == "more") {
-        this.addSymbolCase = "addRow";
-        this.RowCount++;
-      }
-    },
-    //设置kline的延时创建时间,同时加载太多有可能会丢失样式覆盖
-    KLineDelayTime(index, SymbolIndex) {
-      switch (this.addSymbolCase) {
-        case "":
-          return index * 200 + SymbolIndex * 500;
-        case "addLine":
-          return index * 200;
-        case "addRow":
-          return SymbolIndex * 200;
-      }
-    },
-    //改变总主题
-    changeTheme(theme) {
-      for(let kLineItem of this.$refs.kLine) {
-        kLineItem.changeTheme(theme)
-      }
+    changeMode(type) {
+      console.log(type);
+      this.showMode = type;
     },
   },
 };
@@ -235,6 +123,4 @@ body {
     }
   }
 }
-
-
 </style>
