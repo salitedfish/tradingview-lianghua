@@ -9,12 +9,24 @@
         <span @click="changeRowCount('more')">加一列</span>
         <span @click="changeLineCount('less')">减一行</span>
         <span @click="changeLineCount('more')">加一行</span>
-        <input
-          type="text"
-          class="input-box"
-          placeholder="请输入要添加的币种..."
-          v-model="addSymbol"
-        />
+        <div class="search-box">
+          <input
+            type="text"
+            class="input-box"
+            placeholder="请输入要添加的币种..."
+            v-model="addSymbol"
+            @input="searchEvent()"
+          />
+          <ul class="search-list">
+            <li
+              v-for="item in this.addSearchList"
+              :key="item.symbol"
+              @click="checkoutSymbol(item.symbol)"
+            >
+              {{ item.symbol }}
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
     <!-- 通过list循环展示k线图 -->
@@ -45,6 +57,7 @@
 </template>
 
 <script>
+import searchConfig from "../service/searchConfig";
 const RowListDate = [
   ["15"],
   ["15", "60"],
@@ -52,7 +65,7 @@ const RowListDate = [
   ["15", "60", "240", "1D"],
 ];
 export default {
-  name: 'KLinePageCustom',
+  name: "KLinePageCustom",
   data() {
     return {
       list: [],
@@ -60,6 +73,7 @@ export default {
       RowListDate,
       addSymbol: "",
       addSymbolCase: "",
+      addSearchList: [],
     };
   },
   components: {
@@ -118,7 +132,7 @@ export default {
         this.addSymbolCase = "addLine";
         //添加行的时候如果没有填对应的symbol，则使用前一个symbol
         if (!this.addSymbol) {
-          const preSymbol = this.list[this.list.length-1].symbol
+          const preSymbol = this.list[this.list.length - 1].symbol;
           this.list.push({ symbol: preSymbol });
         } else {
           this.list.push({ symbol: this.addSymbol });
@@ -150,14 +164,33 @@ export default {
         kLineItem.changeTheme(theme);
       }
     },
-    //当K线的symbol改变时，对应index的list里面的对应项的symbol也改变，同时同一行的渲染的symbol都改变
+    //当K线的symbol改变时，对应index的list里面的对应项的symbol也改变，同时同一行的symbol变了导致key变了
     symbolChanged(param) {
       this.list[param.index].symbol = param.symbol;
-      console.log(this.list)
     },
-    changeMode(type){
-      this.$emit('changeMode',type)
-    }
+    changeMode(type) {
+      this.$emit("changeMode", type);
+    },
+    searchEvent() {
+      if (this.addSymbol) {
+        searchConfig
+          .getSymbolListBySearch({
+            query: this.addSymbol,
+            limit: 30,
+            type: "",
+            exchange: "",
+          })
+          .then((res) => {
+            this.addSearchList = res.data;
+          });
+      } else {
+        this.addSearchList = [];
+      }
+    },
+    checkoutSymbol(symbol) {
+      this.addSymbol = symbol;
+      this.addSearchList = [];
+    },
   },
 };
 </script>
@@ -192,11 +225,32 @@ body {
       span {
         padding: 0 5px;
       }
-      .input-box {
-        background-color: #131722;
-        border: 1px solid #787b86;
-        border-radius: 3px;
-        padding-left: 5px;
+      .search-box {
+        position: relative;
+        .input-box {
+          background-color: #131722;
+          border: 1px solid #787b86;
+          border-radius: 3px;
+          padding-left: 5px;
+        }
+        .search-list {
+          position: absolute;
+          top: 25px;
+          left: 0;
+          right: 0;
+          background-color: #131722;
+          border-radius: 3px;
+          color: #787b86;
+          opacity: 0.9;
+          li {
+            cursor: pointer;
+            border: 1px solid #787b86;
+            &:hover {
+              background-color: #787b86;
+              color: #131722;
+            }
+          }
+        }
       }
     }
     span {

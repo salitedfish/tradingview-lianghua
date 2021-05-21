@@ -15,16 +15,15 @@ export default {
     };
   },
   components: {
-    KLinePageA: () => {
-      return import("./views/KLinePageCustom");
+    KLinePageCustom: () => {
+      return import("./views/KLinePageCustom.vue");
     },
-    KLinePage: () => {
-      return import("./views/KLinePageScreen");
+    KLinePageScreen: () => {
+      return import("./views/KLinePageScreen.vue");
     },
   },
   methods: {
     changeMode(type) {
-      console.log(type);
       this.showMode = type;
     },
   },

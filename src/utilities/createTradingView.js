@@ -56,9 +56,7 @@ const createTradingView = (vm, config = {}) => {
             { text: "7d", resolution: "60", title: "7天" },
             { text: "3d", resolution: "15", title: "3天" },
             { text: "1d", resolution: "5", title: "1天" },
-        ]
-        ,
-
+        ],
         //设置禁用哪些特性
         disabled_features: [
             // "edit_buttons_in_legend",
@@ -82,13 +80,12 @@ const createTradingView = (vm, config = {}) => {
             // "legend_widget"
             // "show_chart_property_page"
             // 'header_chart_type'
+            'header_settings'
         ],
-
         //设置开启哪些特性
         enabled_features: [
             // "study_templates",
         ],
-
         overrides: {
             // "has_no_volume":false,
             "volumePaneSize":"small",
@@ -105,7 +102,6 @@ const createTradingView = (vm, config = {}) => {
             "scalesProperties.lineColor": "#767D99", //每个panel之间的分割线的颜色
             "scalesProperties.textColor": "#767D99",
             "scalesProperties.fontSize": 12,//改变坐标线的字体大小
-
 
             // 'paneProperties.legendProperties.showSeriesTitle': true, // 图表标题
             // 'mainSeriesProperties.lineStyle.color':'#fff',
@@ -131,10 +127,6 @@ const createTradingView = (vm, config = {}) => {
             "mainSeriesProperties.hollowCandleStyle.borderDownColor": "#F84960",
 
             "mainSeriesProperties.hollowCandleStyle.drawBorder": false,
-
-
-            
-
         },
 
         //统一设置指标的属性
