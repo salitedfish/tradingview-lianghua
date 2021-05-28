@@ -5,7 +5,7 @@ const createTradingView = (vm, config = {}) => {
     // console.log(vm.interval)
     // console.log(vm.xkey)
     const symbolInfo = vm.symbol
-        ? { name: vm.symbol, exchange: vm.exchange || "ZHAOBI" }
+        ? { name: vm.symbol, exchange: vm.exchange || "ZHAOBIBI" }
         : {
             name: "BTCUSDT",
             exchange: "ZHAOBI",
@@ -21,7 +21,7 @@ const createTradingView = (vm, config = {}) => {
         //周期，可以设置60s或60，没写单位代表60分钟，小时必须用分钟表示。用来设置每个K线间隔的时间
         interval: vm.interval || "60",
         //初始商品名
-        symbol: symbolInfo.name,
+        symbol: symbolInfo.name.toUpperCase(),
         //挂载的dom元素
         container_id: "kline_container_" + vm.xkey,
         // datafeed: new Datafeeds.UDFCompatibleDatafeed("http://172.16.103.31:15921/kdata",10000),

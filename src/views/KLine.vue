@@ -9,7 +9,7 @@ import { createTradingView } from "../utilities/createTradingView";
 import { createStudy } from "../utilities/createStudy";
 // import overrides from "../utilities/overrides";
 export default {
-  props: ["symbol", "interval", "exchange", "xkey", "createDelay",'yIndex','xIndex'],
+  props: ["symbol", "interval", "exchange", "xkey", "createDelay",'yIndex'],
   data() {
     return {
       widget: null,

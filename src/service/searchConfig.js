@@ -8,6 +8,13 @@ const searchConfig = {
             url:urlConfig.getSymbolListBySearch,
             params
         })
+    },
+    getSymbolListByRank:(params)=>{
+        return axios({
+            method:'get',
+            url:'rank/market/vol_sort',
+            params
+        })
     }
 }
 

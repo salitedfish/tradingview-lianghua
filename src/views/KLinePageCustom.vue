@@ -43,7 +43,6 @@
           :exchange="SymbolItem.exchange"
           :interval="item"
           :yIndex="SymbolIndex"
-          :xIndex="index"
           :xkey="SymbolItem.symbol + index.toString() + SymbolIndex.toString()"
           v-for="(item, index) in RowListDate[RowCount - 1]"
           :key="SymbolItem.symbol + item"
@@ -95,9 +94,7 @@ export default {
       //如果路由中list不存在
       this.list = [
         {
-          symbol: query.name,
-          exchange: query.exchange,
-          interval: query.interval,
+          symbol: 'BTCUSDT',
         },
       ];
     }
@@ -265,42 +262,33 @@ body {
       width: 100%;
       height: 100%;
       display: flex;
-      // flex-shrink: 1;
       &-item {
         height: 100%;
         flex: 1;
-        // width: 100%;
       }
     }
     .line-two {
-      /*border: 1px solid black;*/
       width: 100%;
       height: 50%;
       display: flex;
-      // flex-shrink: 1;
       &-item {
         height: 100%;
         flex: 1;
-        // width: 50%;
       }
     }
     .line-three {
-      /*border: 1px solid black;*/
       width: 100%;
       height: 33.333%;
       display: flex;
-      // flex-shrink: 1;
       &-item {
         height: 100%;
         flex: 1;
       }
     }
     .line-four {
-      /*border: 1px solid black;*/
       width: 100%;
       height: 25%;
       display: flex;
-      // flex-shrink: 1;
       &-item {
         height: 100%;
         flex: 1;
