@@ -153,12 +153,10 @@ export default {
             });
           } else {
             alert("未查询到数据");
-            // console.log("未查询到数据");
           }
-          // console.log(this.KLineData);
         })
         .catch((err) => {
-          console.log(err);
+          alert("网络异常~");
         });
       if (this.searchData.rank != "0") {
         this.searchInterval = setInterval(this.searchSymbolByRank, 3000);
