@@ -15,11 +15,9 @@ var HistoryProvider = /** @class */ (function () {
         if (symbolInfo.currency_code !== undefined) {
             requestParams.currencyCode = symbolInfo.currency_code;
         }
-
         return new Promise(function (resolve, reject) {
             _this._requester.sendRequest(_this._datafeedUrl, 'history', requestParams)
                 .then(function (response) {
-                    console.log('yes')
                 if (response.s !== 'ok' && response.s !== 'no_data') {
                     reject(response.errmsg);
                     return;
@@ -37,7 +35,8 @@ var HistoryProvider = /** @class */ (function () {
                     var ohlPresent = response.o !== undefined;
                     for (var i = 0; i < response.t.length; ++i) {
                         var barValue = {
-                            time: response.t[i] * 1000,
+                            // time: response.t[i] * 1000,
+                            time: resolution.indexOf('D') != -1 ? (response.t[i] + 86400) * 1000 : response.t[i] * 1000,
                             close: parseFloat(response.c[i]),
                             open: parseFloat(response.c[i]),
                             high: parseFloat(response.c[i]),
@@ -67,7 +66,6 @@ var HistoryProvider = /** @class */ (function () {
             });
         });
     };
-
     return HistoryProvider;
 }());
 export { HistoryProvider };

@@ -11,7 +11,6 @@ var UDFCompatibleDatafeed = /** @class */ (function (_super) {
         var quotesProvider = new QuotesProvider(datafeedURL, requester);
         _this = _super.call(this, datafeedURL, quotesProvider, requester, updateFrequency) || this;
         return _this;
-        
     }
     return UDFCompatibleDatafeed;
 }(UDFCompatibleDatafeedBase));

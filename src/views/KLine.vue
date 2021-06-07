@@ -9,7 +9,7 @@ import { createTradingView } from "../utilities/createTradingView";
 import { createStudy } from "../utilities/createStudy";
 // import overrides from "../utilities/overrides";
 export default {
-  props: ["symbol", "interval", "exchange", "xkey", "createDelay",'yIndex'],
+  props: ["symbol", "interval", "exchange", "xkey", "createDelay", "yIndex"],
   data() {
     return {
       widget: null,
@@ -21,6 +21,7 @@ export default {
     };
   },
   mounted() {
+    console.log("TradingView-version:", TradingView.version());
     let vm = this;
     // console.log(this.baseUrl);
     // const query=this.$route.query;
@@ -134,6 +135,13 @@ export default {
         //   vm.widget.chart().setChartType(9)
         // },4000)
 
+        vm.widget
+          .chart()
+          .onIntervalChanged()
+          .subscribe(null, (interval, timeframeObj) => {
+            
+          });
+
         //订阅商品更改时的事件
         vm.widget
           .chart()
@@ -141,9 +149,12 @@ export default {
           .subscribe(
             null,
             (Subscription) => {
-              // console.log(vm.widget.activeChart().symbolExt().description)
-              const changedSymbol = vm.widget.activeChart().symbolExt().description
-              this.$emit('symbolChanged',{symbol:changedSymbol,index:this.yIndex})
+              const changedSymbol = vm.widget.activeChart().symbolExt()
+                .description;
+              this.$emit("symbolChanged", {
+                symbol: changedSymbol,
+                index: this.yIndex,
+              });
               //当商品更改时，便利entityId，移除item
               entityId.forEach((item) => {
                 vm.widget.chart().removeEntity(item);
@@ -180,7 +191,6 @@ export default {
       }
 
       // this.widget.applyOverrides(overrides);
-
     },
   },
   beforeDestroy() {

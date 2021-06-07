@@ -7,22 +7,19 @@ function extractField(data, field, arrayIndex) {
     var value = data[field];
     return Array.isArray(value) ? value[arrayIndex] : value;
 }
-/**
- * This class implements interaction with UDF-compatible datafeed.
- * See UDF protocol reference at https://github.com/tradingview/charting_library/wiki/UDF
- */
-
+//这个是提供给图表库的数据库实例的类
 var UDFCompatibleDatafeedBase = /** @class */ (function () {
+    //构造函数，传入url，周期
     function UDFCompatibleDatafeedBase(datafeedURL, quotesProvider, requester, updateFrequency) {
         var _this = this;
         if (updateFrequency === void 0) { updateFrequency = 10 * 1000; }
         this._configuration = defaultConfiguration();
         this._symbolsStorage = null;
         this._datafeedURL = datafeedURL;
-        this._requester = requester;
-        this._historyProvider = new HistoryProvider(datafeedURL, this._requester);
         this._quotesProvider = quotesProvider;
-        this._dataPulseProvider = new DataPulseProvider(this._historyProvider, updateFrequency);
+        this._requester = requester;
+        this._historyProvider = new HistoryProvider(datafeedURL, this._requester); //这里面有底层的getbar函数，请求数据通过他来实现
+        this._dataPulseProvider = new DataPulseProvider(this._historyProvider, updateFrequency); //有底层的数据订阅和更新函数，但实际的数据请求还是通过historyprovider的getbar来实现
         this._quotesPulseProvider = new QuotesPulseProvider(this._quotesProvider);
         this._configurationReadyPromise = this._requestConfiguration()
             .then(function (configuration) {
@@ -32,12 +29,99 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
             _this._setupWithConfiguration(configuration);
         });
     }
+    //图表库会自己调用下列函数
     UDFCompatibleDatafeedBase.prototype.onReady = function (callback) {
         var _this = this;
         this._configurationReadyPromise.then(function () {
             callback(_this._configuration);
         });
     };
+    //查询币种时，图表库调用的函数
+    UDFCompatibleDatafeedBase.prototype.searchSymbols = function (userInput, exchange, symbolType, onResult) {
+        if (this._configuration.supports_search) {
+            var params = {
+                limit: 30 /* SearchItemsLimit */,
+                query: userInput.toUpperCase(),
+                type: symbolType,
+                exchange: exchange,
+            };
+            this._send('search', params)
+                .then(function (response) {
+                if (response.s !== undefined) {
+                    logMessage("UdfCompatibleDatafeed: search symbols error=" + response.errmsg);
+                    onResult([]);
+                    return;
+                }
+                onResult(response); //这是把请求的结果传递给图表库
+            })
+                .catch(function (reason) {
+                logMessage("UdfCompatibleDatafeed: Search symbols for '" + userInput + "' failed. Error=" + getErrorMessage(reason));
+                onResult([]);
+            });
+        }
+        else {
+            if (this._symbolsStorage === null) {
+                throw new Error('UdfCompatibleDatafeed: inconsistent configuration (symbols storage)');
+            }
+            this._symbolsStorage.searchSymbols(userInput, exchange, symbolType, 30 /* SearchItemsLimit */)
+                .then(onResult)
+                .catch(onResult.bind(null, []));
+        }
+    };
+    //通过币种获取币种信息时图表库调用的函数
+    UDFCompatibleDatafeedBase.prototype.resolveSymbol = function (symbolName, onResolve, onError, extension) {
+        logMessage('Resolve requested');
+        var currencyCode = extension && extension.currencyCode;
+        var resolveRequestStartTime = Date.now();
+        function onResultReady(symbolInfo) {
+            logMessage("Symbol resolved: " + (Date.now() - resolveRequestStartTime) + "ms");
+            onResolve(symbolInfo); //将获取到的币种信息传递给图表库
+        }
+        if (!this._configuration.supports_group_request) {
+            var params = {
+                symbol: symbolName,
+            };
+            if (currencyCode !== undefined) {
+                params.currencyCode = currencyCode;
+            }
+            this._send('symbols', params)
+                .then(function (response) {
+                if (response.s !== undefined) {
+                    onError('unknown_symbol');
+                }
+                else {
+                    onResultReady(response); //将获取到的币种信息传递给图表库
+                }
+            })
+                .catch(function (reason) {
+                logMessage("UdfCompatibleDatafeed: Error resolving symbol: " + getErrorMessage(reason));
+                onError('unknown_symbol');
+            });
+        }
+        else {
+            if (this._symbolsStorage === null) {
+                throw new Error('UdfCompatibleDatafeed: inconsistent configuration (symbols storage)');
+            }
+            this._symbolsStorage.resolveSymbol(symbolName, currencyCode).then(onResultReady).catch(onError);
+        }
+    };
+    //这个是获取币种历史数据时调用的函数，但其实底层的数据获取函数和订阅时调用的getbar是同一个
+    UDFCompatibleDatafeedBase.prototype.getBars = function (symbolInfo, resolution, rangeStartDate, rangeEndDate, onResult, onError) {
+        this._historyProvider.getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate)
+            .then(function (result) {
+            onResult(result.bars, result.meta);
+        })
+            .catch(onError);
+    };
+    //订阅数据更新的函数，图表库只是主动调用一次这个函数，底层实现在另外的文件，底层会循环调用回调，返回数据给图表库，如果用websocket，那么就是当服务器返回数据时才调用回调
+    UDFCompatibleDatafeedBase.prototype.subscribeBars = function (symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeededCallback) {
+        this._dataPulseProvider.subscribeBars(symbolInfo, resolution, onTick, listenerGuid);
+    };
+    //取消订阅数据更新的函数，底层实现在另外的文件
+    UDFCompatibleDatafeedBase.prototype.unsubscribeBars = function (listenerGuid) {
+        this._dataPulseProvider.unsubscribeBars(listenerGuid);
+    };
+    //下面几个先不管
     UDFCompatibleDatafeedBase.prototype.getQuotes = function (symbols, onDataCallback, onErrorCallback) {
         this._quotesProvider.getQuotes(symbols).then(onDataCallback).catch(onErrorCallback);
     };
@@ -131,86 +215,6 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
             logMessage("UdfCompatibleDatafeed: Fail to load server time, error=" + getErrorMessage(error));
         });
     };
-    UDFCompatibleDatafeedBase.prototype.searchSymbols = function (userInput, exchange, symbolType, onResult) {
-        if (this._configuration.supports_search) {
-            var params = {
-                limit: 30 /* SearchItemsLimit */,
-                query: userInput.toUpperCase(),
-                type: symbolType,
-                exchange: exchange,
-            };
-            this._send('search', params)
-                .then(function (response) {
-                if (response.s !== undefined) {
-                    logMessage("UdfCompatibleDatafeed: search symbols error=" + response.errmsg);
-                    onResult([]);
-                    return;
-                }
-                onResult(response);
-            })
-                .catch(function (reason) {
-                logMessage("UdfCompatibleDatafeed: Search symbols for '" + userInput + "' failed. Error=" + getErrorMessage(reason));
-                onResult([]);
-            });
-        }
-        else {
-            if (this._symbolsStorage === null) {
-                throw new Error('UdfCompatibleDatafeed: inconsistent configuration (symbols storage)');
-            }
-            this._symbolsStorage.searchSymbols(userInput, exchange, symbolType, 30 /* SearchItemsLimit */)
-                .then(onResult)
-                .catch(onResult.bind(null, []));
-        }
-    };
-    UDFCompatibleDatafeedBase.prototype.resolveSymbol = function (symbolName, onResolve, onError, extension) {
-        logMessage('Resolve requested');
-        var currencyCode = extension && extension.currencyCode;
-        var resolveRequestStartTime = Date.now();
-        function onResultReady(symbolInfo) {
-            logMessage("Symbol resolved: " + (Date.now() - resolveRequestStartTime) + "ms");
-            onResolve(symbolInfo);
-        }
-        if (!this._configuration.supports_group_request) {
-            var params = {
-                symbol: symbolName,
-            };
-            if (currencyCode !== undefined) {
-                params.currencyCode = currencyCode;
-            }
-            this._send('symbols', params)
-                .then(function (response) {
-                if (response.s !== undefined) {
-                    onError('unknown_symbol');
-                }
-                else {
-                    onResultReady(response);
-                }
-            })
-                .catch(function (reason) {
-                logMessage("UdfCompatibleDatafeed: Error resolving symbol: " + getErrorMessage(reason));
-                onError('unknown_symbol');
-            });
-        }
-        else {
-            if (this._symbolsStorage === null) {
-                throw new Error('UdfCompatibleDatafeed: inconsistent configuration (symbols storage)');
-            }
-            this._symbolsStorage.resolveSymbol(symbolName, currencyCode).then(onResultReady).catch(onError);
-        }
-    };
-    UDFCompatibleDatafeedBase.prototype.getBars = function (symbolInfo, resolution, rangeStartDate, rangeEndDate, onResult, onError) {
-        this._historyProvider.getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate)
-            .then(function (result) {
-            onResult(result.bars, result.meta);
-        })
-            .catch(onError);
-    };
-    UDFCompatibleDatafeedBase.prototype.subscribeBars = function (symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeededCallback) {
-        this._dataPulseProvider.subscribeBars(symbolInfo, resolution, onTick, listenerGuid);
-    };
-    UDFCompatibleDatafeedBase.prototype.unsubscribeBars = function (listenerGuid) {
-        this._dataPulseProvider.unsubscribeBars(listenerGuid);
-    };
     UDFCompatibleDatafeedBase.prototype._requestConfiguration = function () {
         return this._send('config')
             .catch(function (reason) {
@@ -218,6 +222,7 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
             return null;
         });
     };
+    //发送数据请求,其实所有的请求都是由同一个函数发送，只是调用的位置和参数不同
     UDFCompatibleDatafeedBase.prototype._send = function (urlPath, params) {
         return this._requester.sendRequest(this._datafeedURL, urlPath, params);
     };

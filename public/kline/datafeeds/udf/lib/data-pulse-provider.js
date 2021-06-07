@@ -1,11 +1,13 @@
 import { getErrorMessage, logMessage, } from './helpers';
+//datafeed实例
 var DataPulseProvider = /** @class */ (function () {
     function DataPulseProvider(historyProvider, updateFrequency) {
-        this._subscribers = {};
+        this._subscribers = {}; //订阅者对象列表
         this._requestsPending = 0;
         this._historyProvider = historyProvider;
-        setInterval(this._updateData.bind(this), updateFrequency);
+        setInterval(this._updateData.bind(this), updateFrequency); //定时调用数据更新
     }
+    //订阅数据更新
     DataPulseProvider.prototype.subscribeBars = function (symbolInfo, resolution, newDataCallback, listenerGuid) {
         if (this._subscribers.hasOwnProperty(listenerGuid)) {
             logMessage("DataPulseProvider: already has subscriber with id=" + listenerGuid);
@@ -23,6 +25,7 @@ var DataPulseProvider = /** @class */ (function () {
         delete this._subscribers[listenerGuid];
         logMessage("DataPulseProvider: unsubscribed for #" + listenerGuid);
     };
+    //定时调用更新数据函数（10秒）
     DataPulseProvider.prototype._updateData = function () {
         var _this = this;
         if (this._requestsPending > 0) {
@@ -31,6 +34,7 @@ var DataPulseProvider = /** @class */ (function () {
         this._requestsPending = 0;
         var _loop_1 = function (listenerGuid) {
             this_1._requestsPending += 1;
+            //给订阅者更新数据
             this_1._updateDataForSubscriber(listenerGuid)
                 .then(function () {
                 _this._requestsPending -= 1;
@@ -48,10 +52,8 @@ var DataPulseProvider = /** @class */ (function () {
     };
     DataPulseProvider.prototype._updateDataForSubscriber = function (listenerGuid) {
         var _this = this;
-        var subscriptionRecord = this._subscribers[listenerGuid];
+        var subscriptionRecord = this._subscribers[listenerGuid]; //根据订阅者的guid获取订阅对象
         var rangeEndTime = parseInt((Date.now() / 1000).toString());
-        // BEWARE: please note we really need 2 bars, not the only last one
-        // see the explanation below. `10` is the `large enough` value to work around holidays
         var rangeStartTime = rangeEndTime - periodLengthSeconds(subscriptionRecord.resolution, 10);
         return this._historyProvider.getBars(subscriptionRecord.symbolInfo, subscriptionRecord.resolution, rangeStartTime, rangeEndTime)
             .then(function (result) {
@@ -59,7 +61,6 @@ var DataPulseProvider = /** @class */ (function () {
         });
     };
     DataPulseProvider.prototype._onSubscriberDataReceived = function (listenerGuid, result) {
-        // means the subscription was cancelled while waiting for data
         if (!this._subscribers.hasOwnProperty(listenerGuid)) {
             logMessage("DataPulseProvider: Data comes for already unsubscribed subscription #" + listenerGuid);
             return;
@@ -74,8 +75,6 @@ var DataPulseProvider = /** @class */ (function () {
             return;
         }
         var isNewBar = subscriptionRecord.lastBarTime !== null && lastBar.time > subscriptionRecord.lastBarTime;
-        // Pulse updating may miss some trades data (ie, if pulse period = 10 secods and new bar is started 5 seconds later after the last update, the
-        // old bar's last 5 seconds trades will be lost). Thus, at fist we should broadcast old bar updates when it's ready.
         if (isNewBar) {
             if (bars.length < 2) {
                 throw new Error('Not enough bars in history for proper pulse update. Need at least 2.');
@@ -84,11 +83,12 @@ var DataPulseProvider = /** @class */ (function () {
             subscriptionRecord.listener(previousBar);
         }
         subscriptionRecord.lastBarTime = lastBar.time;
-        subscriptionRecord.listener(lastBar);
+        subscriptionRecord.listener(lastBar); //最终把最新的数据通过订阅对象上的回调函数更新
     };
     return DataPulseProvider;
 }());
 export { DataPulseProvider };
+//这个函数是根据周期来获取starttime的
 function periodLengthSeconds(resolution, requiredPeriodsCount) {
     var daysCount = 0;
     if (resolution === 'D' || resolution === '1D') {
@@ -101,9 +101,7 @@ function periodLengthSeconds(resolution, requiredPeriodsCount) {
         daysCount = 7 * requiredPeriodsCount;
     }
     else {
-        //如果resolution是分钟，也就是15、30、60等，那就执行下面这个
         daysCount = requiredPeriodsCount * parseInt(resolution) / (24 * 60);
     }
     return daysCount * 24 * 60 * 60;
 }
-

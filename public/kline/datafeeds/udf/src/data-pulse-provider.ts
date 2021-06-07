@@ -24,16 +24,18 @@ interface DataSubscribers {
 	[guid: string]: DataSubscriber;
 }
 
+//datafeed实例
 export class DataPulseProvider {
-	private readonly _subscribers: DataSubscribers = {};
+	private readonly _subscribers: DataSubscribers = {};//订阅者对象列表
 	private _requestsPending: number = 0;
-	private readonly _historyProvider: HistoryProvider;
+	private readonly _historyProvider: HistoryProvider;//请求的api
 
 	public constructor(historyProvider: HistoryProvider, updateFrequency: number) {
 		this._historyProvider = historyProvider;
-		setInterval(this._updateData.bind(this), updateFrequency);
+		setInterval(this._updateData.bind(this), updateFrequency);//定时调用数据更新
 	}
 
+	//订阅数据更新
 	public subscribeBars(symbolInfo: LibrarySymbolInfo, resolution: string, newDataCallback: SubscribeBarsCallback, listenerGuid: string): void {
 		if (this._subscribers.hasOwnProperty(listenerGuid)) {
 			logMessage(`DataPulseProvider: already has subscriber with id=${listenerGuid}`);
@@ -55,14 +57,16 @@ export class DataPulseProvider {
 		logMessage(`DataPulseProvider: unsubscribed for #${listenerGuid}`);
 	}
 
+	//定时调用更新数据函数（10秒）
 	private _updateData(): void {
 		if (this._requestsPending > 0) {
 			return;
 		}
 
 		this._requestsPending = 0;
-		for (const listenerGuid in this._subscribers) { // tslint:disable-line:forin
+		for (const listenerGuid in this._subscribers) { //便利订阅者
 			this._requestsPending += 1;
+			//给订阅者更新数据
 			this._updateDataForSubscriber(listenerGuid)
 				.then(() => {
 					this._requestsPending -= 1;
@@ -76,12 +80,10 @@ export class DataPulseProvider {
 	}
 
 	private _updateDataForSubscriber(listenerGuid: string): Promise<void> {
-		const subscriptionRecord = this._subscribers[listenerGuid];
+		const subscriptionRecord = this._subscribers[listenerGuid];//根据订阅者的guid获取订阅对象
 
 		const rangeEndTime = parseInt((Date.now() / 1000).toString());
 
-		// BEWARE: please note we really need 2 bars, not the only last one
-		// see the explanation below. `10` is the `large enough` value to work around holidays
 		const rangeStartTime = rangeEndTime - periodLengthSeconds(subscriptionRecord.resolution, 10);
 
 		return this._historyProvider.getBars(subscriptionRecord.symbolInfo, subscriptionRecord.resolution, rangeStartTime, rangeEndTime)
@@ -91,7 +93,6 @@ export class DataPulseProvider {
 	}
 
 	private _onSubscriberDataReceived(listenerGuid: string, result: GetBarsResult): void {
-		// means the subscription was cancelled while waiting for data
 		if (!this._subscribers.hasOwnProperty(listenerGuid)) {
 			logMessage(`DataPulseProvider: Data comes for already unsubscribed subscription #${listenerGuid}`);
 			return;
@@ -111,8 +112,6 @@ export class DataPulseProvider {
 
 		const isNewBar = subscriptionRecord.lastBarTime !== null && lastBar.time > subscriptionRecord.lastBarTime;
 
-		// Pulse updating may miss some trades data (ie, if pulse period = 10 secods and new bar is started 5 seconds later after the last update, the
-		// old bar's last 5 seconds trades will be lost). Thus, at fist we should broadcast old bar updates when it's ready.
 		if (isNewBar) {
 			if (bars.length < 2) {
 				throw new Error('Not enough bars in history for proper pulse update. Need at least 2.');
@@ -123,10 +122,11 @@ export class DataPulseProvider {
 		}
 
 		subscriptionRecord.lastBarTime = lastBar.time;
-		subscriptionRecord.listener(lastBar);
+		subscriptionRecord.listener(lastBar);//最终把最新的数据通过订阅对象上的回调函数更新
 	}
 }
 
+//这个函数是根据周期来获取starttime的
 function periodLengthSeconds(resolution: string, requiredPeriodsCount: number): number {
 	let daysCount = 0;
 

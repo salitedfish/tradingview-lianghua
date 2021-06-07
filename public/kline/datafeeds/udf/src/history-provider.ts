@@ -87,7 +87,8 @@ export class HistoryProvider {
 
 						for (let i = 0; i < response.t.length; ++i) {
 							const barValue: Bar = {
-								time: response.t[i] * 1000,
+								// time: response.t[i] * 1000,
+								time: resolution.indexOf('D') != -1? (response.t[i] + 86400) * 1000: response.t[i] * 1000,//测试语句，如果周期为天，那么传递给图表库的时间加一天
 								close: parseFloat(response.c[i]),
 								open: parseFloat(response.c[i]),
 								high: parseFloat(response.c[i]),

@@ -38,7 +38,7 @@ const createTradingView = (vm, config = {}) => {
         library_path: `${vm.baseUrl}kline/charting_library/`,
         locale: "zh",
         timezone: "Asia/Shanghai", // 设置时区
-        charts_storage_api_version: "1.3",
+        charts_storage_api_version: "1.1",
         client_id: "tradingview.com",
         user_id: "public_user_id",
         debug: false,

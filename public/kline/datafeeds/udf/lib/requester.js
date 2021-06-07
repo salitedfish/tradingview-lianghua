@@ -21,7 +21,6 @@ var Requester = /** @class */ (function () {
         if (this._headers !== undefined) {
             options.headers = this._headers;
         }
-        //这里是用的fetch进行请求
         return fetch(datafeedUrl + "/" + urlPath, options)
             .then(function (response) { return response.text(); })
             .then(function (responseTest) { return JSON.parse(responseTest); });

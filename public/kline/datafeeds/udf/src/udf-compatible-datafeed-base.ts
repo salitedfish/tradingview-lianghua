@@ -71,15 +71,12 @@ type UdfDatafeedTimescaleMark = UdfDatafeedMarkType<TimescaleMark>;
 
 function extractField<Field extends keyof Mark>(data: UdfDatafeedMark, field: Field, arrayIndex: number): Mark[Field];
 function extractField<Field extends keyof TimescaleMark>(data: UdfDatafeedTimescaleMark, field: Field, arrayIndex: number): TimescaleMark[Field];
-function extractField<Field extends keyof(TimescaleMark | Mark)>(data: UdfDatafeedMark | UdfDatafeedTimescaleMark, field: Field, arrayIndex: number): (TimescaleMark | Mark)[Field] {
+function extractField<Field extends keyof (TimescaleMark | Mark)>(data: UdfDatafeedMark | UdfDatafeedTimescaleMark, field: Field, arrayIndex: number): (TimescaleMark | Mark)[Field] {
 	const value = data[field];
 	return Array.isArray(value) ? value[arrayIndex] : value;
 }
 
-/**
- * This class implements interaction with UDF-compatible datafeed.
- * See UDF protocol reference at https://github.com/tradingview/charting_library/wiki/UDF
- */
+//这个是提供给图表库的数据库实例的类
 export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQuotesApi, IDatafeedChartApi {
 	protected _configuration: UdfCompatibleConfiguration = defaultConfiguration();
 	private readonly _datafeedURL: string;
@@ -95,13 +92,14 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 
 	private readonly _requester: Requester;
 
+	//构造函数，传入url，周期
 	protected constructor(datafeedURL: string, quotesProvider: IQuotesProvider, requester: Requester, updateFrequency: number = 10 * 1000) {
 		this._datafeedURL = datafeedURL;
-		this._requester = requester;
-		this._historyProvider = new HistoryProvider(datafeedURL, this._requester);
 		this._quotesProvider = quotesProvider;
+		this._requester = requester;
 
-		this._dataPulseProvider = new DataPulseProvider(this._historyProvider, updateFrequency);
+		this._historyProvider = new HistoryProvider(datafeedURL, this._requester);//这里面有底层的getbar函数，请求数据通过他来实现
+		this._dataPulseProvider = new DataPulseProvider(this._historyProvider, updateFrequency);//有底层的数据订阅和更新函数，但实际的数据请求还是通过historyprovider的getbar来实现
 		this._quotesPulseProvider = new QuotesPulseProvider(this._quotesProvider);
 
 		this._configurationReadyPromise = this._requestConfiguration()
@@ -114,12 +112,108 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 			});
 	}
 
+	//图表库会自己调用下列函数
 	public onReady(callback: OnReadyCallback): void {
 		this._configurationReadyPromise.then(() => {
 			callback(this._configuration);
 		});
 	}
 
+	//查询币种时，图表库调用的函数
+	public searchSymbols(userInput: string, exchange: string, symbolType: string, onResult: SearchSymbolsCallback): void {
+		if (this._configuration.supports_search) {
+			const params: RequestParams = {
+				limit: Constants.SearchItemsLimit,
+				query: userInput.toUpperCase(),
+				type: symbolType,
+				exchange: exchange,
+			};
+
+			this._send<UdfSearchSymbolsResponse | UdfErrorResponse>('search', params)
+				.then((response: UdfSearchSymbolsResponse | UdfErrorResponse) => {
+					if (response.s !== undefined) {
+						logMessage(`UdfCompatibleDatafeed: search symbols error=${response.errmsg}`);
+						onResult([]);
+						return;
+					}
+
+					onResult(response);//这是把请求的结果传递给图表库
+				})
+				.catch((reason?: string | Error) => {
+					logMessage(`UdfCompatibleDatafeed: Search symbols for '${userInput}' failed. Error=${getErrorMessage(reason)}`);
+					onResult([]);
+				});
+		} else {
+			if (this._symbolsStorage === null) {
+				throw new Error('UdfCompatibleDatafeed: inconsistent configuration (symbols storage)');
+			}
+
+			this._symbolsStorage.searchSymbols(userInput, exchange, symbolType, Constants.SearchItemsLimit)
+				.then(onResult)
+				.catch(onResult.bind(null, []));
+		}
+	}
+
+	//通过币种获取币种信息时图表库调用的函数
+	public resolveSymbol(symbolName: string, onResolve: ResolveCallback, onError: ErrorCallback, extension?: SymbolResolveExtension): void {
+		logMessage('Resolve requested');
+
+		const currencyCode = extension && extension.currencyCode;
+
+		const resolveRequestStartTime = Date.now();
+		function onResultReady(symbolInfo: LibrarySymbolInfo): void {
+			logMessage(`Symbol resolved: ${Date.now() - resolveRequestStartTime}ms`);
+			onResolve(symbolInfo);//将获取到的币种信息传递给图表库
+		}
+
+		if (!this._configuration.supports_group_request) {
+			const params: RequestParams = {
+				symbol: symbolName,
+			};
+			if (currencyCode !== undefined) {
+				params.currencyCode = currencyCode;
+			}
+
+			this._send<ResolveSymbolResponse | UdfErrorResponse>('symbols', params)
+				.then((response: ResolveSymbolResponse | UdfErrorResponse) => {
+					if (response.s !== undefined) {
+						onError('unknown_symbol');
+					} else {
+						onResultReady(response);//将获取到的币种信息传递给图表库
+					}
+				})
+				.catch((reason?: string | Error) => {
+					logMessage(`UdfCompatibleDatafeed: Error resolving symbol: ${getErrorMessage(reason)}`);
+					onError('unknown_symbol');
+				});
+		} else {
+			if (this._symbolsStorage === null) {
+				throw new Error('UdfCompatibleDatafeed: inconsistent configuration (symbols storage)');
+			}
+
+			this._symbolsStorage.resolveSymbol(symbolName, currencyCode).then(onResultReady).catch(onError);
+		}
+	}
+
+	//这个是获取币种历史数据时调用的函数，但其实底层的数据获取函数和订阅时调用的getbar是同一个
+	public getBars(symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, rangeStartDate: number, rangeEndDate: number, onResult: HistoryCallback, onError: ErrorCallback): void {
+		this._historyProvider.getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate)
+			.then((result: GetBarsResult) => {
+				onResult(result.bars, result.meta);
+			})
+			.catch(onError);
+	}
+
+	//订阅数据更新的函数，图表库只是主动调用一次这个函数，底层实现在另外的文件，底层会循环调用回调，返回数据给图表库，如果用websocket，那么就是当服务器返回数据时才调用回调
+	public subscribeBars(symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, onTick: SubscribeBarsCallback, listenerGuid: string, onResetCacheNeededCallback: () => void): void {
+		this._dataPulseProvider.subscribeBars(symbolInfo, resolution, onTick, listenerGuid);
+	}
+
+	//取消订阅数据更新的函数，底层实现在另外的文件
+	public unsubscribeBars(listenerGuid: string): void {
+		this._dataPulseProvider.unsubscribeBars(listenerGuid);
+	}
+	//下面几个先不管
 	public getQuotes(symbols: string[], onDataCallback: QuotesCallback, onErrorCallback: (msg: string) => void): void {
 		this._quotesProvider.getQuotes(symbols).then(onDataCallback).catch(onErrorCallback);
 	}
@@ -229,96 +323,6 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 			});
 	}
 
-	public searchSymbols(userInput: string, exchange: string, symbolType: string, onResult: SearchSymbolsCallback): void {
-		if (this._configuration.supports_search) {
-			const params: RequestParams = {
-				limit: Constants.SearchItemsLimit,
-				query: userInput.toUpperCase(),
-				type: symbolType,
-				exchange: exchange,
-			};
-
-			this._send<UdfSearchSymbolsResponse | UdfErrorResponse>('search', params)
-				.then((response: UdfSearchSymbolsResponse | UdfErrorResponse) => {
-					if (response.s !== undefined) {
-						logMessage(`UdfCompatibleDatafeed: search symbols error=${response.errmsg}`);
-						onResult([]);
-						return;
-					}
-
-					onResult(response);
-				})
-				.catch((reason?: string | Error) => {
-					logMessage(`UdfCompatibleDatafeed: Search symbols for '${userInput}' failed. Error=${getErrorMessage(reason)}`);
-					onResult([]);
-				});
-		} else {
-			if (this._symbolsStorage === null) {
-				throw new Error('UdfCompatibleDatafeed: inconsistent configuration (symbols storage)');
-			}
-
-			this._symbolsStorage.searchSymbols(userInput, exchange, symbolType, Constants.SearchItemsLimit)
-				.then(onResult)
-				.catch(onResult.bind(null, []));
-		}
-	}
-
-	public resolveSymbol(symbolName: string, onResolve: ResolveCallback, onError: ErrorCallback, extension?: SymbolResolveExtension): void {
-		logMessage('Resolve requested');
-
-		const currencyCode = extension && extension.currencyCode;
-
-		const resolveRequestStartTime = Date.now();
-		function onResultReady(symbolInfo: LibrarySymbolInfo): void {
-			logMessage(`Symbol resolved: ${Date.now() - resolveRequestStartTime}ms`);
-			onResolve(symbolInfo);
-		}
-
-		if (!this._configuration.supports_group_request) {
-			const params: RequestParams = {
-				symbol: symbolName,
-			};
-			if (currencyCode !== undefined) {
-				params.currencyCode = currencyCode;
-			}
-
-			this._send<ResolveSymbolResponse | UdfErrorResponse>('symbols', params)
-				.then((response: ResolveSymbolResponse | UdfErrorResponse) => {
-					if (response.s !== undefined) {
-						onError('unknown_symbol');
-					} else {
-						onResultReady(response);
-					}
-				})
-				.catch((reason?: string | Error) => {
-					logMessage(`UdfCompatibleDatafeed: Error resolving symbol: ${getErrorMessage(reason)}`);
-					onError('unknown_symbol');
-				});
-		} else {
-			if (this._symbolsStorage === null) {
-				throw new Error('UdfCompatibleDatafeed: inconsistent configuration (symbols storage)');
-			}
-
-			this._symbolsStorage.resolveSymbol(symbolName, currencyCode).then(onResultReady).catch(onError);
-		}
-	}
-
-	public getBars(symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, rangeStartDate: number, rangeEndDate: number, onResult: HistoryCallback, onError: ErrorCallback): void {
-		this._historyProvider.getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate)
-			.then((result: GetBarsResult) => {
-				onResult(result.bars, result.meta);
-			})
-			.catch(onError);
-	}
-
-	public subscribeBars(symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, onTick: SubscribeBarsCallback, listenerGuid: string, onResetCacheNeededCallback: () => void): void {
-		this._dataPulseProvider.subscribeBars(symbolInfo, resolution, onTick, listenerGuid);
-	}
-
-	public unsubscribeBars(listenerGuid: string): void {
-		this._dataPulseProvider.unsubscribeBars(listenerGuid);
-	}
-
 	protected _requestConfiguration(): Promise<UdfCompatibleConfiguration | null> {
 		return this._send<UdfCompatibleConfiguration>('config')
 			.catch((reason?: string | Error) => {
@@ -327,6 +331,7 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 			});
 	}
 
+	//发送数据请求,其实所有的请求都是由同一个函数发送，只是调用的位置和参数不同
 	private _send<T>(urlPath: string, params?: RequestParams): Promise<T> {
 		return this._requester.sendRequest<T>(this._datafeedURL, urlPath, params);
 	}
