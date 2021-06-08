@@ -187,6 +187,7 @@ export default {
     border-bottom: 1px solid #787b86;
     .center-container {
       width: 50%;
+      min-width: 600px;
       height: 100%;
       margin: 0 auto;
       display: flex;

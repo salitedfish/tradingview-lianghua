@@ -219,6 +219,7 @@ body {
       display: flex;
       justify-content: space-around;
       align-items: center;
+      min-width: 1000px;
       span {
         padding: 0 5px;
       }
