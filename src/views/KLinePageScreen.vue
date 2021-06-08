@@ -137,27 +137,31 @@ export default {
         default:
           params.volume_to = "";
       }
-      searchConfig
-        .getSymbolListByRank(params)
-        .then((res) => {
-          // console.log(res.data);
+      if (params.limit == "0") {
+        this.KLineData = [];
+      } else {
+        searchConfig
+          .getSymbolListByRank(params)
+          .then((res) => {
+            // console.log(res.data);
+            //这是把数据处理成渲染需要的二维数组格式
+            if (res.data.data.items) {
+              // 如果过滤得到的数据是空的，那就去掉
+              this.KLineData = rankDataMap(
+                this.searchData.rank,
+                res.data.data.items
+              ).filter((item) => {
+                return item.length > 0;
+              });
+            } else {
+              alert("未查询到数据");
+            }
+          })
+          .catch((err) => {
+            alert("网络异常~");
+          });
+      }
 
-          //这是把数据处理成渲染需要的二维数组格式
-          if (res.data.data.items) {
-            // 如果过滤得到的数据是空的，那就去掉
-            this.KLineData = rankDataMap(
-              this.searchData.rank,
-              res.data.data.items
-            ).filter((item) => {
-              return item.length > 0;
-            });
-          } else {
-            alert("未查询到数据");
-          }
-        })
-        .catch((err) => {
-          alert("网络异常~");
-        });
       if (this.searchData.rank != "0") {
         this.searchInterval = setInterval(this.searchSymbolByRank, 3000);
       }
