@@ -20,10 +20,10 @@
           <ul class="search-list">
             <li
               v-for="item in this.addSearchList"
-              :key="item.symbol"
+              :key="item.symbol+item.exchange"
               @click="checkoutSymbol(item.symbol)"
             >
-              {{ item.symbol }}
+              {{ item.symbol }} -- {{item.exchange}}
             </li>
           </ul>
         </div>
