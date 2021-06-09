@@ -39,7 +39,7 @@
             class="select-content"
             v-model="searchData.rank"
           >
-            <option value="0">{{ "0" }}</option>
+            <option value="0">{{ "" }}</option>
             <option value="4">{{ "4" }}</option>
             <option value="6">{{ "6" }}</option>
             <option value="9">{{ "9" }}</option>
