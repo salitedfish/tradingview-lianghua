@@ -48,6 +48,7 @@
           </select>
         </div>
         <span @click="searchSymbolByRank()">查找</span>
+        <span @click="clearKLine()">清空</span>
       </div>
     </div>
     <div class="KLineBox">
@@ -111,12 +112,15 @@ export default {
   methods: {
     searchSymbolByRank() {
       clearInterval(this.searchInterval);
+      if (this.searchData.rank == "0") {
+        return;
+      }
       const params = {};
       params.limit = this.searchData.rank;
       params.volume_from = this.searchData.volume;
       params.exchange = "huobi";
       params.type = "spot";
-      params.period = "1day"; //默认是24小时的成交量
+      params.period = "1day";
       //根据volumeFrom获取volumeTo
       switch (this.searchData.volume) {
         case "50000000":
@@ -137,38 +141,37 @@ export default {
         default:
           params.volume_to = "";
       }
-      if (params.limit == "0") {
-        this.KLineData = [];
-      } else {
-        searchConfig
-          .getSymbolListByRank(params)
-          .then((res) => {
-            // console.log(res.data);
-            //这是把数据处理成渲染需要的二维数组格式
-            if (res.data.data.items) {
-              // 如果过滤得到的数据是空的，那就去掉
-              this.KLineData = rankDataMap(
-                this.searchData.rank,
-                res.data.data.items
-              ).filter((item) => {
-                return item.length > 0;
-              });
-            } else {
-              alert("未查询到数据");
-            }
-          })
-          .catch((err) => {
-            alert("网络异常~");
-          });
-      }
 
-      if (this.searchData.rank != "0") {
-        this.searchInterval = setInterval(this.searchSymbolByRank, 3000);
-      }
+      searchConfig
+        .getSymbolListByRank(params)
+        .then((res) => {
+          //这是把数据处理成渲染需要的二维数组格式
+          if (res.data.data.items) {
+            // 如果过滤得到的数据是空的，为了flex布局自适应宽度，就去掉
+            this.KLineData = rankDataMap(
+              this.searchData.rank,
+              res.data.data.items
+            ).filter((item) => {
+              return item.length > 0;
+            });
+          } else {
+            alert("未查询到数据");
+          }
+        })
+        .catch((err) => {
+          alert("网络异常~");
+        });
+
+      this.searchInterval = setInterval(this.searchSymbolByRank, 3000);
     },
     //这个是用来切换到自定义模式
     changeMode(type) {
       this.$emit("changeMode", type);
+    },
+    clearKLine() {
+      this.KLineData = [];
+      this.searchData.rank = "0";
+      this.searchData.volume = "";
     },
   },
 };

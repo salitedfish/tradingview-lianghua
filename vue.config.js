@@ -14,7 +14,7 @@ module.exports={
         }
       },
       '/rank': {
-        target: "http://119.8.239.24:18081",
+        target: "http://119.8.239.24:18080",
         pathRewrite: {
           "^/rank": ''
         }
