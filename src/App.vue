@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <k-line-page-custom @changeMode="changeMode" v-show="showMode == 'custom'">
+    <k-line-page-custom @changeMode="changeMode" v-if="showMode == 'custom'">
     </k-line-page-custom>
-    <k-line-page-screen @changeMode="changeMode" v-show="showMode == 'screen'"></k-line-page-screen>
+    <k-line-page-screen @changeMode="changeMode" v-if="showMode == 'screen'"></k-line-page-screen>
   </div>
 </template>
 

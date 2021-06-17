@@ -5,7 +5,12 @@
         <span @click="changeMode('custom')">筛选模式</span>
         <div class="select-box">
           <span class="select-title">周期：</span>
-          <select name="周期" id="" class="select-content" v-model="interval">
+          <select
+            name="周期"
+            id=""
+            class="select-content"
+            v-model="interval"
+          >
             <option value="5">{{ "5分钟" }}</option>
             <option value="15">{{ "15分钟" }}</option>
             <option value="60">{{ "1小时" }}</option>
@@ -23,11 +28,11 @@
             v-model="searchData.volume"
           >
             <option value="">{{ "" }}</option>
-            <option value="1000000000">{{ "10亿 ~ 无限" }}</option>
-            <option value="500000000">{{ "5亿 ~ 10亿" }}</option>
-            <option value="200000000">{{ "2亿 ~ 5亿" }}</option>
-            <option value="100000000">{{ "1亿 ~ 2亿" }}</option>
-            <option value="50000000">{{ "0.5亿 ~ 1亿" }}</option>
+            <option value="1000000000">{{ "> 10亿" }}</option>
+            <option value="500000000">{{ "> 5亿" }}</option>
+            <option value="200000000">{{ "> 2亿" }}</option>
+            <option value="100000000">{{ "> 1亿" }}</option>
+            <option value="50000000">{{ "> 0.5亿" }}</option>
           </select>
         </div>
 
@@ -61,7 +66,7 @@
         <div
           class="KLineRowBox"
           v-for="itemB in itemA"
-          :key="itemB.symbol + interval"
+          :key="itemB.symbol"
         >
           <k-line
             class="item"
@@ -122,25 +127,25 @@ export default {
       params.type = "spot";
       params.period = "1day";
       //根据volumeFrom获取volumeTo
-      switch (this.searchData.volume) {
-        case "50000000":
-          params.volume_to = "100000000";
-          break;
-        case "100000000":
-          params.volume_to = "200000000";
-          break;
-        case "200000000":
-          params.volume_to = "500000000";
-          break;
-        case "500000000":
-          params.volume_to = "1000000000";
-          break;
-        case "1000000000":
-          params.volume_to = "";
-          break;
-        default:
-          params.volume_to = "";
-      }
+      // switch (this.searchData.volume) {
+      //   case "50000000":
+      //     params.volume_to = "100000000";
+      //     break;
+      //   case "100000000":
+      //     params.volume_to = "200000000";
+      //     break;
+      //   case "200000000":
+      //     params.volume_to = "500000000";
+      //     break;
+      //   case "500000000":
+      //     params.volume_to = "1000000000";
+      //     break;
+      //   case "1000000000":
+      //     params.volume_to = "";
+      //     break;
+      //   default:
+      //     params.volume_to = "";
+      // }
 
       searchConfig
         .getSymbolListByRank(params)

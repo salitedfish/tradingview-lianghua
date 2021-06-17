@@ -365,6 +365,7 @@ function defaultConfiguration(): UdfCompatibleConfiguration {
 			'15' as ResolutionString,
 			'30' as ResolutionString,
 			'60' as ResolutionString,
+			// 'D' as ResolutionString,
 			'1D' as ResolutionString,
 			'1W' as ResolutionString,
 			'1M' as ResolutionString,

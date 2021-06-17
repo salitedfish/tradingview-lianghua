@@ -56,7 +56,7 @@ export class HistoryProvider {
 	public getBars(symbolInfo: LibrarySymbolInfo, resolution: string, rangeStartDate: number, rangeEndDate: number): Promise<GetBarsResult> {
 		const requestParams: RequestParams = {
 			symbol: symbolInfo.ticker || '',
-			resolution: resolution,
+			resolution: resolution == '1D'? 'D':resolution,
 			from: rangeStartDate,
 			to: rangeEndDate,
 		};
@@ -88,21 +88,21 @@ export class HistoryProvider {
 						for (let i = 0; i < response.t.length; ++i) {
 							const barValue: Bar = {
 								// time: response.t[i] * 1000,
-								time: resolution.indexOf('D') != -1? (response.t[i] + 86400) * 1000: response.t[i] * 1000,//测试语句，如果周期为天，那么传递给图表库的时间加一天
-								close: parseFloat(response.c[i]),
-								open: parseFloat(response.c[i]),
-								high: parseFloat(response.c[i]),
-								low: parseFloat(response.c[i]),
+								time: resolution == '1D' && symbolInfo.ticker?.indexOf('HOLD') == -1 ? (response.t[i] + 86400) * 1000: response.t[i] * 1000,//fix bug
+								close: symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat(response.c[i]) : (0-parseFloat(response.c[i])),
+								open: symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat(response.c[i]) : (0-parseFloat(response.c[i])),
+								high: symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat(response.c[i]) : (0-parseFloat(response.c[i])),
+								low: symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat(response.c[i]) : (0-parseFloat(response.c[i])),
 							};
 
 							if (ohlPresent) {
-								barValue.open = parseFloat((response as HistoryFullDataResponse).o[i]);
-								barValue.high = parseFloat((response as HistoryFullDataResponse).h[i]);
-								barValue.low = parseFloat((response as HistoryFullDataResponse).l[i]);
+								barValue.open = symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat((response as HistoryFullDataResponse).o[i]) : (0-parseFloat((response as HistoryFullDataResponse).o[i]));
+								barValue.high = symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat((response as HistoryFullDataResponse).h[i]) : (0-parseFloat((response as HistoryFullDataResponse).h[i]));
+								barValue.low = symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat((response as HistoryFullDataResponse).l[i]) : (0-parseFloat((response as HistoryFullDataResponse).l[i]));
 							}
 
 							if (volumePresent) {
-								barValue.volume = parseFloat((response as HistoryFullDataResponse).v[i]);
+								barValue.volume = symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat((response as HistoryFullDataResponse).v[i]) : (0-parseFloat((response as HistoryFullDataResponse).v[i]));
 							}
 
 							bars.push(barValue);

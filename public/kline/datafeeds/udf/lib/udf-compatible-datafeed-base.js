@@ -252,6 +252,7 @@ function defaultConfiguration() {
             '15',
             '30',
             '60',
+            // 'D' as ResolutionString,
             '1D',
             '1W',
             '1M',

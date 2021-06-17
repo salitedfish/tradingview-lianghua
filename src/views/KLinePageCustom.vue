@@ -3,6 +3,14 @@
     <div id="banner-box">
       <div class="center-container">
         <span @click="changeMode('screen')">自定义模式</span>
+        <span
+          @click="showExchange = 'zhaobi'"
+          v-if="showExchange == 'huobi'"
+        >火币</span>
+        <span
+          @click="showExchange = 'huobi'"
+          v-if="showExchange == 'zhaobi'"
+        >找币</span>
         <span @click="changeTheme('light')">明亮</span>
         <span @click="changeTheme('dark')">暗黑</span>
         <span @click="changeRowCount('less')">减一列</span>
@@ -30,7 +38,10 @@
       </div>
     </div>
     <!-- 通过list循环展示k线图 -->
-    <div id="kline-box">
+    <div
+      class="kline-box huobiBox"
+      v-if="showExchange == 'huobi'"
+    >
       <div
         v-for="(SymbolItem, SymbolIndex) in list"
         :key="SymbolIndex"
@@ -50,6 +61,30 @@
           @symbolChanged="symbolChanged"
           ref="kLine"
         ></k-line>
+      </div>
+    </div>
+    <div
+      class="kline-box zhaobiBox"
+      v-if="showExchange == 'zhaobi'"
+    >
+      <div
+        v-for="(SymbolItem, SymbolIndex) in list"
+        :key="SymbolIndex"
+        :class="lineClassByCount"
+      >
+        <k-line-b
+          :class="lineClassByCount + '-item'"
+          :symbol="SymbolItem.symbol"
+          :exchange="SymbolItem.exchange"
+          :interval="item"
+          :yIndex="SymbolIndex"
+          :xkey="SymbolItem.symbol + index.toString() + SymbolIndex.toString()"
+          v-for="(item, index) in RowListDate[RowCount - 1]"
+          :key="SymbolItem.symbol + item"
+          :createDelay="KLineDelayTime(index, SymbolIndex)"
+          @symbolChanged="symbolChanged"
+          ref="kLine"
+        ></k-line-b>
       </div>
     </div>
   </div>
@@ -73,11 +108,15 @@ export default {
       addSymbol: "",
       addSymbolCase: "",
       addSearchList: [],
+      showExchange: "huobi",
     };
   },
   components: {
     KLine: () => {
       return import("./KLine");
+    },
+    KLineB: () => {
+      return import("./KlineB.vue");
     },
   },
   mounted() {
@@ -94,7 +133,7 @@ export default {
       //如果路由中list不存在
       this.list = [
         {
-          symbol: 'BTCUSDT',
+          symbol: "BTCUSDT",
         },
       ];
     }
@@ -169,14 +208,21 @@ export default {
       this.$emit("changeMode", type);
     },
     searchEvent() {
-      if (this.addSymbol) {
+      const params = {
+        query: this.addSymbol,
+        limit: 30,
+        type: "",
+        exchange: "",
+      };
+      if (this.addSymbol && this.showExchange == "huobi") {
         searchConfig
-          .getSymbolListBySearch({
-            query: this.addSymbol,
-            limit: 30,
-            type: "",
-            exchange: "",
-          })
+          .getSymbolListBySearch(params)
+          .then((res) => {
+            this.addSearchList = res.data;
+          });
+      } else if (this.addSymbol && this.showExchange == "zhaobi") {
+        searchConfig
+          .getZhaobiSymbolListBySearch(params)
           .then((res) => {
             this.addSearchList = res.data;
           });
@@ -257,7 +303,7 @@ body {
       border-radius: 3px;
     }
   }
-  #kline-box {
+  .kline-box {
     height: 96%;
     .line-one {
       width: 100%;

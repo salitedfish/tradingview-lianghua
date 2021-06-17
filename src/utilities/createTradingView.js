@@ -19,6 +19,7 @@ const createTradingView = (vm, config = {}) => {
         // width: "100%",
         // height: "100%",
         //周期，可以设置60s或60，没写单位代表60分钟，小时必须用分钟表示。用来设置每个K线间隔的时间
+        // interval:  "1D",
         interval: vm.interval || "60",
         //初始商品名
         symbol: symbolInfo.name.toUpperCase(),
@@ -27,7 +28,7 @@ const createTradingView = (vm, config = {}) => {
         // datafeed: new Datafeeds.UDFCompatibleDatafeed("http://172.16.103.31:15921/kdata",10000),
         //采用接口提供数据
         datafeed: new Datafeeds.UDFCompatibleDatafeed(
-            "/api",
+            vm.DIYExchange,
             // "https://api.33.cn/kdata",
             // "http://47.56.83.226:5062",//GoLang 
             // "http://119.8.239.24:5062",//PHP
@@ -57,6 +58,108 @@ const createTradingView = (vm, config = {}) => {
             { text: "3d", resolution: "15", title: "3天" },
             { text: "1d", resolution: "5", title: "1天" },
         ],
+        custom_indicators_getter: function (PineJS) {
+            return Promise.resolve([
+                {
+                    // 将<study name>替换为您的指标名称
+                    // 它将由图表库内部使用
+                    name: "holdKLine",
+                    metainfo: {
+                        "_metainfoVersion": 40,
+                        "id": "holdKLine@tv-basicstudies-1",
+                        "scriptIdPart": "",
+                        "name": "holdKLine",
+                        // 此说明将显示在指标窗口中
+                        // 当调用createStudy方法时，它也被用作“name”参数
+                        "description": "holdKLine",
+                        // 该描述将显示在图表上
+                        "shortDescription": "holdKLine",
+                        "is_hidden_study": true,
+                        "is_price_study": false,
+                        "isCustomIndicator": true,
+                        "plots": [{ "id": "plot_0", "type": "line" }],
+                        "defaults": {
+                            "styles": {
+                                "plot_0": {
+                                    "linestyle": 0,
+                                    "visible": true,
+                                    // 绘图线宽度
+                                    "linewidth": 1,
+                                    // 绘制类型:
+                                    //    1 - 直方图
+                                    //    2 - 线形图
+                                    //    3 - 十字指针
+                                    //    4 - 山形图
+                                    //    5 - 柱状图
+                                    //    6 - 圆圈图
+                                    //    7 - 中断线
+                                    //    8 - 中断区块
+                                    "plottype":2,
+                                    // 显示价格线?
+                                    "trackPrice": true,
+                                    // 绘制透明度，百分比。
+                                    "transparency": 40,
+                                    // 以#RRGGBB格式绘制颜色
+                                    "color": "#880000"
+                                }
+                            },
+                            // 指标输出值的精度
+                            // (小数点后的位数)。
+                            "precision": 2,
+                            "inputs": {}
+                        },
+                        "styles": {
+                            "plot_0": {
+                                // 输出的名字将在样式窗口显示
+                                "title": "holdKline",
+                                "histogramBase": 0,
+                            }
+                        },
+                        "inputs": [],
+                    },
+                    constructor: function () {
+                        this.init = function (context, inputCallback) {
+                            this._context = context;
+                            this._input = inputCallback;
+                            // 定义要绘制的商品。
+                            // 商品应该是一个字符串。
+                            // 您可以使用PineJS.Std.ticker（this._context）获取所选商品的代码。
+                            // 例,
+                            //    var symbol = "AAPL";
+                            //    var symbol = "#EQUITY";
+                            //    var symbol = PineJS.Std.ticker(this._context) + "#TEST";
+                            var symbol = "HOLD:BTCUSDT";
+                            this._context.new_sym(symbol, PineJS.Std.period(this._context), PineJS.Std.period(this._context));
+                        };
+                        this.main = function (context, inputCallback) {
+                            // window.console.log(this._context)
+                            this._context = context;
+                            this._input = inputCallback;
+                            this._context.select_sym(1);
+                            // 您可以在PineJS.Std对象中使用以下内置函数：
+                            //     open, high, low, close
+                            //    hl2, hlc3, ohlc4
+                            var o = PineJS.Std.open(this._context)
+                            var h = PineJS.Std.high(this._context)
+                            var l = PineJS.Std.low(this._context)
+                            var c = PineJS.Std.close(this._context);
+                            // console.log('ooooooooooooo',o)
+                            // console.log('hhhhhhhhhhhhh',h)
+                            // console.log('lllllllllllll',l)
+                            // console.log('ccccccccccccc',c)
+                            return [0 - o, 0 - h, 0 - l, 0 - c];
+                            return {
+                                open: [0 - o],
+                                high: [0 - h],
+                                low: [0 - l],
+                                close: [0 - c]
+                            }
+
+                        }
+                    }
+                }
+            ])
+        },
         //设置禁用哪些特性
         disabled_features: [
             // "edit_buttons_in_legend",
@@ -88,8 +191,8 @@ const createTradingView = (vm, config = {}) => {
         ],
         overrides: {
             // "has_no_volume":false,
-            "volumePaneSize":"small",
-            "paneProperties.legendProperties.showLegend": false,
+            // "volumePaneSize": "small",
+            // "paneProperties.legendProperties.showLegend": false,
 
             "mainSeriesProperties.style": 1, // k线图
             // "paneProperties.background": "rgb(27,34,63)", // 背景色透明
@@ -133,7 +236,7 @@ const createTradingView = (vm, config = {}) => {
         studies_overrides: {
             "volume.volume.color.0": "rgba(180,82,94,.6)",//设置成交量的颜色，0代表跌的时候
             "volume.volume.color.1": "rgba(95,189,123,.6)",//设置成交量颜色，1代表涨的时候
-            
+            // "holdKline.style": 2,
             // "volume.volume.transparency": 100
             // 对比K线样式
             "Overlay.style": 1, // k线图
@@ -149,6 +252,7 @@ const createTradingView = (vm, config = {}) => {
             // "bollinger bands.lower.linewidth": 10,
             // "Moving Average.plot.color": "#333333",//设置全部均线的默认颜色，后续每次创建均线指标时可以覆盖
         },
+
     }
     //将用户配置与默认参数合并
     const currentConfig = {}
