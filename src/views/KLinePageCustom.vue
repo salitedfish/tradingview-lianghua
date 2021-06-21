@@ -265,7 +265,7 @@ body {
       display: flex;
       justify-content: space-around;
       align-items: center;
-      min-width: 1000px;
+      min-width: 600px;
       span {
         padding: 0 5px;
       }

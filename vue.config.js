@@ -13,8 +13,9 @@ module.exports = {
           '^/api': ''
         }
       },
+      //代理到正式的筛选接口
       '/rank': {
-        target: "http://119.8.239.24:18080",
+        target: "http://123.60.6.107:18079",
         pathRewrite: {
           "^/rank": ''
         }
