@@ -52,6 +52,19 @@
             <option value="16">{{ "16" }}</option>
           </select>
         </div>
+
+        <div class="select-box">
+          <span class="select-title">数据源：</span>
+          <select
+            name="排名"
+            id=""
+            class="select-content"
+            v-model="searchData.origin"
+          >
+            <option value="spot">{{ "币币" }}</option>
+            <option value="futures">{{ "合约" }}</option>
+          </select>
+        </div>
         <span @click="searchSymbolByRank()">查找</span>
         <span @click="clearKLine()">清空</span>
       </div>
@@ -94,6 +107,7 @@ export default {
       searchData: {
         volume: "",
         rank: "4",
+        origin: "spot"
       },
       interval: "15",
       KLineData: [[{ symbol: "BTCUSDT" }]],
@@ -124,7 +138,7 @@ export default {
       params.limit = this.searchData.rank;
       params.volume_from = this.searchData.volume;
       params.exchange = "huobi";
-      params.type = "spot";
+      params.type = this.searchData.origin;
       params.period = "1day";
       //根据volumeFrom获取volumeTo
       // switch (this.searchData.volume) {
