@@ -32,7 +32,7 @@ export class DataPulseProvider {
 
 	public constructor(historyProvider: HistoryProvider, updateFrequency: number) {
 		this._historyProvider = historyProvider;
-		setInterval(this._updateData.bind(this), updateFrequency);//定时调用数据更新
+		setInterval(this._updateData.bind(this), updateFrequency);//定时调用数据更新(updateFrequency默认为10秒)
 	}
 
 	//订阅数据更新
