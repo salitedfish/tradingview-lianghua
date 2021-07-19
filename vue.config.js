@@ -8,7 +8,8 @@ module.exports = {
         // PHP接口
         // target:'http://119.8.239.24:5062',
         // golang接口
-        target: 'http://119.8.239.24:5062',
+        // target: 'http://119.8.239.24:5062',
+        target:'http://119.8.37.55:5062',
         pathRewrite: {
           '^/api': ''
         }
