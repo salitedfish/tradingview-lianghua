@@ -89,6 +89,7 @@ export default {
         createStudy(vm.widget, "Bollinger Bands", false, false, [50, 2]);
         createStudy(vm.widget, "Bollinger Bands", false, false, [100, 2]);
         // createStudy(vm.widget, "holdKLine", false, true);
+        //这里选择overlay指标，该指标参数就是symbol
         createStudy(vm.widget, "Overlay", false, false,['HOLD:'+this.symbol]);
         // this.config[symbolInfo.exchange] &&
         //   this.config[symbolInfo.exchange].forEach((val) => {

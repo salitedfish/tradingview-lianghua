@@ -46,7 +46,7 @@ const createTradingView = (vm, config = {}) => {
         // loading_screen: { backgroundColor: "#000000", foregroundColor: "#000000", },//todo:do it
         allow_symbol_change: true,
         theme: "Light",
-        timeframe: "1w",//设置初始的时间展示范围
+        timeframe: "720",//设置初始的时间展示范围
         // toolbar_bg: "#FFF",
         //点击改变周期，将周期转化为resolution写的周期
         time_frames: [

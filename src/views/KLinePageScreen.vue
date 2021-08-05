@@ -2,7 +2,7 @@
   <div id="app">
     <div id="banner-box">
       <div class="center-container">
-        <span @click="changeMode('custom')">筛选模式</span>
+        <span @click="changeMode('custom')" class="btn">筛选模式</span>
         <div class="select-box">
           <span class="select-title">周期：</span>
           <select
@@ -65,8 +65,8 @@
             <option value="futures">{{ "合约" }}</option>
           </select>
         </div>
-        <span @click="searchSymbolByRank()">查找</span>
-        <span @click="clearKLine()">清空</span>
+        <span @click="searchSymbolByRank()" class="btn">查找</span>
+        <span @click="clearKLine()" class="btn">清空</span>
       </div>
     </div>
     <div class="KLineBox">
@@ -206,8 +206,9 @@ export default {
   height: 100%;
   // background-color: #131722;
   #banner-box {
-    background-color: #131722;
-    color: #787b86;
+    // background-color: #131722;
+    background-color: white;
+    color: black;
     height: 4%;
     // padding: 10px;
     border-bottom: 1px solid #787b86;
@@ -222,6 +223,13 @@ export default {
       span {
         padding: 0 5px;
       }
+      .btn {
+        &:hover {
+              background-color: rgba(0, 132, 255, 0.781);
+              color: white;
+              border: 1px solid white;
+        }
+      }
       .select-box {
         height: 100%;
         display: flex;
@@ -233,13 +241,15 @@ export default {
         .select-content {
           cursor: pointer;
           border: 1px solid #787b86;
-          background-color: #131722;
+          // background-color: #131722;
+          background-color: white;
           border-radius: 3px;
           color: #787b86;
         }
       }
       .input-box {
-        background-color: #131722;
+        background-color: white;
+        // background-color: #131722;
         border: 1px solid #787b86;
         border-radius: 3px;
         padding-left: 5px;

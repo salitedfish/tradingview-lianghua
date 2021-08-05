@@ -2,21 +2,23 @@
   <div id="app">
     <div id="banner-box">
       <div class="center-container">
-        <span @click="changeMode('screen')">自定义模式</span>
+        <span @click="changeMode('screen')" class="btn">自定义模式</span>
         <span
           @click="showExchange = 'zhaobi'"
           v-if="showExchange == 'huobi'"
+          class="btn"
         >火币</span>
         <span
           @click="showExchange = 'huobi'"
           v-if="showExchange == 'zhaobi'"
+          class="btn"
         >找币</span>
-        <span @click="changeTheme('light')">明亮</span>
-        <span @click="changeTheme('dark')">暗黑</span>
-        <span @click="changeRowCount('less')">减一列</span>
-        <span @click="changeRowCount('more')">加一列</span>
-        <span @click="changeLineCount('less')">减一行</span>
-        <span @click="changeLineCount('more')">加一行</span>
+        <span @click="changeTheme('light')" class="btn">明亮</span>
+        <span @click="changeTheme('dark')" class="btn">暗黑</span>
+        <span @click="changeRowCount('less')" class="btn">减一列</span>
+        <span @click="changeRowCount('more')" class="btn">加一列</span>
+        <span @click="changeLineCount('less')" class="btn">减一行</span>
+        <span @click="changeLineCount('more')" class="btn">加一行</span>
         <div class="search-box">
           <input
             type="text"
@@ -108,7 +110,7 @@ export default {
       addSymbol: "",
       addSymbolCase: "",
       addSearchList: [],
-      showExchange: "huobi",
+      showExchange: "zhaobi",
     };
   },
   components: {
@@ -253,8 +255,9 @@ body {
   height: 100%;
   // background-color: #131722;
   #banner-box {
-    background-color: #131722;
-    color: #787b86;
+    // background-color: #131722;
+    background-color: white;
+    color: black;
     height: 4%;
     // padding: 10px;
     border-bottom: 1px solid #787b86;
@@ -269,10 +272,18 @@ body {
       span {
         padding: 0 5px;
       }
+      .btn {
+        &:hover {
+              background-color: rgba(0, 132, 255, 0.781);
+              color: white;
+              border: 1px solid white;
+
+        }
+      }
       .search-box {
         position: relative;
         .input-box {
-          background-color: #131722;
+          background-color: white;
           border: 1px solid #787b86;
           border-radius: 3px;
           padding-left: 5px;
@@ -282,16 +293,19 @@ body {
           top: 25px;
           left: 0;
           right: 0;
-          background-color: #131722;
+          // background-color: #131722;
+          background-color: white;
           border-radius: 3px;
-          color: #787b86;
+          color: black;
           opacity: 0.9;
           li {
             cursor: pointer;
             border: 1px solid #787b86;
             &:hover {
-              background-color: #787b86;
-              color: #131722;
+              background-color: rgba(0, 132, 255, 0.781);
+              color: white;
+              // background-color: #787b86;
+              // color: #131722;
             }
           }
         }
