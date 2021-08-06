@@ -212,6 +212,8 @@ export default {
     height: 4%;
     // padding: 10px;
     border-bottom: 1px solid #787b86;
+    width: calc(100vw);
+    overflow-x: scroll;
     .center-container {
       width: 50%;
       min-width: 600px;

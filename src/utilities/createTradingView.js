@@ -1,3 +1,5 @@
+import { isMobile } from "./tools"
+
 const createTradingView = (vm, config = {}) => {
     //定义symbol,从vue实例的参数中获取数据
     // console.log(vm.exchange)
@@ -46,7 +48,8 @@ const createTradingView = (vm, config = {}) => {
         // loading_screen: { backgroundColor: "#000000", foregroundColor: "#000000", },//todo:do it
         allow_symbol_change: true,
         theme: "Light",
-        timeframe: "720",//设置初始的时间展示范围
+        // timeframe: "720",//设置初始的时间展示范围,
+        timeframe: isMobile()?"720":"1d",//设置初始的时间展示范围
         // toolbar_bg: "#FFF",
         //点击改变周期，将周期转化为resolution写的周期
         time_frames: [
@@ -164,7 +167,7 @@ const createTradingView = (vm, config = {}) => {
         disabled_features: [
             // "edit_buttons_in_legend",
             // "header_widget",
-            // "left_toolbar",
+            isMobile()?"left_toolbar":'',
             // "edit_buttons_in_legend",
             "use_localstorage_for_settings",//禁用此功能，否则更改图表一些样式无法及时生效
             // "timeframes_toolbar",
