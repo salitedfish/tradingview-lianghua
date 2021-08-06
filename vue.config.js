@@ -23,7 +23,8 @@ module.exports = {
       },
       //这个找币接口支持持仓量
       '/zhaobiapi': {
-        target: "https://api.33.cn/kdata",
+        // target: "https://api.33.cn/kdata",
+        target: "http://47.56.83.226:5062",
         pathRewrite: {
           "^/zhaobiapi": ''
         }
