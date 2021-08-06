@@ -2,7 +2,7 @@
   <div id="app">
     <div id="banner-box">
       <div class="center-container">
-        <span @click="changeMode('screen')" class="btn">自定义模式</span>
+        <span @click="changeMode('screen')" class="btn" v-if="!isMobile">自定义模式</span>
         <span
           @click="showExchange = 'zhaobi'"
           v-if="showExchange == 'huobi'"
@@ -13,13 +13,13 @@
           v-if="showExchange == 'zhaobi'"
           class="btn"
         >找币</span>
-        <span @click="changeTheme('light')" class="btn">明亮</span>
-        <span @click="changeTheme('dark')" class="btn">暗黑</span>
-        <span @click="changeRowCount('less')" class="btn">减一列</span>
-        <span @click="changeRowCount('more')" class="btn">加一列</span>
-        <span @click="changeLineCount('less')" class="btn">减一行</span>
-        <span @click="changeLineCount('more')" class="btn">加一行</span>
-        <div class="search-box">
+        <span @click="changeTheme('light')" class="btn" v-if="!isMobile">明亮</span>
+        <span @click="changeTheme('dark')" class="btn" v-if="!isMobile">暗黑</span>
+        <span @click="changeRowCount('less')" class="btn" v-if="!isMobile">减一列</span>
+        <span @click="changeRowCount('more')" class="btn" v-if="!isMobile">加一列</span>
+        <span @click="changeLineCount('less')" class="btn" v-if="!isMobile">减一行</span>
+        <span @click="changeLineCount('more')" class="btn" v-if="!isMobile">加一行</span>
+        <div class="search-box" v-if="!isMobile">
           <input
             type="text"
             class="input-box"
@@ -94,6 +94,7 @@
 
 <script>
 import searchConfig from "../service/searchConfig";
+import { isMobile } from "../utilities/tools"
 const RowListDate = [
   ["15"],
   ["15", "60"],
@@ -111,6 +112,7 @@ export default {
       addSymbolCase: "",
       addSearchList: [],
       showExchange: "zhaobi",
+      isMobile: isMobile()
     };
   },
   components: {
@@ -262,7 +264,8 @@ body {
     // padding: 10px;
     border-bottom: 1px solid #787b86;
     width: calc(100vw);
-    overflow-x:scroll;
+
+
     .center-container {
       width: 50%;
       height: 100%;
@@ -270,7 +273,7 @@ body {
       display: flex;
       justify-content: space-around;
       align-items: center;
-      min-width: 600px;
+      min-width: 400px;
       span {
         padding: 0 5px;
       }
