@@ -110,7 +110,7 @@ export default {
         origin: "spot"
       },
       interval: "15",
-      KLineData: [[{ symbol: "BTCUSDT" }]],
+      KLineData: [[{ symbol: "ETHUSDT" }]],
       searchInterval: "",
     };
   },

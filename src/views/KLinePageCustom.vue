@@ -137,7 +137,7 @@ export default {
       //如果路由中list不存在
       this.list = [
         {
-          symbol: "BTCUSDT",
+          symbol: "ETHUSDT",
         },
       ];
     }

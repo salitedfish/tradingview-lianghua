@@ -9,7 +9,7 @@ const createTradingView = (vm, config = {}) => {
     const symbolInfo = vm.symbol
         ? { name: vm.symbol, exchange: vm.exchange || "ZHAOBIBI" }
         : {
-            name: "BTCUSDT",
+            name: "ETHUSDT",
             exchange: "ZHAOBI",
         };
 
@@ -131,7 +131,7 @@ const createTradingView = (vm, config = {}) => {
                             //    var symbol = "AAPL";
                             //    var symbol = "#EQUITY";
                             //    var symbol = PineJS.Std.ticker(this._context) + "#TEST";
-                            var symbol = "HOLD:BTCUSDT";
+                            var symbol = "HOLD:ETHUSDT";
                             this._context.new_sym(symbol, PineJS.Std.period(this._context), PineJS.Std.period(this._context));
                         };
                         this.main = function (context, inputCallback) {
