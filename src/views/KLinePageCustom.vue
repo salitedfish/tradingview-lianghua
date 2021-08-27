@@ -127,12 +127,10 @@ export default {
     //从其他页面跳转过来的路由获取参数
     const query = this.$route.query;
     //如果路由中list存在
-    if (query.list) {
-      try {
-        this.list = JSON.parse(query.list);
-      } catch (e) {
-        this.list = [];
-      }
+    if (query.symbol) {
+        this.list = [{
+          symbol:query.symbol
+        }];
     } else {
       //如果路由中list不存在
       this.list = [

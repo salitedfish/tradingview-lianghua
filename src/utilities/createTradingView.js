@@ -252,13 +252,13 @@ const createTradingView = (vm, config = {}) => {
             // "Overlay.candleStyle.wickDownColor": "#B4525E", // 阴线的影线颜色
 
             "Overlay.style": 1, // k线图
-            "Overlay.candleStyle.upColor": "#B4525E", // 蜡烛图阳线颜色
-            "Overlay.candleStyle.borderUpColor": "#B4525E", // 阳线边框颜色
-            "Overlay.candleStyle.wickUpColor": "#B4525E", // 阳线的影线颜色
+            "Overlay.candleStyle.upColor": "#02C076", // 蜡烛图阳线颜色
+            "Overlay.candleStyle.borderUpColor": "#02C076", // 阳线边框颜色
+            "Overlay.candleStyle.wickUpColor": "#02C076", // 阳线的影线颜色
 
-            "Overlay.candleStyle.downColor": "#5FBD7B", // 蜡烛图阴线颜色
-            "Overlay.candleStyle.borderDownColor": "#5FBD7B", // 阴线边框颜色
-            "Overlay.candleStyle.wickDownColor": "#5FBD7B", // 阴线的影线颜色
+            "Overlay.candleStyle.downColor": "#F84960", // 蜡烛图阴线颜色
+            "Overlay.candleStyle.borderDownColor": "#F84960", // 阴线边框颜色
+            "Overlay.candleStyle.wickDownColor": "#F84960", // 阴线的影线颜色
 
             // "bollinger bands.upper.linewidth": 10,//用来设置布林带的上规宽度
             // "bollinger bands.lower.linewidth": 10,
