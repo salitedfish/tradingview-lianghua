@@ -54,7 +54,7 @@
           :class="lineClassByCount + '-item'"
           :symbol="SymbolItem.symbol"
           :exchange="SymbolItem.exchange"
-          :interval="item"
+          :interval="routeInterval||item"
           :yIndex="SymbolIndex"
           :xkey="SymbolItem.symbol + index.toString() + SymbolIndex.toString()"
           v-for="(item, index) in RowListDate[RowCount - 1]"
@@ -78,7 +78,7 @@
           :class="lineClassByCount + '-item'"
           :symbol="SymbolItem.symbol"
           :exchange="SymbolItem.exchange"
-          :interval="item"
+          :interval="routeInterval||item"
           :yIndex="SymbolIndex"
           :xkey="SymbolItem.symbol + index.toString() + SymbolIndex.toString()"
           v-for="(item, index) in RowListDate[RowCount - 1]"
@@ -111,8 +111,9 @@ export default {
       addSymbol: "",
       addSymbolCase: "",
       addSearchList: [],
-      showExchange: "zhaobi",
-      isMobile: isMobile()
+      showExchange: this.$route.query.exchange?this.$route.query.exchange.toLowerCase():"zhaobi",
+      isMobile: isMobile(),
+      routeInterval:this.$route.query.interval || null
     };
   },
   components: {
