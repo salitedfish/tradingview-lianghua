@@ -251,14 +251,26 @@ const createTradingView = (vm, config = {}) => {
             // "Overlay.candleStyle.borderDownColor": "#B4525E", // 阴线边框颜色
             // "Overlay.candleStyle.wickDownColor": "#B4525E", // 阴线的影线颜色
 
-            "Overlay.style": 1, // k线图
-            "Overlay.candleStyle.upColor": "#02C076", // 蜡烛图阳线颜色
-            "Overlay.candleStyle.borderUpColor": "#02C076", // 阳线边框颜色
-            "Overlay.candleStyle.wickUpColor": "#02C076", // 阳线的影线颜色
+            //下面是我感觉正确的颜色
+            // "Overlay.style": 1, // k线图
+            // "Overlay.candleStyle.upColor": "#02C076", // 蜡烛图阳线颜色
+            // "Overlay.candleStyle.borderUpColor": "#02C076", // 阳线边框颜色
+            // "Overlay.candleStyle.wickUpColor": "#02C076", // 阳线的影线颜色
 
-            "Overlay.candleStyle.downColor": "#F84960", // 蜡烛图阴线颜色
-            "Overlay.candleStyle.borderDownColor": "#F84960", // 阴线边框颜色
-            "Overlay.candleStyle.wickDownColor": "#F84960", // 阴线的影线颜色
+            // "Overlay.candleStyle.downColor": "#F84960", // 蜡烛图阴线颜色
+            // "Overlay.candleStyle.borderDownColor": "#F84960", // 阴线边框颜色
+            // "Overlay.candleStyle.wickDownColor": "#F84960", // 阴线的影线颜色
+
+            "Overlay.style": 1, // k线图
+            "Overlay.candleStyle.upColor": "#F84960", // 蜡烛图阳线颜色
+            "Overlay.candleStyle.borderUpColor": "#F84960", // 阳线边框颜色
+            "Overlay.candleStyle.wickUpColor": "#F84960", // 阳线的影线颜色
+
+            "Overlay.candleStyle.downColor": "#02C076", // 蜡烛图阴线颜色
+            "Overlay.candleStyle.borderDownColor": "#02C076", // 阴线边框颜色
+            "Overlay.candleStyle.wickDownColor": "#02C076", // 阴线的影线颜色
+
+
 
             // "bollinger bands.upper.linewidth": 10,//用来设置布林带的上规宽度
             // "bollinger bands.lower.linewidth": 10,
