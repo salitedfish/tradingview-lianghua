@@ -16,7 +16,7 @@
             <option value="60">{{ "1小时" }}</option>
             <option value="240">{{ "4小时" }}</option>
             <option value="1D">{{ "1天" }}</option>
-            <option value="1W">{{ "1周" }}</option>
+            <!-- <option value="1W">{{ "1周" }}</option> -->
           </select>
         </div>
         <div class="select-box">
@@ -127,6 +127,22 @@ export default {
           return "four";
       }
     },
+    volumeTime() {
+      switch (this.interval) {
+        case '5':
+          return "5min";
+        case '15':
+          return "15min";
+        case '60':
+          return "60min";
+        case '240':
+          return "4hour";
+        case '1D':
+          return "1day";
+        default:
+          return '1day'
+      }
+    }
   },
   methods: {
     searchSymbolByRank() {
@@ -139,7 +155,7 @@ export default {
       params.volume_from = this.searchData.volume;
       params.exchange = "huobi";
       params.type = this.searchData.origin;
-      params.period = "1day";
+      params.period = this.volumeTime;
       //根据volumeFrom获取volumeTo
       // switch (this.searchData.volume) {
       //   case "50000000":
@@ -181,7 +197,7 @@ export default {
           alert("网络异常~");
         });
 
-      this.searchInterval = setInterval(this.searchSymbolByRank, 3000);
+      this.searchInterval = setInterval(this.searchSymbolByRank, 10000);
     },
     //这个是用来切换到自定义模式
     changeMode(type) {
