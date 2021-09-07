@@ -20,9 +20,9 @@
           </select>
         </div>
         <div class="select-box">
-          <span class="select-title">成交量：</span>
+          <span class="select-title">成交额：</span>
           <select
-            name="交易量"
+            name="交易额"
             id="selectBox"
             class="select-content"
             v-model="searchData.volume"
