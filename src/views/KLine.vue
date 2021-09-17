@@ -22,33 +22,15 @@ export default {
     };
   },
   mounted() {
-    console.log("TradingView-version:", TradingView.version());
+    // console.log("TradingView-version:", TradingView.version());
     let vm = this;
-    // console.log(this.baseUrl);
-    // const query=this.$route.query;
-    // let symbolQuery={name:query.name,exchange:query.exchange}
-    //
-    // if(symbolQuery.name&&!symbolQuery.exchange){
-    //   symbolQuery.exchange='ZHAOBI'
-    // }
-    // if(!symbolQuery.name){
-    //   symbolQuery=null;
-    // }
     setTimeout(() => {
       //在index.html里面已经引入了tradingView,可以直接使用
       vm.widget = createTradingView(vm);
-
       //当图表准备就绪时调用回调
       vm.widget.onChartReady(() => {
         var entityId = [];
         //createStudy用来创建指标
-        vm.widget.headerReady().then(() => {
-          const themeChangeButton = vm.widget.createButton();
-          themeChangeButton.textContent = "主题切换";
-          themeChangeButton.addEventListener("click", () => {
-            this.changeTheme();
-          });
-        });
         createStudy(
           vm.widget,
           "Moving Average",
@@ -98,7 +80,13 @@ export default {
         createStudy(vm.widget, "Bollinger Bands", false, false, [100, 2]);
         createStudy(vm.widget, "Average Directional Index", false, false);
         // createStudy(vm.widget, "Volume", false, false, [100, 4]);
-
+        vm.widget.headerReady().then(() => {
+          const themeChangeButton = vm.widget.createButton();
+          themeChangeButton.textContent = "主题切换";
+          themeChangeButton.addEventListener("click", () => {
+            this.changeTheme();
+          });
+        });
         // vm.widget.activeChart().createShape(
         //   [
         //     { time: Date.now() / 1000 - 500 * 24 * 3600 * 1000, price: 150 },
@@ -196,6 +184,7 @@ export default {
     },
   },
   beforeDestroy() {
+    this.widget = null
     // for (let id of window.KLINEINTERVALS) {
     //   clearInterval(id);
     // }

@@ -25,7 +25,7 @@ export default {
     };
   },
   mounted() {
-    console.log("TradingView-version:", TradingView.version());
+    // console.log("TradingView-version:", TradingView.version());
     let vm = this;
     setTimeout(() => {
       //在index.html里面已经引入了tradingView,可以直接使用

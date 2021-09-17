@@ -74,12 +74,12 @@
         class="KLineLineBox"
         :class="lineCount + 'LineItem'"
         v-for="(itemA, indexA) in KLineData"
-        :key="itemA + indexA"
+        :key="indexA"
       >
         <div
           class="KLineRowBox"
-          v-for="itemB in itemA"
-          :key="itemB.symbol"
+          v-for="(itemB,indexB) in itemA"
+          :key="itemB.symbol + indexB"
         >
           <k-line
             class="item"
