@@ -53,31 +53,31 @@ export default {
             "Plot.color": "#84aad5",
           }
         );
-        createStudy(
-          vm.widget,
-          "Moving Average",
-          false,
-          false,
-          [30, "close", 0],
-          null,
-          {
-            "Plot.color": "#55b263",
-          }
-        );
-        createStudy(
-          vm.widget,
-          "Moving Average",
-          false,
-          false,
-          [60, "close", 0],
-          null,
-          {
-            "Plot.color": "#b7248a",
-          }
-        );
+        // createStudy(
+        //   vm.widget,
+        //   "Moving Average",
+        //   false,
+        //   false,
+        //   [30, "close", 0],
+        //   null,
+        //   {
+        //     "Plot.color": "#55b263",
+        //   }
+        // );
+        // createStudy(
+        //   vm.widget,
+        //   "Moving Average",
+        //   false,
+        //   false,
+        //   [60, "close", 0],
+        //   null,
+        //   {
+        //     "Plot.color": "#b7248a",
+        //   }
+        // );
         createStudy(vm.widget, "Bollinger Bands", false, false, [20, 2]);
-        createStudy(vm.widget, "Bollinger Bands", false, false, [50, 2]);
-        createStudy(vm.widget, "Bollinger Bands", false, false, [100, 2]);
+        // createStudy(vm.widget, "Bollinger Bands", false, false, [50, 2]);
+        // createStudy(vm.widget, "Bollinger Bands", false, false, [100, 2]);
         createStudy(vm.widget, "Average Directional Index", false, false);
         // createStudy(vm.widget, "Volume", false, false, [100, 4]);
         vm.widget.headerReady().then(() => {
