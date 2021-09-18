@@ -13,13 +13,13 @@
           v-if="showExchange == 'zhaobi'"
           class="btn"
         >找币</span>
-        <span @click="changeTheme('light')" class="btn" v-if="!isMobile">明亮</span>
+        <!-- <span @click="changeTheme('light')" class="btn" v-if="!isMobile">明亮</span>
         <span @click="changeTheme('dark')" class="btn" v-if="!isMobile">暗黑</span>
         <span @click="changeRowCount('less')" class="btn" v-if="!isMobile">减一列</span>
         <span @click="changeRowCount('more')" class="btn" v-if="!isMobile">加一列</span>
         <span @click="changeLineCount('less')" class="btn" v-if="!isMobile">减一行</span>
-        <span @click="changeLineCount('more')" class="btn" v-if="!isMobile">加一行</span>
-        <div class="search-box" v-if="!isMobile">
+        <span @click="changeLineCount('more')" class="btn" v-if="!isMobile">加一行</span> -->
+        <!-- <div class="search-box" v-if="!isMobile">
           <input
             type="text"
             class="input-box"
@@ -36,10 +36,11 @@
               {{ item.symbol }} -- {{item.exchange}}
             </li>
           </ul>
-        </div>
+        </div> -->
       </div>
     </div>
     <!-- 通过list循环展示k线图 -->
+
     <div
       class="kline-box huobiBox"
       v-if="showExchange == 'huobi'"
@@ -57,7 +58,7 @@
           :interval="routeInterval||item"
           :yIndex="SymbolIndex"
           :xkey="SymbolItem.symbol + index.toString() + SymbolIndex.toString()"
-          v-for="(item, index) in RowListDate[RowCount - 1]"
+          v-for="(item, index) in RowListDate[SymbolIndex]"
           :key="SymbolItem.symbol + item"
           :createDelay="KLineDelayTime(index, SymbolIndex)"
           @symbolChanged="symbolChanged"
@@ -65,6 +66,7 @@
         ></k-line>
       </div>
     </div>
+
     <div
       class="kline-box zhaobiBox"
       v-if="showExchange == 'zhaobi'"
@@ -81,7 +83,7 @@
           :interval="routeInterval||item"
           :yIndex="SymbolIndex"
           :xkey="SymbolItem.symbol + index.toString() + SymbolIndex.toString()"
-          v-for="(item, index) in RowListDate[RowCount - 1]"
+          v-for="(item, index) in RowListDate[SymbolIndex]"
           :key="SymbolItem.symbol + item"
           :createDelay="KLineDelayTime(index, SymbolIndex)"
           @symbolChanged="symbolChanged"
@@ -96,17 +98,17 @@
 import searchConfig from "../service/searchConfig";
 import { isMobile } from "../utilities/tools"
 const RowListDate = [
-  ["15"],
+  // ["15"],
   ["15", "60"],
-  ["15", "60", "240"],
-  ["15", "60", "240", "1D"],
+  ["240", "1D"]
+  // ["15", "60", "240", "1D"],
 ];
 export default {
   name: "KLinePageCustom",
   data() {
     return {
       list: [],
-      RowCount: 1,
+      // RowCount: 2,
       RowListDate,
       addSymbol: "",
       addSymbolCase: "",
@@ -129,12 +131,20 @@ export default {
     const query = this.$route.query;
     //如果路由中list存在
     if (query.symbol) {
-        this.list = [{
+        this.list = [
+          {
           symbol:query.symbol
-        }];
+          },
+          {
+          symbol:query.symbol
+          }
+        ];
     } else {
       //如果路由中list不存在
       this.list = [
+        {
+          symbol: "ETHUSDT",
+        },
         {
           symbol: "ETHUSDT",
         },
@@ -164,28 +174,28 @@ export default {
     },
   },
   methods: {
-    changeLineCount(type) {
-      if (this.list.length >= 2 && type == "less") {
-        this.list.pop();
-      } else if (this.list.length <= 3 && type == "more") {
-        this.addSymbolCase = "addLine";
-        //添加行的时候如果没有填对应的symbol，则使用前一个symbol
-        if (!this.addSymbol) {
-          const preSymbol = this.list[this.list.length - 1].symbol;
-          this.list.push({ symbol: preSymbol });
-        } else {
-          this.list.push({ symbol: this.addSymbol });
-        }
-      }
-    },
-    changeRowCount(type) {
-      if (this.RowCount >= 2 && type == "less") {
-        this.RowCount--;
-      } else if (this.RowCount <= 3 && type == "more") {
-        this.addSymbolCase = "addRow";
-        this.RowCount++;
-      }
-    },
+    // changeLineCount(type) {
+    //   if (this.list.length >= 2 && type == "less") {
+    //     this.list.pop();
+    //   } else if (this.list.length <= 3 && type == "more") {
+    //     this.addSymbolCase = "addLine";
+    //     //添加行的时候如果没有填对应的symbol，则使用前一个symbol
+    //     if (!this.addSymbol) {
+    //       const preSymbol = this.list[this.list.length - 1].symbol;
+    //       this.list.push({ symbol: preSymbol });
+    //     } else {
+    //       this.list.push({ symbol: this.addSymbol });
+    //     }
+    //   }
+    // },
+    // changeRowCount(type) {
+    //   if (this.RowCount >= 2 && type == "less") {
+    //     this.RowCount--;
+    //   } else if (this.RowCount <= 3 && type == "more") {
+    //     this.addSymbolCase = "addRow";
+    //     this.RowCount++;
+    //   }
+    // },
     //设置kline的延时创建时间,同时加载太多有可能会丢失样式覆盖
     KLineDelayTime(index, SymbolIndex) {
       switch (this.addSymbolCase) {
@@ -203,9 +213,11 @@ export default {
         kLineItem.changeTheme(theme);
       }
     },
-    //当K线的symbol改变时，对应index的list里面的对应项的symbol也改变，同时同一行的symbol变了导致key变了
+    //当K线的symbol改变时，循环将list里的symbol都改变
     symbolChanged(param) {
-      this.list[param.index].symbol = param.symbol;
+      this.list.forEach((item)=>{
+        item.symbol = param.symbol
+      })
     },
     changeMode(type) {
       this.$emit("changeMode", type);
