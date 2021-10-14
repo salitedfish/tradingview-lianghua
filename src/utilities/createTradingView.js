@@ -31,11 +31,7 @@ const createTradingView = (vm, config = {}) => {
         //采用接口提供数据
         datafeed: new Datafeeds.UDFCompatibleDatafeed(
             vm.DIYExchange,
-            // "https://api.33.cn/kdata",
-            // "http://47.56.83.226:5062",//GoLang 
-            // "http://119.8.239.24:5062",//PHP
-            // "https://kdata.zhaobi.tech/kdata",
-            10000
+            vm.xkey == 'reAnalyse'?360000000:10000//哈哈，量化回归分析100个小时请求一次数据
         ),
         //设置static文件夹路径
         library_path: `${vm.baseUrl}kline/charting_library/`,
@@ -49,7 +45,7 @@ const createTradingView = (vm, config = {}) => {
         allow_symbol_change: true,
         theme: "Light",
         // timeframe: "720",//设置初始的时间展示范围,
-        timeframe: isMobile()?"720":"1d",//设置初始的时间展示范围
+        timeframe:vm.xkey == 'reAnalyse'?'1m': isMobile()?"720":"1d",//设置初始的时间展示范围
         // toolbar_bg: "#FFF",
         //点击改变周期，将周期转化为resolution写的周期
         time_frames: [
@@ -166,7 +162,7 @@ const createTradingView = (vm, config = {}) => {
         //设置禁用哪些特性
         disabled_features: [
             // "edit_buttons_in_legend",
-            // "header_widget",
+            // "header_widget", 
             isMobile()?"left_toolbar":'',
             // "edit_buttons_in_legend",
             "use_localstorage_for_settings",//禁用此功能，否则更改图表一些样式无法及时生效
@@ -185,7 +181,6 @@ const createTradingView = (vm, config = {}) => {
             // "control_bar", //控制图表工具栏（鼠标移至底部会出现）
             // "legend_widget"
             // "show_chart_property_page"
-            // 'header_chart_type'
             'header_settings'
         ],
         //设置开启哪些特性

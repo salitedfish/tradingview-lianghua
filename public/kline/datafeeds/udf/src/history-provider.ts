@@ -86,6 +86,9 @@ export class HistoryProvider {
 						const ohlPresent = response.o !== undefined;
 
 						for (let i = 0; i < response.t.length; ++i) {
+							/**
+							* 这里先把开高低收都用收赋值
+							*/
 							const barValue: Bar = {
 								// time: response.t[i] * 1000,
 								time: resolution == '1D' && symbolInfo.ticker?.indexOf('HOLD') == -1 ? (response.t[i] + 86400) * 1000: response.t[i] * 1000,//fix bug
@@ -95,6 +98,9 @@ export class HistoryProvider {
 								low: symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat(response.c[i]) : (0-parseFloat(response.c[i])),
 							};
 
+                            /**
+							 * 如果有open数据，再重新复制开高低
+							 */
 							if (ohlPresent) {
 								barValue.open = symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat((response as HistoryFullDataResponse).o[i]) : (0-parseFloat((response as HistoryFullDataResponse).o[i]));
 								barValue.high = symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat((response as HistoryFullDataResponse).h[i]) : (0-parseFloat((response as HistoryFullDataResponse).h[i]));

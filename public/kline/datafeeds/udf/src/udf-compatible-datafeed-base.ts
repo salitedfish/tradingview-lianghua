@@ -119,7 +119,9 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 		});
 	}
 
-	//查询币种时，图表库调用的函数
+	/**
+	 * 查询币种时，图表库调用的函数
+	 */
 	public searchSymbols(userInput: string, exchange: string, symbolType: string, onResult: SearchSymbolsCallback): void {
 		if (this._configuration.supports_search) {
 			const params: RequestParams = {
@@ -154,7 +156,9 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 		}
 	}
 
-	//通过币种获取币种信息时图表库调用的函数
+	/**
+	 * 通过币种获取币种信息时图表库调用的函数
+	 */
 	public resolveSymbol(symbolName: string, onResolve: ResolveCallback, onError: ErrorCallback, extension?: SymbolResolveExtension): void {
 		logMessage('Resolve requested');
 
@@ -195,7 +199,9 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 		}
 	}
 
-	//这个是获取币种历史数据时调用的函数，但其实底层的数据获取函数和订阅时调用的getbar是同一个
+	/**
+	 * 这个是获取币种历史数据时调用的函数，但其实底层的数据获取函数和订阅时调用的getbar是同一个
+	 */
 	public getBars(symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, rangeStartDate: number, rangeEndDate: number, onResult: HistoryCallback, onError: ErrorCallback): void {
 		this._historyProvider.getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate)
 			.then((result: GetBarsResult) => {
@@ -204,16 +210,23 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 			.catch(onError);
 	}
 
-	//订阅数据更新的函数，图表库只是主动调用一次这个函数，底层实现在另外的文件，底层会循环调用回调，返回数据给图表库，如果用websocket，那么就是当服务器返回数据时才调用回调
+	/**
+	 * 订阅数据更新的函数，图表库只是主动调用一次这个函数，底层实现在另外的文件，底层会循环调用回调，返回数据给图表库，如果用websocket，那么就是当服务器返回数据时才调用回调
+	 */
 	public subscribeBars(symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, onTick: SubscribeBarsCallback, listenerGuid: string, onResetCacheNeededCallback: () => void): void {
 		this._dataPulseProvider.subscribeBars(symbolInfo, resolution, onTick, listenerGuid);
 	}
 
-	//取消订阅数据更新的函数，底层实现在另外的文件
+	/**
+	 * 取消订阅数据更新的函数，底层实现在另外的文件
+	 */
 	public unsubscribeBars(listenerGuid: string): void {
 		this._dataPulseProvider.unsubscribeBars(listenerGuid);
 	}
-	//下面几个先不管
+	
+	/**
+	 * 下面几个先不管
+	 */
 	public getQuotes(symbols: string[], onDataCallback: QuotesCallback, onErrorCallback: (msg: string) => void): void {
 		this._quotesProvider.getQuotes(symbols).then(onDataCallback).catch(onErrorCallback);
 	}
@@ -230,6 +243,9 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 		return undefined;
 	}
 
+    /**
+	 * 获取K线标记点
+	 */
 	public getMarks(symbolInfo: LibrarySymbolInfo, from: number, to: number, onDataCallback: GetMarksCallback<Mark>, resolution: ResolutionString): void {
 		if (!this._configuration.supports_marks) {
 			return;
@@ -242,11 +258,14 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 			resolution: resolution,
 		};
 
-		this._send<Mark[] | UdfDatafeedMark>('marks', requestParams)
-			.then((response: Mark[] | UdfDatafeedMark) => {
+		this._send<Mark[] | UdfDatafeedMark>('marks', requestParams).then((response: Mark[] | UdfDatafeedMark) => {
+
 				if (!Array.isArray(response)) {
 					const result: Mark[] = [];
 					for (let i = 0; i < response.id.length; ++i) {
+						if(response.color[i] == '#02C076') {
+							response.color[i] == '#333333'
+						}
 						result.push({
 							id: extractField(response, 'id', i),
 							time: extractField(response, 'time', i),
@@ -262,6 +281,7 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 				}
 
 				onDataCallback(response);
+
 			})
 			.catch((error?: string | Error) => {
 				logMessage(`UdfCompatibleDatafeed: Request marks failed: ${getErrorMessage(error)}`);

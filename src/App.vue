@@ -1,7 +1,10 @@
 <template>
   <div id="app">
-    <k-line-page-custom @changeMode="changeMode" v-if="showMode == 'custom'">
-    </k-line-page-custom>
+    <!-- 量化回归分析 -->
+    <k-line-page-re-analyse v-if="showMode == 'reAnalyse'"></k-line-page-re-analyse>
+    <!-- 自定义页面 -->
+    <k-line-page-custom @changeMode="changeMode" v-if="showMode == 'custom'"></k-line-page-custom>
+    <!-- 删选页面 -->
     <k-line-page-screen @changeMode="changeMode" v-if="showMode == 'screen'"></k-line-page-screen>
   </div>
 </template>
@@ -11,7 +14,9 @@ export default {
   name: "app",
   data() {
     return {
-      showMode: "custom",
+      showMode: "reAnalyse",
+      // showMode: "custom",
+      // showMode: "screen",
     };
   },
   components: {
@@ -20,6 +25,9 @@ export default {
     },
     KLinePageScreen: () => {
       return import("./views/KLinePageScreen.vue");
+    },
+    KLinePageReAnalyse: () => {
+      return import("./views/KlinePageReAnalyse.vue")
     },
   },
   methods: {

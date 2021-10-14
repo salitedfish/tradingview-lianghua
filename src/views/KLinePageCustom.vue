@@ -111,17 +111,17 @@ export default {
       addSymbol: "",
       addSymbolCase: "",
       addSearchList: [],
-      showExchange: this.$route.query.exchange?this.$route.query.exchange.toLowerCase():"zhaobi",
+      showExchange: this.$route.query.exchange?this.$route.query.exchange.toLowerCase():"huobi",
       isMobile: isMobile(),
       routeInterval:this.$route.query.interval || null
     };
   },
   components: {
     KLine: () => {
-      return import("./KLine");
+      return import("../components/KLine");
     },
     KLineB: () => {
-      return import("./KlineB.vue");
+      return import("../components/KlineB.vue");
     },
   },
   mounted() {

@@ -99,7 +99,7 @@ import { rankDataMap } from "../utilities/dataMap";
 export default {
   components: {
     KLine: () => {
-      return import("./KLine");
+      return import("../components/KLine");
     },
   },
   data() {

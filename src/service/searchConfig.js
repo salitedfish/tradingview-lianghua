@@ -22,6 +22,13 @@ const searchConfig = {
             url: 'rank/market/vol_sort',
             params
         })
+    },
+    reAnalyse_getSymbolConfig: (params={}) => {
+        return axios({
+            method: 'get',
+            url: urlConfig.reAnalyse_getSymbolConfig,
+            params
+        })
     }
 }
 
