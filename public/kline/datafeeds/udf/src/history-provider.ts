@@ -105,6 +105,7 @@ export class HistoryProvider {
 								barValue.open = symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat((response as HistoryFullDataResponse).o[i]) : (0-parseFloat((response as HistoryFullDataResponse).o[i]));
 								barValue.high = symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat((response as HistoryFullDataResponse).h[i]) : (0-parseFloat((response as HistoryFullDataResponse).h[i]));
 								barValue.low = symbolInfo.ticker?.indexOf('HOLD') == -1? parseFloat((response as HistoryFullDataResponse).l[i]) : (0-parseFloat((response as HistoryFullDataResponse).l[i]));
+
 							}
 
 							if (volumePresent) {

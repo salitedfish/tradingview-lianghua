@@ -35,6 +35,9 @@ var HistoryProvider = /** @class */ (function () {
                     var volumePresent = response.v !== undefined;
                     var ohlPresent = response.o !== undefined;
                     for (var i = 0; i < response.t.length; ++i) {
+                        /**
+                        * 这里先把开高低收都用收赋值
+                        */
                         var barValue = {
                             // time: response.t[i] * 1000,
                             time: resolution == '1D' && ((_a = symbolInfo.ticker) === null || _a === void 0 ? void 0 : _a.indexOf('HOLD')) == -1 ? (response.t[i] + 86400) * 1000 : response.t[i] * 1000,
@@ -43,6 +46,9 @@ var HistoryProvider = /** @class */ (function () {
                             high: ((_d = symbolInfo.ticker) === null || _d === void 0 ? void 0 : _d.indexOf('HOLD')) == -1 ? parseFloat(response.c[i]) : (0 - parseFloat(response.c[i])),
                             low: ((_e = symbolInfo.ticker) === null || _e === void 0 ? void 0 : _e.indexOf('HOLD')) == -1 ? parseFloat(response.c[i]) : (0 - parseFloat(response.c[i])),
                         };
+                        /**
+                         * 如果有open数据，再重新复制开高低
+                         */
                         if (ohlPresent) {
                             barValue.open = ((_f = symbolInfo.ticker) === null || _f === void 0 ? void 0 : _f.indexOf('HOLD')) == -1 ? parseFloat(response.o[i]) : (0 - parseFloat(response.o[i]));
                             barValue.high = ((_g = symbolInfo.ticker) === null || _g === void 0 ? void 0 : _g.indexOf('HOLD')) == -1 ? parseFloat(response.h[i]) : (0 - parseFloat(response.h[i]));

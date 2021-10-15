@@ -73,6 +73,11 @@ function extractField<Field extends keyof Mark>(data: UdfDatafeedMark, field: Fi
 function extractField<Field extends keyof TimescaleMark>(data: UdfDatafeedTimescaleMark, field: Field, arrayIndex: number): TimescaleMark[Field];
 function extractField<Field extends keyof (TimescaleMark | Mark)>(data: UdfDatafeedMark | UdfDatafeedTimescaleMark, field: Field, arrayIndex: number): (TimescaleMark | Mark)[Field] {
 	const value = data[field];
+	if(field == 'color'&&Array.isArray(value)){
+		value[arrayIndex]  = {
+			background:value[arrayIndex] 
+		}
+	}
 	return Array.isArray(value) ? value[arrayIndex] : value;
 }
 
@@ -261,11 +266,9 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 		this._send<Mark[] | UdfDatafeedMark>('marks', requestParams).then((response: Mark[] | UdfDatafeedMark) => {
 
 				if (!Array.isArray(response)) {
-					const result: Mark[] = [];
+					// const result: Mark[] = [];
+					const result = [];
 					for (let i = 0; i < response.id.length; ++i) {
-						if(response.color[i] == '#02C076') {
-							response.color[i] == '#333333'
-						}
 						result.push({
 							id: extractField(response, 'id', i),
 							time: extractField(response, 'time', i),

@@ -29,6 +29,12 @@ const searchConfig = {
             url: urlConfig.reAnalyse_getSymbolConfig,
             params
         })
+    },
+    reAnalyse_getStudyConfig:() => {
+        return axios({
+            method: 'get',
+            url: urlConfig.reAnalyse_getStudyConfig,
+        })
     }
 }
 

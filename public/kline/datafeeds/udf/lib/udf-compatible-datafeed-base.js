@@ -5,6 +5,11 @@ import { QuotesPulseProvider } from './quotes-pulse-provider';
 import { SymbolsStorage } from './symbols-storage';
 function extractField(data, field, arrayIndex) {
     var value = data[field];
+    if (field == 'color' && Array.isArray(value)) {
+        value[arrayIndex] = {
+            background: value[arrayIndex]
+        };
+    }
     return Array.isArray(value) ? value[arrayIndex] : value;
 }
 //这个是提供给图表库的数据库实例的类
@@ -36,7 +41,9 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
             callback(_this._configuration);
         });
     };
-    //查询币种时，图表库调用的函数
+    /**
+     * 查询币种时，图表库调用的函数
+     */
     UDFCompatibleDatafeedBase.prototype.searchSymbols = function (userInput, exchange, symbolType, onResult) {
         if (this._configuration.supports_search) {
             var params = {
@@ -68,7 +75,9 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
                 .catch(onResult.bind(null, []));
         }
     };
-    //通过币种获取币种信息时图表库调用的函数
+    /**
+     * 通过币种获取币种信息时图表库调用的函数
+     */
     UDFCompatibleDatafeedBase.prototype.resolveSymbol = function (symbolName, onResolve, onError, extension) {
         logMessage('Resolve requested');
         var currencyCode = extension && extension.currencyCode;
@@ -105,7 +114,9 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
             this._symbolsStorage.resolveSymbol(symbolName, currencyCode).then(onResultReady).catch(onError);
         }
     };
-    //这个是获取币种历史数据时调用的函数，但其实底层的数据获取函数和订阅时调用的getbar是同一个
+    /**
+     * 这个是获取币种历史数据时调用的函数，但其实底层的数据获取函数和订阅时调用的getbar是同一个
+     */
     UDFCompatibleDatafeedBase.prototype.getBars = function (symbolInfo, resolution, rangeStartDate, rangeEndDate, onResult, onError) {
         this._historyProvider.getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate)
             .then(function (result) {
@@ -113,15 +124,21 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
         })
             .catch(onError);
     };
-    //订阅数据更新的函数，图表库只是主动调用一次这个函数，底层实现在另外的文件，底层会循环调用回调，返回数据给图表库，如果用websocket，那么就是当服务器返回数据时才调用回调
+    /**
+     * 订阅数据更新的函数，图表库只是主动调用一次这个函数，底层实现在另外的文件，底层会循环调用回调，返回数据给图表库，如果用websocket，那么就是当服务器返回数据时才调用回调
+     */
     UDFCompatibleDatafeedBase.prototype.subscribeBars = function (symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeededCallback) {
         this._dataPulseProvider.subscribeBars(symbolInfo, resolution, onTick, listenerGuid);
     };
-    //取消订阅数据更新的函数，底层实现在另外的文件
+    /**
+     * 取消订阅数据更新的函数，底层实现在另外的文件
+     */
     UDFCompatibleDatafeedBase.prototype.unsubscribeBars = function (listenerGuid) {
         this._dataPulseProvider.unsubscribeBars(listenerGuid);
     };
-    //下面几个先不管
+    /**
+     * 下面几个先不管
+     */
     UDFCompatibleDatafeedBase.prototype.getQuotes = function (symbols, onDataCallback, onErrorCallback) {
         this._quotesProvider.getQuotes(symbols).then(onDataCallback).catch(onErrorCallback);
     };
@@ -134,6 +151,9 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
     UDFCompatibleDatafeedBase.prototype.calculateHistoryDepth = function (resolution, resolutionBack, intervalBack) {
         return undefined;
     };
+    /**
+     * 获取K线标记点
+     */
     UDFCompatibleDatafeedBase.prototype.getMarks = function (symbolInfo, from, to, onDataCallback, resolution) {
         if (!this._configuration.supports_marks) {
             return;
@@ -144,9 +164,9 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
             to: to,
             resolution: resolution,
         };
-        this._send('marks', requestParams)
-            .then(function (response) {
+        this._send('marks', requestParams).then(function (response) {
             if (!Array.isArray(response)) {
+                // const result: Mark[] = [];
                 var result = [];
                 for (var i = 0; i < response.id.length; ++i) {
                     result.push({

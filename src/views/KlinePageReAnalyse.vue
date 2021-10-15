@@ -21,7 +21,8 @@ export default {
       DIYExchange: '/reAnalyse',
       symbol:'',
       interval:'',
-      xkey:'reAnalyse'
+      xkey:'reAnalyse',
+      studyConfig:[]
     };
   },
   mounted() {
@@ -30,13 +31,19 @@ export default {
     */
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
       this.symbol = res.data[0].value
-      // this.interval = res.data[1].value
-      this.interval = '1'
-      /**
-       * 获取完配置后再创建K线
-       */
-      this.createTradingView()
-      this.createStudy()
+      if(res.data[1].value == 'M1'){
+        this.interval = '1'
+      }else if(res.data[1].value == 'M5'){
+        this.interval = '5'
+      }
+      searchConfig.reAnalyse_getStudyConfig().then((res)=>{
+        this.studyConfig = res.data
+         /**
+         * 获取完配置后再创建K线
+         */
+        this.createTradingView()
+        this.createStudy()
+      })
     })
   },
   methods: {
@@ -45,54 +52,20 @@ export default {
     },
     createStudy(){
       this.widget.onChartReady(() => {
-        createStudy(
-          this.widget,
-          "Moving Average",
-          false,
-          false,
-          [5, "close", 0],
-          null,
-          {
-            "Plot.color": "#965fc4",
+        for(let item of this.studyConfig) {
+          /**
+           * 根据指标配置循环创建bolling和ma
+           */
+          if(item.type.indexOf('Bolling') != -1){
+            for(let i of item.period){
+              createStudy(this.widget, "Bollinger Bands", false, false, [i, 2]);
+            }
+          }else if(item.type.indexOf('Ma') != -1){
+            for(let i of item.period){
+              createStudy( this.widget,"Moving Average",false,false,[i, "close", 0],null);
+            }
           }
-        );
-        createStudy(
-          this.widget,
-          "Moving Average",
-          false,
-          false,
-          [10, "close", 0],
-          null,
-          {
-            "Plot.color": "#84aad5",
-          }
-        );
-        createStudy(
-          this.widget,
-          "Moving Average",
-          false,
-          false,
-          [30, "close", 0],
-          null,
-          {
-            "Plot.color": "#55b263",
-          }
-        );
-        createStudy(
-          this.widget,
-          "Moving Average",
-          false,
-          false,
-          [60, "close", 0],
-          null,
-          {
-            "Plot.color": "#b7248a",
-          }
-        );
-        createStudy(this.widget, "Bollinger Bands", false, false, [20, 2]);
-        createStudy(this.widget, "Bollinger Bands", false, false, [50, 2]);
-        createStudy(this.widget, "Bollinger Bands", false, false, [100, 2]);
-        // createStudy(this.widget, "Average Directional Index", false, false);
+        }
       })
     }
   },
