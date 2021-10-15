@@ -19,14 +19,19 @@ var HistoryProvider = /** @class */ (function () {
             _this._requester.sendRequest(_this._datafeedUrl, 'history', requestParams)
                 .then(function (response) {
                 var _a, _b, _c, _d, _e, _f, _g, _h, _j;
-                if (response.s !== 'ok' && response.s !== 'no_data') {
-                    reject(response.errmsg);
-                    return;
-                }
                 var bars = [];
                 var meta = {
                     noData: false,
                 };
+                if (response.s !== 'ok' && response.s !== 'no_data') {
+                    // reject(response.errmsg);
+                    meta.noData = true;
+                    resolve({
+                        bars: bars,
+                        meta: meta,
+                    });
+                    return;
+                }
                 if (response.s === 'no_data') {
                     meta.noData = true;
                     meta.nextTime = response.nextTime;

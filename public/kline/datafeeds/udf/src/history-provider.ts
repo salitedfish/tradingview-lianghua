@@ -68,15 +68,19 @@ export class HistoryProvider {
 		return new Promise((resolve: (result: GetBarsResult) => void, reject: (reason: string) => void) => {
 			this._requester.sendRequest<HistoryResponse>(this._datafeedUrl, 'history', requestParams)
 				.then((response: HistoryResponse | UdfErrorResponse) => {
-					if (response.s !== 'ok' && response.s !== 'no_data') {
-						reject(response.errmsg);
-						return;
-					}
-
 					const bars: Bar[] = [];
 					const meta: HistoryMetadata = {
 						noData: false,
 					};
+					if (response.s !== 'ok' && response.s !== 'no_data') {
+						// reject(response.errmsg);
+						meta.noData = true;
+						resolve({
+							bars: bars,
+							meta: meta,
+						});
+						return;
+					}
 
 					if (response.s === 'no_data') {
 						meta.noData = true;
