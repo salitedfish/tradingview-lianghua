@@ -35,6 +35,19 @@ const searchConfig = {
             method: 'get',
             url: urlConfig.reAnalyse_getStudyConfig,
         })
+    },
+    reAnalyse_getCountList:() => {
+        return axios({
+            method: 'get',
+            url: urlConfig.reAnalyse_getCountList
+        })
+    },
+    reAnalyse_getOrderList:(params) => {
+        return axios({
+            method: 'get',
+            url: urlConfig.reAnalyse_getOrderList,
+            params
+        })
     }
 }
 
