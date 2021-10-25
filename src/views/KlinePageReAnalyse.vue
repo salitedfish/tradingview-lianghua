@@ -39,10 +39,10 @@
         </div>
         <div class="order_chart">
           <div v-for="(item,index) in orderList" :key="index" class="chart_item">
-          <div>{{item.OpenTime}}</div>
+          <div>{{(item.OpenTime*1000) | mapTime('YYYY-MM-DD')}}</div>
           <div>{{item.OpenPrice}}</div>
           <div>{{item.CurPrice}}</div>
-          <div>{{item.CurTime}}</div>
+          <div>{{(item.CurTime*1000) | mapTime('YYYY-MM-DD')}}</div>
           <div>{{item.Point}}</div>
           <div>{{item.Profit}}</div>
           <div>{{item.MaxPoint}}</div>
