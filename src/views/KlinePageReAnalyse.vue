@@ -3,7 +3,10 @@
     <div class="kline_container" id="kline_container_reAnalyse"></div>
     <div class="chart_container">
       <div class="count_container">
-        <div class="head">账户列表</div>
+        <div class="head">
+          <div class="clear" @click="clearData()">清除数据</div>
+          账户列表
+        </div>
         <div class="chart_head">
           <div class="child_one">InitBalance</div>
           <div class="child_one">Balance</div>
@@ -163,6 +166,10 @@ export default {
           }
         }
       })
+    },
+    clearData(){
+      searchConfig.reAnalyse_clear()
+      location.reload()
     }
   },
   beforeDestroy() {
@@ -258,6 +265,14 @@ export default {
   .head {
     font-size: 16px;
     border-bottom: 1px dotted #888;
+    .clear {
+      width: 100px;
+      margin: 0 auto;
+      background: #e92929;
+      color: #ffffff;
+      cursor: pointer;
+      border-radius: 3px;
+    }
   }
 }
 ::-webkit-scrollbar {

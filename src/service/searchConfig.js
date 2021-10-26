@@ -48,6 +48,12 @@ const searchConfig = {
             url: urlConfig.reAnalyse_getOrderList,
             params
         })
+    },
+    reAnalyse_clear:() => {
+        return axios({
+            method: 'post',
+            url: urlConfig.reAnalyse_clear
+        })
     }
 }
 
