@@ -35,7 +35,7 @@ const createTradingView = (vm, config = {}) => {
             // "http://47.56.83.226:5062",//GoLang 
             // "http://119.8.239.24:5062",//PHP
             // "https://kdata.zhaobi.tech/kdata",
-            10000
+            1000
         ),
         //设置static文件夹路径
         library_path: `${vm.baseUrl}kline/charting_library/`,
