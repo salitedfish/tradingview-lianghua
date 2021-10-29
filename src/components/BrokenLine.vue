@@ -39,13 +39,18 @@ export default {
           })
         this.myChart.setOption({
             tooltip: {
-              trigger: 'axis'
+              trigger: 'axis',
+              axisPointer: {
+                type: 'cross'
+              }
             },
             xAxis: {
+              name: 'OpenTime',
               type: 'category',
               data: this.xLineData
             },
             yAxis: {
+              name: 'Balance',
               type: 'value'
             },
             series: [
