@@ -27,7 +27,7 @@
       </div>
       <div class="order_container">
         <div class="order_banner">
-          <div class="show_line_btn" @click="showLine">查看趋势</div>
+          <div class="show_line_btn" @click="showLine">资产变动曲线</div>
         </div>
         <div class="head">{{orderParams.orders || '全部'}} 订单列表</div>
         <div class="chart_head">
@@ -254,7 +254,7 @@ export default {
       border-bottom: 1px solid #333333;
       .show_line_btn {
         height: 25px;
-        width: 70px;
+        width: 90px;
         line-height: 25px;
         background-color: rgb(93, 93, 241);
         color: #ffffff;
