@@ -9,6 +9,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "echarts": "^5.2.1",
     "element-ui": "^2.15.6",
     "moment": "^2.29.1",
     "vue": "^2.6.11",

@@ -54,6 +54,12 @@ const searchConfig = {
             method: 'post',
             url: urlConfig.reAnalyse_clear
         })
+    },
+    reAnalyse_broken_line:() => {
+        return axios({
+            method: 'get',
+            url: urlConfig.reAnalyse_broken_line
+        })
     }
 }
 

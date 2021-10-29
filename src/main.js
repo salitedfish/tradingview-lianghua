@@ -8,7 +8,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 Vue.filter('mapTime',(time,format)=>{
   return moment(time).format(format)
 })
-
+Vue.prototype.$moment = moment
 Vue.config.productionTip = false
 new Vue({
   router,

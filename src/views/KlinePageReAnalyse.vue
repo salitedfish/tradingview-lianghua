@@ -20,38 +20,41 @@
             <div class="child_one">{{item.Balance}}</div>
             <div class="child_one">{{item.Orders}}</div>
             <div class="child_one">{{item.Margin}}</div>
-            <div class="child_two">{{item.SignalInfo}}</div>
+            <div class="child_two" :title="item.SignalInfo">{{item.SignalInfo}}</div>
           </div>
         </div>
         <!-- <div>分页</div> -->
       </div>
       <div class="order_container">
+        <div class="order_banner">
+          <div class="show_line_btn" @click="showLine">查看趋势</div>
+        </div>
         <div class="head">{{orderParams.orders || '全部'}} 订单列表</div>
         <div class="chart_head">
-          <div>OpenTime</div>
-          <div>OpenPrice</div>
+          <!-- <div>OpenTime</div> -->
+          <!-- <div>OpenPrice</div> -->
           <div>CurPrice</div>
           <div>CurTime</div>
           <div>Point</div>
-          <div>Profit</div>
+          <!-- <div>Profit</div> -->
           <div>MaxPoint</div>
-          <div>MaxProfit</div>
+          <!-- <div>MaxProfit</div> -->
           <div>MinPoint</div>
-          <div>MinProfit</div>
+          <!-- <div>MinProfit</div> -->
           <div>Margin</div>
         </div>
         <div class="order_chart">
           <div v-for="(item,index) in orderList" :key="index" class="chart_item">
-          <div>{{(item.OpenTime*1000) | mapTime('YYYY-MM-DD')}}</div>
-          <div>{{item.OpenPrice}}</div>
+          <!-- <div>{{(item.OpenTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div> -->
+          <!-- <div>{{item.OpenPrice}}</div> -->
           <div>{{item.CurPrice}}</div>
-          <div>{{(item.CurTime*1000) | mapTime('YYYY-MM-DD')}}</div>
+          <div>{{(item.CurTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div>
           <div>{{item.Point}}</div>
-          <div>{{item.Profit}}</div>
+          <!-- <div>{{item.Profit}}</div> -->
           <div>{{item.MaxPoint}}</div>
-          <div>{{item.MaxProfit}}</div>
+          <!-- <div>{{item.MaxProfit}}</div> -->
           <div>{{item.MinPoint}}</div>
-          <div>{{item.MinProfit}}</div>
+          <!-- <div>{{item.MinProfit}}</div> -->
           <div>{{item.Margin}}</div>
           </div>
         </div>
@@ -68,6 +71,7 @@
         </div>
       </div>
     </div>
+    <broken-line v-if="showBrokenLine" @hideDialog="showLine"></broken-line>
   </div>
 </template>
 
@@ -77,9 +81,13 @@ import { Pagination } from "element-ui"
 import { createTradingView } from "../utilities/createTradingView";
 import { createStudy } from "../utilities/createStudy";
 import searchConfig from "../service/searchConfig"
+import BrokenLine from "@/components/BrokenLine.vue"
 // import overrides from "../utilities/overrides";
 Vue.use(Pagination)
 export default {
+  components: {
+    BrokenLine
+  },
   data() {
     return {
       widget: null,
@@ -100,7 +108,8 @@ export default {
         pageNum:1,
         orders:null
       },
-      orderTotal:null
+      orderTotal:null,
+      showBrokenLine: false
     };
   },
   mounted() {
@@ -137,6 +146,9 @@ export default {
         this.orderList = res.data.data
         this.orderTotal = res.data.totalNum
       })
+      // searchConfig.reAnalyse_getOrderList({pageNum:1, pageSize: 10000, orders: null}).then((res) => {
+      //   console.log(res.data.data)
+      // })
     },
     handleCurrentChange(pageNum){
       this.orderParams.pageNum = pageNum
@@ -170,6 +182,9 @@ export default {
     clearData(){
       searchConfig.reAnalyse_clear()
       location.reload()
+    },
+    showLine(){
+      this.showBrokenLine = !this.showBrokenLine
     }
   },
   beforeDestroy() {
@@ -184,7 +199,7 @@ export default {
 }
 
 .kline_container {
-  width: 50%;
+  width: 70%;
   height: calc(100vh);
 }
 
@@ -206,7 +221,7 @@ export default {
         width: 100px
       }
       .child_two {
-        flex: 1
+        width: 200px;
       }
     }
     .count_chart {
@@ -214,7 +229,7 @@ export default {
       overflow-y:scroll;
       .chart_item {
         display: flex;
-        height: 25px;
+        // height: 25px;
         align-items: center;
         border: 1px solid #efefefef;
         cursor: pointer;
@@ -226,13 +241,27 @@ export default {
         width: 100px
       }
       .child_two {
-        flex: 1
+        width: 200px;
       }
       }
     }
   }
   .order_container {
     height: calc(70vh);
+    .order_banner {
+      display: flex;
+      padding: 5px 5px;
+      border-bottom: 1px solid #333333;
+      .show_line_btn {
+        height: 25px;
+        width: 70px;
+        line-height: 25px;
+        background-color: rgb(93, 93, 241);
+        color: #ffffff;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    }
     .chart_head {
       display: flex;
       height: 30px;
@@ -240,11 +269,11 @@ export default {
       justify-content: space-around;
       background-color: #eeeeee;
         div {
-          width: 10%;
+          width: 16%;
         }
     }
     .order_chart {
-      height: calc(55vh);
+      height: calc(50vh);
       overflow-y:scroll;
       .chart_item {
         display: flex;
@@ -257,7 +286,7 @@ export default {
           background-color: #eeeeee;
         }
         div {
-          width: 10%;
+          width: 16%;
         }
       }
     }
