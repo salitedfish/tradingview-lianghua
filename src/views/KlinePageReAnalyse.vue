@@ -48,7 +48,7 @@
           <!-- <div>{{(item.OpenTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div> -->
           <!-- <div>{{item.OpenPrice}}</div> -->
           <div>{{item.CurPrice}}</div>
-          <div>{{(item.CurTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div>
+          <div>{{(item.CurTime*1000) | mapTime('MM-DD HH:mm:ss')}}</div>
           <div>{{item.Point}}</div>
           <!-- <div>{{item.Profit}}</div> -->
           <div>{{item.MaxPoint}}</div>
