@@ -165,13 +165,24 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
             resolution: resolution,
         };
         this._send('marks', requestParams).then(function (response) {
+            var num = 0;
+            switch (resolution) {
+                case '1':
+                    num = 60;
+                    break;
+                case '5':
+                    num = 300;
+                    break;
+                default:
+                    break;
+            }
             if (!Array.isArray(response)) {
                 // const result: Mark[] = [];
                 var result = [];
                 for (var i = 0; i < response.id.length; ++i) {
                     result.push({
                         id: extractField(response, 'id', i),
-                        time: extractField(response, 'time', i),
+                        time: extractField(response, 'time', i) - num,
                         color: extractField(response, 'color', i),
                         text: extractField(response, 'text', i),
                         label: extractField(response, 'label', i),

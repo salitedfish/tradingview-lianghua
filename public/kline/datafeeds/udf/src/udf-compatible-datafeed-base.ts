@@ -264,6 +264,17 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 		};
 
 		this._send<Mark[] | UdfDatafeedMark>('marks', requestParams).then((response: Mark[] | UdfDatafeedMark) => {
+			let num = 0
+			switch(resolution){
+				case '1':
+					num = 60;
+					break
+				case '5':
+					num = 300;
+					break
+				default:
+					break
+			}
 
 				if (!Array.isArray(response)) {
 					// const result: Mark[] = [];
@@ -271,7 +282,7 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 					for (let i = 0; i < response.id.length; ++i) {
 						result.push({
 							id: extractField(response, 'id', i),
-							time: extractField(response, 'time', i),
+							time: extractField(response, 'time', i) - num,
 							color: extractField(response, 'color', i),
 							text: extractField(response, 'text', i),
 							label: extractField(response, 'label', i),
