@@ -252,8 +252,8 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 	 * 获取K线标记点
 	 */
 	public getMarks(symbolInfo: LibrarySymbolInfo, from: number, to: number, onDataCallback: GetMarksCallback<Mark>, resolution: ResolutionString): void {
-		return
-		if (!this._configuration.supports_marks) {
+		// return
+		if (this._configuration.supports_marks) {
 			return;
 		}
 
