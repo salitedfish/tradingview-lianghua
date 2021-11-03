@@ -637,6 +637,7 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
      * 获取K线标记点
      */
     UDFCompatibleDatafeedBase.prototype.getMarks = function (symbolInfo, from, to, onDataCallback, resolution) {
+        return;
         if (!this._configuration.supports_marks) {
             return;
         }
@@ -668,7 +669,9 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
                         color: extractField(response, 'color', i),
                         text: extractField(response, 'text', i),
                         label: extractField(response, 'label', i),
+                        // label: "↓",
                         labelFontColor: extractField(response, 'labelFontColor', i),
+                        // labelFontColor: "#333333",
                         minSize: extractField(response, 'minSize', i),
                     });
                 }

@@ -60,6 +60,13 @@ const searchConfig = {
             method: 'get',
             url: urlConfig.reAnalyse_broken_line
         })
+    },
+    reAnalyse_getMarks:(params) => {
+        return axios({
+            method: 'get',
+            url: urlConfig.reAnalyse_getMarks,
+            params
+        })
     }
 }
 

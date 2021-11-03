@@ -252,6 +252,7 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 	 * 获取K线标记点
 	 */
 	public getMarks(symbolInfo: LibrarySymbolInfo, from: number, to: number, onDataCallback: GetMarksCallback<Mark>, resolution: ResolutionString): void {
+		return
 		if (!this._configuration.supports_marks) {
 			return;
 		}
@@ -286,7 +287,9 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 							color: extractField(response, 'color', i),
 							text: extractField(response, 'text', i),
 							label: extractField(response, 'label', i),
+							// label: "↓",
 							labelFontColor: extractField(response, 'labelFontColor', i),
+							// labelFontColor: "#333333",
 							minSize: extractField(response, 'minSize', i),
 						});
 					}

@@ -109,7 +109,9 @@ export default {
         orders:null
       },
       orderTotal:null,
-      showBrokenLine: false
+      showBrokenLine: false,
+      marksObj:{},
+      timeOutFun:null
     };
   },
   mounted() {
@@ -132,6 +134,7 @@ export default {
          */
         this.createTradingView()
         this.createStudy()
+        this.createMarks()
       })
     })
   },
@@ -177,8 +180,44 @@ export default {
             }
           }
         }
-        this.widget.activeChart().createShape({ time: 1634091519 }, { shape: 'vertical_line' });
-        
+
+      })
+    },
+    createMarks(){
+      this.widget.onChartReady(()=>{
+        this.widget.chart().onVisibleRangeChanged().subscribe(
+          null,
+          ({from, to}) => {
+            const eventFun = () => {
+              const params = {
+                symbol:this.symbol,
+                from,
+                to,
+                resolution: this.interval
+              }
+              searchConfig.reAnalyse_getMarks(params).then((res)=>{
+                this.marksObj = res.data
+                  this.marksObj.id.forEach((item,index) => {
+                    if(this.marksObj.label[index] == '买'){
+                      this.widget.activeChart().createShape({ time: this.marksObj.time[index]}, { text: this.marksObj.text[index], color: '#ffffff', shape: 'arrow_up', zOrder: "top", lock: true });
+                    }else if(this.marksObj.label[index] == '卖'){
+                      this.widget.activeChart().createShape({ time: this.marksObj.time[index]}, { text: this.marksObj.text[index], color: '#ffffff', shape: 'arrow_down', zOrder: "top", lock: true });
+                    }else if(this.marksObj.label[index] == '平'){
+                      this.widget.activeChart().createShape({ time: this.marksObj.time[index]}, { text: this.marksObj.text[index], color: '#ffffff', shape: 'arrow_left', zOrder: "top", lock: true });
+                    }
+                  });
+              })
+            }
+            if(!this.timeOutFun){
+              this.timeOutFun = setTimeout(eventFun,1000)
+            }else {
+              clearTimeout(this.timeOutFun)
+              this.timeOutFun = setTimeout(eventFun,1000)
+            }
+            
+          },
+          false
+        )
       })
     },
     clearData(){
