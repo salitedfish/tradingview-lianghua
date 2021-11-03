@@ -185,7 +185,7 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
                 for (var i = 0; i < response.id.length; ++i) {
                     result.push({
                         id: extractField(response, 'id', i),
-                        time: extractField(response, 'time', i),
+                        time: extractField(response, 'time', i) - 60,
                         color: extractField(response, 'color', i),
                         label: extractField(response, 'label', i),
                         tooltip: extractField(response, 'tooltip', i),

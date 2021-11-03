@@ -5,7 +5,7 @@ var DataPulseProvider = /** @class */ (function () {
         this._subscribers = {}; //订阅者对象列表
         this._requestsPending = 0;
         this._historyProvider = historyProvider;
-        setInterval(this._updateData.bind(this), updateFrequency); //定时调用数据更新
+        setInterval(this._updateData.bind(this), updateFrequency); //定时调用数据更新(updateFrequency默认为10秒)
     }
     //订阅数据更新
     DataPulseProvider.prototype.subscribeBars = function (symbolInfo, resolution, newDataCallback, listenerGuid) {
