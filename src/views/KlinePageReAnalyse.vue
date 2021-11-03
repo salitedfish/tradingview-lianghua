@@ -177,6 +177,7 @@ export default {
             }
           }
         }
+        this.widget.activeChart().createShape({ time: 1634091519 }, { shape: 'vertical_line' });
         
       })
     },
