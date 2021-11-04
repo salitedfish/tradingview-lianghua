@@ -192,6 +192,10 @@ const createTradingView = (vm, config = {}) => {
             // "volumePaneSize": "small",
             // "paneProperties.legendProperties.showLegend": false,
 
+            "shape.text.color":"#ffffff",
+            "text.backgroundColor":"#ffffff",
+            "shape.arrow_up.color":"#ffffff",
+
             "mainSeriesProperties.style": 1, // k线图
             // "paneProperties.background": "rgb(27,34,63)", // 背景色透明
             // "paneProperties.background": "#000000",

@@ -130,7 +130,7 @@ export default {
       searchConfig.reAnalyse_getStudyConfig().then((res)=>{
         this.studyConfig = res.data
          /**
-         * 获取完配置后再创建K线
+         * 获取完配置后再创建K线、指标、形状
          */
         this.createTradingView()
         this.createStudy()
@@ -139,31 +139,34 @@ export default {
     })
   },
   methods: {
+    /**获取账户列表 */
     getCountList(){
       searchConfig.reAnalyse_getCountList().then((res) => {
         this.countList = res.data
       })
     },
+    /**获取订单列表 */
     getOrderList(params){
       searchConfig.reAnalyse_getOrderList(params).then((res) => {
         this.orderList = res.data.data
         this.orderTotal = res.data.totalNum
       })
-      // searchConfig.reAnalyse_getOrderList({pageNum:1, pageSize: 10000, orders: null}).then((res) => {
-      //   console.log(res.data.data)
-      // })
     },
+    /**分页 */
     handleCurrentChange(pageNum){
       this.orderParams.pageNum = pageNum
       this.getOrderList(this.orderParams)
     },
+    /**根据账号查找订单列表 */
     searchOrdersByOrder(orders){
       this.orderParams.orders = orders
       this.getOrderList(this.orderParams)
     },
+    /**创建图表 */
     createTradingView(){
       this.widget = createTradingView(this);
     },
+    /**创建指标 */
     createStudy(){
       this.widget.onChartReady(() => {
         for(let item of this.studyConfig) {
@@ -183,11 +186,26 @@ export default {
 
       })
     },
+    /**创建标记点 */
     createMarks(){
+      const markShape = (shape, index, overrides) => {
+        this.widget.activeChart().createShape({ 
+          time: this.marksObj.time[index], 
+          price: Number(this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1)) 
+          }, 
+          { 
+           text: this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1), 
+           overrides,
+           shape,
+           zOrder: "top", 
+           lock: true 
+          });
+      }
       this.widget.onChartReady(()=>{
         this.widget.chart().onVisibleRangeChanged().subscribe(
           null,
           ({from, to}) => {
+            clearTimeout(this.timeOutFun)
             const eventFun = () => {
               const params = {
                 symbol:this.symbol,
@@ -199,31 +217,29 @@ export default {
                 this.marksObj = res.data
                   this.marksObj.id.forEach((item,index) => {
                     if(this.marksObj.label[index] == '买'){
-                      this.widget.activeChart().createShape({ time: this.marksObj.time[index]}, { text: this.marksObj.text[index], color: '#ffffff', shape: 'arrow_up', zOrder: "top", lock: true });
+                      markShape('arrow_up', index, {color:"#006000", fontsize: 12})
                     }else if(this.marksObj.label[index] == '卖'){
-                      this.widget.activeChart().createShape({ time: this.marksObj.time[index]}, { text: this.marksObj.text[index], color: '#ffffff', shape: 'arrow_down', zOrder: "top", lock: true });
-                    }else if(this.marksObj.label[index] == '平'){
-                      this.widget.activeChart().createShape({ time: this.marksObj.time[index]}, { text: this.marksObj.text[index], color: '#ffffff', shape: 'arrow_left', zOrder: "top", lock: true });
+                      markShape('arrow_down', index, {color:"#EA0000", fontsize: 12})
+                    }else if(this.marksObj.label[index] == '卖平'){
+                      markShape('arrow_left', index, {color:"#0080FF", fontsize: 12})
+                    }else if(this.marksObj.label[index] == '买平'){
+                      markShape('arrow_right', index, {color:"#0080FF", fontsize: 12})
                     }
                   });
               })
             }
-            if(!this.timeOutFun){
-              this.timeOutFun = setTimeout(eventFun,1000)
-            }else {
-              clearTimeout(this.timeOutFun)
-              this.timeOutFun = setTimeout(eventFun,1000)
-            }
-            
+            this.timeOutFun = setTimeout(eventFun,1000)
           },
           false
         )
       })
     },
+    /**清除数据 */
     clearData(){
       searchConfig.reAnalyse_clear()
       location.reload()
     },
+    /**展示资产变化曲线 */
     showLine(){
       this.showBrokenLine = !this.showBrokenLine
     }
