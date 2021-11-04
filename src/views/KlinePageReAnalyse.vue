@@ -36,7 +36,7 @@
           <div>CurPrice</div>
           <div>CurTime</div>
           <div>Point</div>
-          <!-- <div>Profit</div> -->
+          <div>Type</div>
           <div>MaxPoint</div>
           <!-- <div>MaxProfit</div> -->
           <div>MinPoint</div>
@@ -50,7 +50,7 @@
           <div>{{item.CurPrice}}</div>
           <div>{{(item.CurTime*1000) | mapTime('MM-DD HH:mm:ss')}}</div>
           <div>{{item.Point}}</div>
-          <!-- <div>{{item.Profit}}</div> -->
+          <div>{{item.Type == 0?'买':'卖'}}</div>
           <div>{{item.MaxPoint}}</div>
           <!-- <div>{{item.MaxProfit}}</div> -->
           <div>{{item.MinPoint}}</div>
