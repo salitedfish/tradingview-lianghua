@@ -36,7 +36,7 @@
           <div>CurPrice</div>
           <div>CurTime</div>
           <div>Point</div>
-          <!-- <div>Profit</div> -->
+          <div>type</div>
           <div>MaxPoint</div>
           <!-- <div>MaxProfit</div> -->
           <div>MinPoint</div>
@@ -50,7 +50,7 @@
           <div>{{item.CurPrice}}</div>
           <div>{{(item.CurTime*1000) | mapTime('MM-DD HH:mm:ss')}}</div>
           <div>{{item.Point}}</div>
-          <!-- <div>{{item.Profit}}</div> -->
+          <div>{{item.Type == 0?'买':'卖'}}</div>
           <div>{{item.MaxPoint}}</div>
           <!-- <div>{{item.MaxProfit}}</div> -->
           <div>{{item.MinPoint}}</div>
@@ -96,9 +96,10 @@ export default {
         ZHAOBI: ["HOLD"],
         MT4: ["EASYFOREX", "OANDA"],
       },
-      DIYExchange: '/reAnalyse',
-      symbol:'',
-      interval:'',
+      // DIYExchange: '/reAnalyse',
+      DIYExchange: '/api',
+      symbol:'BTCUSDT',
+      interval:'1',
       xkey:'reAnalyse',
       studyConfig:[],
       countList:[],
@@ -120,13 +121,13 @@ export default {
     /**
     * 量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView
     */
-    searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
-      this.symbol = res.data[0].value
-      if(res.data[1].value == 'M1'){
-        this.interval = '1'
-      }else if(res.data[1].value == 'M5'){
-        this.interval = '5'
-      }
+    // searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
+    //   this.symbol = res.data[0].value
+    //   if(res.data[1].value == 'M1'){
+    //     this.interval = '1'
+    //   }else if(res.data[1].value == 'M5'){
+    //     this.interval = '5'
+    //   }
       searchConfig.reAnalyse_getStudyConfig().then((res)=>{
         this.studyConfig = res.data
          /**
@@ -135,7 +136,7 @@ export default {
         this.createTradingView()
         this.createStudy()
         this.createMarks()
-      })
+    //   })
     })
   },
   methods: {
@@ -194,7 +195,8 @@ export default {
           price: Number(this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1)) 
           }, 
           { 
-           text: this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1), 
+          //  text: this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1), 
+           text: this.marksObj.text[index], 
            overrides,
            shape,
            zOrder: "top", 
