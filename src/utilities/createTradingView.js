@@ -57,108 +57,108 @@ const createTradingView = (vm, config = {}) => {
             { text: "3d", resolution: "15", title: "3天" },
             { text: "1d", resolution: "5", title: "1天" },
         ],
-        custom_indicators_getter: function (PineJS) {
-            return Promise.resolve([
-                {
-                    // 将<study name>替换为您的指标名称
-                    // 它将由图表库内部使用
-                    name: "holdKLine",
-                    metainfo: {
-                        "_metainfoVersion": 40,
-                        "id": "holdKLine@tv-basicstudies-1",
-                        "scriptIdPart": "",
-                        "name": "holdKLine",
-                        // 此说明将显示在指标窗口中
-                        // 当调用createStudy方法时，它也被用作“name”参数
-                        "description": "holdKLine",
-                        // 该描述将显示在图表上
-                        "shortDescription": "holdKLine",
-                        "is_hidden_study": true,
-                        "is_price_study": false,
-                        "isCustomIndicator": true,
-                        "plots": [{ "id": "plot_0", "type": "line" }],
-                        "defaults": {
-                            "styles": {
-                                "plot_0": {
-                                    "linestyle": 0,
-                                    "visible": true,
-                                    // 绘图线宽度
-                                    "linewidth": 1,
-                                    // 绘制类型:
-                                    //    1 - 直方图
-                                    //    2 - 线形图
-                                    //    3 - 十字指针
-                                    //    4 - 山形图
-                                    //    5 - 柱状图
-                                    //    6 - 圆圈图
-                                    //    7 - 中断线
-                                    //    8 - 中断区块
-                                    "plottype":2,
-                                    // 显示价格线?
-                                    "trackPrice": true,
-                                    // 绘制透明度，百分比。
-                                    "transparency": 40,
-                                    // 以#RRGGBB格式绘制颜色
-                                    "color": "#880000"
-                                }
-                            },
-                            // 指标输出值的精度
-                            // (小数点后的位数)。
-                            "precision": 2,
-                            "inputs": {}
-                        },
-                        "styles": {
-                            "plot_0": {
-                                // 输出的名字将在样式窗口显示
-                                "title": "holdKline",
-                                "histogramBase": 0,
-                            }
-                        },
-                        "inputs": [],
-                    },
-                    constructor: function () {
-                        this.init = function (context, inputCallback) {
-                            this._context = context;
-                            this._input = inputCallback;
-                            // 定义要绘制的商品。
-                            // 商品应该是一个字符串。
-                            // 您可以使用PineJS.Std.ticker（this._context）获取所选商品的代码。
-                            // 例,
-                            //    var symbol = "AAPL";
-                            //    var symbol = "#EQUITY";
-                            //    var symbol = PineJS.Std.ticker(this._context) + "#TEST";
-                            var symbol = "HOLD:ETHUSDT";
-                            this._context.new_sym(symbol, PineJS.Std.period(this._context), PineJS.Std.period(this._context));
-                        };
-                        this.main = function (context, inputCallback) {
-                            // window.console.log(this._context)
-                            this._context = context;
-                            this._input = inputCallback;
-                            this._context.select_sym(1);
-                            // 您可以在PineJS.Std对象中使用以下内置函数：
-                            //     open, high, low, close
-                            //    hl2, hlc3, ohlc4
-                            var o = PineJS.Std.open(this._context)
-                            var h = PineJS.Std.high(this._context)
-                            var l = PineJS.Std.low(this._context)
-                            var c = PineJS.Std.close(this._context);
-                            // console.log('ooooooooooooo',o)
-                            // console.log('hhhhhhhhhhhhh',h)
-                            // console.log('lllllllllllll',l)
-                            // console.log('ccccccccccccc',c)
-                            return [0 - o, 0 - h, 0 - l, 0 - c];
-                            // return {
-                            //     open: [0 - o],
-                            //     high: [0 - h],
-                            //     low: [0 - l],
-                            //     close: [0 - c]
-                            // }
+        // custom_indicators_getter: function (PineJS) {
+        //     return Promise.resolve([
+        //         {
+        //             // 将<study name>替换为您的指标名称
+        //             // 它将由图表库内部使用
+        //             name: "holdKLine",
+        //             metainfo: {
+        //                 "_metainfoVersion": 40,
+        //                 "id": "holdKLine@tv-basicstudies-1",
+        //                 "scriptIdPart": "",
+        //                 "name": "holdKLine",
+        //                 // 此说明将显示在指标窗口中
+        //                 // 当调用createStudy方法时，它也被用作“name”参数
+        //                 "description": "holdKLine",
+        //                 // 该描述将显示在图表上
+        //                 "shortDescription": "holdKLine",
+        //                 "is_hidden_study": true,
+        //                 "is_price_study": false,
+        //                 "isCustomIndicator": true,
+        //                 "plots": [{ "id": "plot_0", "type": "line" }],
+        //                 "defaults": {
+        //                     "styles": {
+        //                         "plot_0": {
+        //                             "linestyle": 0,
+        //                             "visible": true,
+        //                             // 绘图线宽度
+        //                             "linewidth": 1,
+        //                             // 绘制类型:
+        //                             //    1 - 直方图
+        //                             //    2 - 线形图
+        //                             //    3 - 十字指针
+        //                             //    4 - 山形图
+        //                             //    5 - 柱状图
+        //                             //    6 - 圆圈图
+        //                             //    7 - 中断线
+        //                             //    8 - 中断区块
+        //                             "plottype":2,
+        //                             // 显示价格线?
+        //                             "trackPrice": true,
+        //                             // 绘制透明度，百分比。
+        //                             "transparency": 40,
+        //                             // 以#RRGGBB格式绘制颜色
+        //                             "color": "#880000"
+        //                         }
+        //                     },
+        //                     // 指标输出值的精度
+        //                     // (小数点后的位数)。
+        //                     "precision": 2,
+        //                     "inputs": {}
+        //                 },
+        //                 "styles": {
+        //                     "plot_0": {
+        //                         // 输出的名字将在样式窗口显示
+        //                         "title": "holdKline",
+        //                         "histogramBase": 0,
+        //                     }
+        //                 },
+        //                 "inputs": [],
+        //             },
+        //             constructor: function () {
+        //                 this.init = function (context, inputCallback) {
+        //                     this._context = context;
+        //                     this._input = inputCallback;
+        //                     // 定义要绘制的商品。
+        //                     // 商品应该是一个字符串。
+        //                     // 您可以使用PineJS.Std.ticker（this._context）获取所选商品的代码。
+        //                     // 例,
+        //                     //    var symbol = "AAPL";
+        //                     //    var symbol = "#EQUITY";
+        //                     //    var symbol = PineJS.Std.ticker(this._context) + "#TEST";
+        //                     var symbol = "HOLD:ETHUSDT";
+        //                     this._context.new_sym(symbol, PineJS.Std.period(this._context), PineJS.Std.period(this._context));
+        //                 };
+        //                 this.main = function (context, inputCallback) {
+        //                     // window.console.log(this._context)
+        //                     this._context = context;
+        //                     this._input = inputCallback;
+        //                     this._context.select_sym(1);
+        //                     // 您可以在PineJS.Std对象中使用以下内置函数：
+        //                     //     open, high, low, close
+        //                     //    hl2, hlc3, ohlc4
+        //                     var o = PineJS.Std.open(this._context)
+        //                     var h = PineJS.Std.high(this._context)
+        //                     var l = PineJS.Std.low(this._context)
+        //                     var c = PineJS.Std.close(this._context);
+        //                     // console.log('ooooooooooooo',o)
+        //                     // console.log('hhhhhhhhhhhhh',h)
+        //                     // console.log('lllllllllllll',l)
+        //                     // console.log('ccccccccccccc',c)
+        //                     return [0 - o, 0 - h, 0 - l, 0 - c];
+        //                     // return {
+        //                     //     open: [0 - o],
+        //                     //     high: [0 - h],
+        //                     //     low: [0 - l],
+        //                     //     close: [0 - c]
+        //                     // }
 
-                        }
-                    }
-                }
-            ])
-        },
+        //                 }
+        //             }
+        //         }
+        //     ])
+        // },
         //设置禁用哪些特性
         disabled_features: [
             // "edit_buttons_in_legend",
@@ -191,10 +191,6 @@ const createTradingView = (vm, config = {}) => {
             // "has_no_volume":false,
             // "volumePaneSize": "small",
             // "paneProperties.legendProperties.showLegend": false,
-
-            "shape.text.color":"#ffffff",
-            "text.backgroundColor":"#ffffff",
-            "shape.arrow_up.color":"#ffffff",
 
             "mainSeriesProperties.style": 1, // k线图
             // "paneProperties.background": "rgb(27,34,63)", // 背景色透明
