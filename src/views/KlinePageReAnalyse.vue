@@ -82,6 +82,7 @@ import { createTradingView } from "../utilities/createTradingView";
 import { createStudy } from "../utilities/createStudy";
 import searchConfig from "../service/searchConfig"
 import BrokenLine from "@/components/BrokenLine.vue"
+import { mapSymbol } from "@/utilities/dataMap.js"
 // import overrides from "../utilities/overrides";
 Vue.use(Pagination)
 export default {
@@ -92,13 +93,10 @@ export default {
     return {
       widget: null,
       baseUrl: process.env.BASE_URL,
-      config: {
-        ZHAOBI: ["HOLD"],
-        MT4: ["EASYFOREX", "OANDA"],
-      },
-      // DIYExchange: '/reAnalyse',
       DIYExchange: '/api',
-      symbol:'BTCUSDT',
+      // DIYExchange: '/reAnalyse',
+      symbol:'BTC-USD',//这个是用来获取K线的，火币、dydx和找币名称都不一样，dydx要加dydx_
+      symbolRow:'BTCUSD',//这个是用来获取标记的，直接使用获取到的配置里的名称就行
       interval:'1',
       xkey:'reAnalyse',
       studyConfig:[],
@@ -121,13 +119,15 @@ export default {
     /**
     * 量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView
     */
-    // searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
-    //   this.symbol = res.data[0].value
-    //   if(res.data[1].value == 'M1'){
-    //     this.interval = '1'
-    //   }else if(res.data[1].value == 'M5'){
-    //     this.interval = '5'
-    //   }
+    searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
+      
+      this.symbolRow = res.data[0].value
+      this.symbol = mapSymbol(res.data[0].value)
+      if(res.data[1].value == 'M1'){
+        this.interval = '1'
+      }else if(res.data[1].value == 'M5'){
+        this.interval = '5'
+      }
       searchConfig.reAnalyse_getStudyConfig().then((res)=>{
         this.studyConfig = res.data
          /**
@@ -136,7 +136,7 @@ export default {
         this.createTradingView()
         this.createStudy()
         this.createMarks()
-    //   })
+      })
     })
   },
   methods: {
@@ -194,47 +194,38 @@ export default {
           time: this.marksObj.time[index], 
           price: Number(this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1)) 
           }, 
-          { 
-          //  text: this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1), 
-           text: this.marksObj.text[index], 
+          {
+           text: this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1),
            overrides,
            shape,
            zOrder: "top", 
            lock: true 
           });
       }
-      this.widget.onChartReady(()=>{
-        this.widget.chart().onVisibleRangeChanged().subscribe(
-          null,
-          ({from, to}) => {
-            clearTimeout(this.timeOutFun)
-            const eventFun = () => {
-              const params = {
-                symbol:this.symbol,
-                from,
-                to,
-                resolution: this.interval
+      /**间隔10秒获取一次可见范围内的标记 */
+      setInterval(()=>{
+        const { from, to} = this.widget.chart().getVisibleRange()
+        const params = {
+          symbol:this.symbolRow,
+          from,
+          to,
+          resolution: this.interval
+        }
+        searchConfig.reAnalyse_getMarks(params).then((res)=>{
+          this.marksObj = res.data
+            this.marksObj.id.forEach((item,index) => {
+              if(this.marksObj.label[index] == '买'){
+                markShape('arrow_up', index, {color:"#006000", fontsize: 12})
+              }else if(this.marksObj.label[index] == '卖'){
+                markShape('arrow_down', index, {color:"#EA0000", fontsize: 12})
+              }else if(this.marksObj.label[index] == '卖平'){
+                markShape('arrow_left', index, {color:"#0080FF", fontsize: 12})
+              }else if(this.marksObj.label[index] == '买平'){
+                markShape('arrow_right', index, {color:"#0080FF", fontsize: 12})
               }
-              searchConfig.reAnalyse_getMarks(params).then((res)=>{
-                this.marksObj = res.data
-                  this.marksObj.id.forEach((item,index) => {
-                    if(this.marksObj.label[index] == '买'){
-                      markShape('arrow_up', index, {color:"#006000", fontsize: 12})
-                    }else if(this.marksObj.label[index] == '卖'){
-                      markShape('arrow_down', index, {color:"#EA0000", fontsize: 12})
-                    }else if(this.marksObj.label[index] == '卖平'){
-                      markShape('arrow_left', index, {color:"#0080FF", fontsize: 12})
-                    }else if(this.marksObj.label[index] == '买平'){
-                      markShape('arrow_right', index, {color:"#0080FF", fontsize: 12})
-                    }
-                  });
-              })
-            }
-            this.timeOutFun = setTimeout(eventFun,1000)
-          },
-          false
-        )
-      })
+            });
+        })
+      },5000)
     },
     /**清除数据 */
     clearData(){
@@ -244,7 +235,7 @@ export default {
     /**展示资产变化曲线 */
     showLine(){
       this.showBrokenLine = !this.showBrokenLine
-    }
+    },
   },
   beforeDestroy() {
     this.widget = null

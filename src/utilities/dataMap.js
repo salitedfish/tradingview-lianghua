@@ -35,3 +35,21 @@ const rankDataMap = (count, data) => {
 }
 
 export {rankDataMap}
+
+export const mapSymbol = (symbol) => {
+    if(process.env.NODE_ENV == 'dydx') {
+      switch(symbol){
+        case "BTCUSD":
+          return "dydx_BTC-USD";
+        case "ETHUSD":
+          return "dydx_ETH-USD";
+      }
+    }else if(process.env.NODE_ENV == 'huobi') {
+      switch(symbol){
+        case "BTCUSD":
+          return "BTCUSDT";
+        case "ETHUSD":
+          return "ETHUSDT";
+      }
+    }
+}

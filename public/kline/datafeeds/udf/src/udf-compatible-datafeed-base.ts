@@ -143,6 +143,7 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 						onResult([]);
 						return;
 					}
+					
 
 					onResult(response);//这是把请求的结果传递给图表库
 				})
@@ -188,6 +189,9 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 					if (response.s !== undefined) {
 						onError('unknown_symbol');
 					} else {
+						if(response.exchange == 'dydx') {
+							response.ticker = 'dydx_' + response.ticker
+						}
 						onResultReady(response);//将获取到的币种信息传递给图表库
 					}
 				})

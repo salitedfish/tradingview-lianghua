@@ -99,6 +99,9 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
                     onError('unknown_symbol');
                 }
                 else {
+                    if (response.exchange == 'dydx') {
+                        response.ticker = 'dydx_' + response.ticker;
+                    }
                     onResultReady(response); //将获取到的币种信息传递给图表库
                 }
             })
@@ -155,8 +158,8 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
      * 获取K线标记点
      */
     UDFCompatibleDatafeedBase.prototype.getMarks = function (symbolInfo, from, to, onDataCallback, resolution) {
-        return;
-        if (!this._configuration.supports_marks) {
+        // return
+        if (this._configuration.supports_marks) {
             return;
         }
         var requestParams = {
