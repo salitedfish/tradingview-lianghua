@@ -47,10 +47,10 @@
         </div>
         <div class="order_chart">
           <div v-for="(item,index) in orderList" :key="index" class="chart_item">
+          <div :title="$moment(item.OpenTime*1000).format('MM-DD hh:mm:ss')">{{(item.OpenTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div>
+          <div>{{item.OpenPrice}}</div>
           <div>{{(item.CloseTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div>
           <div>{{item.ClosePrice}}</div>
-          <div>{{(item.OpenTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div>
-          <div>{{item.OpenPrice}}</div>
           <!-- <div>{{item.CurPrice}}</div>
           <div>{{(item.CurTime*1000) | mapTime('MM-DD HH:mm:ss')}}</div> -->
           <div>{{item.Point}}</div>
@@ -82,6 +82,8 @@
 <script>
 import Vue from "vue"
 import { Pagination } from "element-ui"
+import { time } from "echarts/core";
+import { MarkPointComponent } from "echarts/components";
 import { createTradingView } from "../utilities/createTradingView";
 import { createStudy } from "../utilities/createStudy";
 import searchConfig from "../service/searchConfig"
@@ -338,7 +340,7 @@ export default {
       overflow-y:scroll;
       .chart_item {
         display: flex;
-        height: 25px;
+        height: 40px;
         align-items: center;
         border: 1px solid #efefefef;
         justify-content: space-around;
