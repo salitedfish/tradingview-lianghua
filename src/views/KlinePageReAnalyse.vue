@@ -31,10 +31,12 @@
         </div>
         <div class="head">{{orderParams.orders || '全部'}} 订单列表</div>
         <div class="chart_head">
-          <!-- <div>OpenTime</div> -->
-          <!-- <div>OpenPrice</div> -->
-          <div>CurPrice</div>
-          <div>CurTime</div>
+          <div>OpenTime</div>
+          <div>OpenPrice</div>
+          <div>CloseTime</div>
+          <div>ClosePrice</div>
+          <!-- <div>CurPrice</div> -->
+          <!-- <div>CurTime</div> -->
           <div>Point</div>
           <div>Type</div>
           <div>MaxPoint</div>
@@ -45,10 +47,12 @@
         </div>
         <div class="order_chart">
           <div v-for="(item,index) in orderList" :key="index" class="chart_item">
-          <!-- <div>{{(item.OpenTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div> -->
-          <!-- <div>{{item.OpenPrice}}</div> -->
-          <div>{{item.CurPrice}}</div>
-          <div>{{(item.CurTime*1000) | mapTime('MM-DD HH:mm:ss')}}</div>
+          <div>{{(item.CloseTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div>
+          <div>{{item.ClosePrice}}</div>
+          <div>{{(item.OpenTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div>
+          <div>{{item.OpenPrice}}</div>
+          <!-- <div>{{item.CurPrice}}</div>
+          <div>{{(item.CurTime*1000) | mapTime('MM-DD HH:mm:ss')}}</div> -->
           <div>{{item.Point}}</div>
           <div>{{item.Type == 0?'买':'卖'}}</div>
           <div>{{item.MaxPoint}}</div>
@@ -256,7 +260,7 @@ export default {
 }
 
 .kline_container {
-  width: 70%;
+  width: 60%;
   height: calc(100vh);
 }
 
