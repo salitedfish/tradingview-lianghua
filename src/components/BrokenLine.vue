@@ -1,6 +1,8 @@
 <template>
   <div class="broken_line_box">
-      <div @click="hideDialog" class="close_btn">关闭</div>
+      <div class="line_box_title">
+        <div @click="hideDialog" class="close_btn">关闭</div>
+      </div>
       <div id="broken_kline">
 
       </div>
@@ -35,8 +37,9 @@ export default {
             return this.$moment(item.OpenTime*1000).format('MM:DD HH:mm')
           })
           this.yLineData = res.data.map((item)=>{
-            return item.Balance
+            return Number(item.Balance)
           })
+          console.log(this.yLineData)
         this.myChart.setOption({
             tooltip: {
               trigger: 'axis',
@@ -51,7 +54,9 @@ export default {
             },
             yAxis: {
               name: 'Balance',
-              type: 'value'
+              type: 'value',
+              min: ()=>{return Math.min.apply(Math, this.yLineData)*0.999999999},
+              max: ()=>{return Math.max.apply(Math, this.yLineData)*1.000000001},
             },
             series: [
               {
@@ -82,6 +87,10 @@ export default {
     background: #fff;
     border: 1px solid #333;
     border-radius: 10px;
+    .line_box_title {
+      display: flex;
+      justify-content: flex-end;
+    }
     .close_btn {
       cursor: pointer;
       height: 25px;
@@ -89,7 +98,7 @@ export default {
       width: 100px;
       background-color: red;
       color: white;
-      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
     }
     #broken_kline {
         position: fixed;
