@@ -84,6 +84,10 @@ export default {
     background: #fff;
     border: 1px solid #333;
     border-radius: 10px;
+    .line_box_title {
+      display: flex;
+      justify-content: flex-end;
+    }
     .close_btn {
       cursor: pointer;
       height: 25px;
@@ -91,7 +95,7 @@ export default {
       width: 100px;
       background-color: red;
       color: white;
-      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
     }
     #broken_kline {
         position: fixed;
