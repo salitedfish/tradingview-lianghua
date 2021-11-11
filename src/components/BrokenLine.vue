@@ -1,6 +1,8 @@
 <template>
   <div class="broken_line_box">
-      <div @click="hideDialog" class="close_btn">关闭</div>
+      <div class="line_box_title">
+        <div @click="hideDialog" class="close_btn">关闭</div>
+      </div>
       <div id="broken_kline">
 
       </div>

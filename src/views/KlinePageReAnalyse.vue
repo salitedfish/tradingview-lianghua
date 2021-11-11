@@ -114,15 +114,14 @@ export default {
       orderTotal:null,
       showBrokenLine: false,
       marksObj:{},
-      timeOutFun:null
+      timeOutFun:null,
+      markTimeCache:[]
     };
   },
   mounted() {
     this.getCountList()
     this.getOrderList(this.orderParams)
-    /**
-    * 量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView
-    */
+    /**量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView*/
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
       
       this.symbolRow = res.data[0].value.split(',')[0]
@@ -134,9 +133,7 @@ export default {
       }
       searchConfig.reAnalyse_getStudyConfig().then((res)=>{
         this.studyConfig = res.data
-         /**
-         * 获取完配置后再创建K线、指标、形状
-         */
+         /** 获取完配置后再创建K线、指标、形状*/
         this.createTradingView()
         this.createStudy()
         this.createMarks()
@@ -175,9 +172,7 @@ export default {
     createStudy(){
       this.widget.onChartReady(() => {
         for(let item of this.studyConfig) {
-          /**
-           * 根据指标配置循环创建bolling和ma
-           */
+          /**根据指标配置循环创建bolling和ma*/
           if(item.type.indexOf('Bolling') != -1){
             for(let i of item.period){
               createStudy(this.widget, "Bollinger Bands", false, false, [i, 2]);
@@ -193,6 +188,7 @@ export default {
     },
     /**创建标记点 */
     createMarks(){
+      /**绘制标记 */
       const markShape = (shape, index, overrides) => {
         this.widget.activeChart().createShape({ 
           time: this.marksObj.time[index], 
@@ -218,6 +214,9 @@ export default {
         searchConfig.reAnalyse_getMarks(params).then((res)=>{
           this.marksObj = res.data
             this.marksObj.id.forEach((item,index) => {
+              /**如果缓存中已经存在这个标记的ID，说明已经绘制过这个标记，则跳过 */
+              if(this.marksObj.id[index].indexOf(this.markTimeCache) != -1) return
+              /**绘制标记 */
               if(this.marksObj.label[index] == '买'){
                 markShape('arrow_up', index, {color:"#006000", fontsize: 12})
               }else if(this.marksObj.label[index] == '卖'){
@@ -227,6 +226,8 @@ export default {
               }else if(this.marksObj.label[index] == '买平'){
                 markShape('arrow_right', index, {color:"#0080FF", fontsize: 12})
               }
+              /**标记绘制完后，缓存此标记的ID */
+              this.markTimeCache.push(this.marksObj.id[index])
             });
         })
       },5000)
