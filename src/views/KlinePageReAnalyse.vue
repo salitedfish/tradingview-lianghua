@@ -331,7 +331,7 @@ export default {
       overflow-y:scroll;
       .chart_item {
         display: flex;
-        height: 25px;
+        height: 40px;
         align-items: center;
         border: 1px solid #efefefef;
         justify-content: space-around;
