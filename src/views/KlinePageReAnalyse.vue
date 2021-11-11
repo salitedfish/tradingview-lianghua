@@ -121,11 +121,11 @@ export default {
     */
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
       
-      this.symbolRow = res.data[0].value
-      this.symbol = mapSymbol(res.data[0].value)
-      if(res.data[1].value == 'M1'){
+      this.symbolRow = res.data[0].value.split(',')[0]
+      this.symbol = mapSymbol(res.data[0].value.split(',')[0])
+      if(res.data[1].value.split(',')[0] == 'M1'){
         this.interval = '1'
-      }else if(res.data[1].value == 'M5'){
+      }else if(res.data[1].value.split(',')[0] == 'M5'){
         this.interval = '5'
       }
       searchConfig.reAnalyse_getStudyConfig().then((res)=>{
