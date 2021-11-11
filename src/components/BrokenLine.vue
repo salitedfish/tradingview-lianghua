@@ -51,7 +51,9 @@ export default {
             },
             yAxis: {
               name: 'Balance',
-              type: 'value'
+              type: 'value',
+              min: ()=>{return Math.min.apply(Math, this.yLineData)*0.999999999},
+              max: ()=>{return Math.max.apply(Math, this.yLineData)*1.000000001},
             },
             series: [
               {
