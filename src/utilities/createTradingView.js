@@ -186,6 +186,7 @@ const createTradingView = (vm, config = {}) => {
             // "show_chart_property_page"
             'header_settings',
             'header_symbol_search',/**量化回归禁用搜索，symbol由后端配置，不可前端再选 */
+            'header_resolutions'
         ],
         //设置开启哪些特性
         enabled_features: [
