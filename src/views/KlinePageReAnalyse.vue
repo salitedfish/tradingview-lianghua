@@ -115,7 +115,7 @@ export default {
       showBrokenLine: false,
       marksObj:{},
       timeOutFun:null,
-      markTimeCache:[]
+      markTimeCache:[]//用于缓存指标ID，以免重复绘图
     };
   },
   mounted() {
@@ -123,14 +123,17 @@ export default {
     this.getOrderList(this.orderParams)
     /**量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView*/
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
-      
+      /**获取指标的symbol */
       this.symbolRow = res.data[0].value.split(',')[0]
+      /**获取K线的Symbol */
       this.symbol = mapSymbol(res.data[0].value.split(',')[0])
+      /**配置周期 */
       if(res.data[1].value.split(',')[0] == 'M1'){
         this.interval = '1'
       }else if(res.data[1].value.split(',')[0] == 'M5'){
         this.interval = '5'
       }
+      /**获取指标配置 */
       searchConfig.reAnalyse_getStudyConfig().then((res)=>{
         this.studyConfig = res.data
          /** 获取完配置后再创建K线、指标、形状*/

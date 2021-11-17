@@ -184,7 +184,8 @@ const createTradingView = (vm, config = {}) => {
             // "control_bar", //控制图表工具栏（鼠标移至底部会出现）
             // "legend_widget"
             // "show_chart_property_page"
-            'header_settings'
+            'header_settings',
+            'header_symbol_search',/**量化回归禁用搜索，symbol由后端配置，不可前端再选 */
         ],
         //设置开启哪些特性
         enabled_features: [
