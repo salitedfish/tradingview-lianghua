@@ -131,7 +131,6 @@ export class SymbolsStorage {
 			const queryIsEmpty = searchString.length === 0;
 
 			searchString = searchString.toUpperCase();
-
 			for (const symbolName of this._symbolsList) {
 				const symbolInfo = this._symbolsInfo[symbolName];
 
