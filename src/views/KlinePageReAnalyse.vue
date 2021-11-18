@@ -1,7 +1,7 @@
 <template>
   <div class="kline">
     <div class="kline_container" id="kline_container_reAnalyse"></div>
-    <div class="chart_container">
+    <!-- <div class="chart_container">
       <div class="count_container">
         <div class="head">
           <div class="clear" @click="clearData()">清除数据</div>
@@ -23,7 +23,6 @@
             <div class="child_two" :title="item.SignalInfo">{{item.SignalInfo}}</div>
           </div>
         </div>
-        <!-- <div>分页</div> -->
       </div>
       <div class="order_container">
         <div class="order_banner">
@@ -35,14 +34,10 @@
           <div>OpenPrice</div>
           <div>CloseTime</div>
           <div>ClosePrice</div>
-          <!-- <div>CurPrice</div> -->
-          <!-- <div>CurTime</div> -->
           <div>Point</div>
           <div>Type</div>
           <div>MaxPoint</div>
-          <!-- <div>MaxProfit</div> -->
           <div>MinPoint</div>
-          <!-- <div>MinProfit</div> -->
           <div>Margin</div>
         </div>
         <div class="order_chart">
@@ -51,14 +46,10 @@
           <div>{{item.OpenPrice}}</div>
           <div>{{(item.CloseTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div>
           <div>{{item.ClosePrice}}</div>
-          <!-- <div>{{item.CurPrice}}</div>
-          <div>{{(item.CurTime*1000) | mapTime('MM-DD HH:mm:ss')}}</div> -->
           <div>{{item.Point}}</div>
           <div>{{item.Type == 0?'买':'卖'}}</div>
           <div>{{item.MaxPoint}}</div>
-          <!-- <div>{{item.MaxProfit}}</div> -->
           <div>{{item.MinPoint}}</div>
-          <!-- <div>{{item.MinProfit}}</div> -->
           <div>{{item.Margin}}</div>
           </div>
         </div>
@@ -74,8 +65,8 @@
           </el-pagination>
         </div>
       </div>
-    </div>
-    <broken-line v-if="showBrokenLine" @hideDialog="showLine"></broken-line>
+    </div> -->
+    <!-- <broken-line v-if="showBrokenLine" @hideDialog="showLine"></broken-line> -->
   </div>
 </template>
 
@@ -119,18 +110,19 @@ export default {
     };
   },
   mounted() {
-    this.getCountList()
-    this.getOrderList(this.orderParams)
+    /**下面两个是获取账号何订单的接口 */
+    // this.getCountList()
+    // this.getOrderList(this.orderParams)
     /**量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView*/
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
-      /**获取指标的symbol */
-      this.symbolRow = res.data[0].value.split(',')[0]
-      /**获取K线的Symbol */
-      this.symbol = mapSymbol(res.data[0].value.split(',')[0])
+      /**获取指标的symbol,目前后端配置0为以太坊，1为比特币 */
+      this.symbolRow = res.data[1].value
+      /**获取K线的Symbol,目前后端配置0为以太坊，1为比特币 */
+      this.symbol = mapSymbol(res.data[1].value)
       /**配置周期 */
-      if(res.data[1].value.split(',')[0] == 'M1'){
+      if(res.data[0].value == 'M1'){
         this.interval = '1'
-      }else if(res.data[1].value.split(',')[0] == 'M5'){
+      }else if(res.data[0].value == 'M5'){
         this.interval = '5'
       }
       /**获取指标配置 */
@@ -205,9 +197,9 @@ export default {
            lock: true 
           });
       }
-      /**间隔10秒获取一次可见范围内的标记 */
+      /**间隔5秒获取一次可见范围内的标记 */
       setInterval(()=>{
-        const { from, to} = this.widget.chart().getVisibleRange()
+        const { from, to} = this.widget.activeChart().getVisibleRange()
         const params = {
           symbol:this.symbolRow,
           from,
@@ -218,7 +210,7 @@ export default {
           this.marksObj = res.data
             this.marksObj.id.forEach((item,index) => {
               /**如果缓存中已经存在这个标记的ID，说明已经绘制过这个标记，则跳过 */
-              if(this.marksObj.id[index].indexOf(this.markTimeCache) != -1) return
+              if(this.markTimeCache.indexOf(this.marksObj.id[index]) != -1) return
               /**绘制标记 */
               if(this.marksObj.label[index] == '买'){
                 markShape('arrow_up', index, {color:"#006000", fontsize: 12})
@@ -257,7 +249,7 @@ export default {
 }
 
 .kline_container {
-  width: 70%;
+  width: 100%;
   height: calc(100vh);
 }
 
