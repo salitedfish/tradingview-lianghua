@@ -197,7 +197,8 @@ const createTradingView = (vm, config = {}) => {
             // "volumePaneSize": "small",
             // "paneProperties.legendProperties.showLegend": false,
 
-            "mainSeriesProperties.style": 1, // k线图
+            "mainSeriesProperties.style": 9, // k线图
+            "mainSeriesProperties.showPriceLine": 1, // 是否显示当前价格线
             // "paneProperties.background": "rgb(27,34,63)", // 背景色透明
             // "paneProperties.background": "#000000",
             // "paneProperties.background": "#ffffff",
@@ -213,26 +214,22 @@ const createTradingView = (vm, config = {}) => {
             // 'mainSeriesProperties.lineStyle.color':'#fff',
 
             //这些是k线图 mainSeriesProperties为1时生效
-            // "mainSeriesProperties.candleStyle.upColor": "#5FBD7B", // 蜡烛图阳线颜色
             "mainSeriesProperties.candleStyle.upColor": "#02C076", // 蜡烛图阳线颜色
             "mainSeriesProperties.candleStyle.borderUpColor": "#02C076", // 阳线边框颜色
             "mainSeriesProperties.candleStyle.wickUpColor": "#02C076", // 阳线的影线颜色
-
             "mainSeriesProperties.candleStyle.downColor": "#F84960", // 蜡烛图阴线颜色
             "mainSeriesProperties.candleStyle.borderDownColor": "#F84960", // 阴线边框颜色
             "mainSeriesProperties.candleStyle.wickDownColor": "#F84960", // 阴线的影线颜色
 
             //这些是空心k线图 mainSeriesProperties为9时生效
-            "mainSeriesProperties.showPriceLine": 1, // 是否显示当前价格线
             "mainSeriesProperties.hollowCandleStyle.upColor": "#02C076",
-            "mainSeriesProperties.hollowCandleStyle.borderUpColor": "#02C076",
-            "mainSeriesProperties.hollowCandleStyle.wickUpColor": "#02C076",
-
             "mainSeriesProperties.hollowCandleStyle.downColor": "#F84960",
-            "mainSeriesProperties.hollowCandleStyle.wickDownColor": "#F84960",
+            "mainSeriesProperties.hollowCandleStyle.drawWick": true,
+            "mainSeriesProperties.hollowCandleStyle.drawBorder": true,
+            // "mainSeriesProperties.hollowCandleStyle.borderColor": "#02C076",
+            "mainSeriesProperties.hollowCandleStyle.borderUpColor": "#02C076",
             "mainSeriesProperties.hollowCandleStyle.borderDownColor": "#F84960",
-
-            "mainSeriesProperties.hollowCandleStyle.drawBorder": false,
+            // "mainSeriesProperties.hollowCandleStyle.wickColor": "#FFFFFF",
         },
 
         //统一设置指标的属性

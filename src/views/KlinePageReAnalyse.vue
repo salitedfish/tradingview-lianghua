@@ -90,7 +90,7 @@ export default {
       baseUrl: process.env.BASE_URL,
       DIYExchange: '/api',
       // DIYExchange: '/reAnalyse',
-      symbol:'BTC-USD',//这个是用来获取K线的，火币、dydx和找币名称都不一样，dydx要加dydx_
+      symbol:'dydx_BTC-USD',//这个是用来获取K线的，火币、dydx和找币名称都不一样，dydx要加dydx_
       symbolRow:'BTCUSD',//这个是用来获取标记的，直接使用获取到的配置里的名称就行
       interval:'1',
       xkey:'reAnalyse',

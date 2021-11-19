@@ -5,7 +5,7 @@
   "scripts": {
     "serve_huobi": "vue-cli-service serve --mode huobi",
     "serve_dydx": "vue-cli-service serve --mode dydx",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build  --mode dydx"
   },
   "dependencies": {
     "axios": "^0.21.1",
