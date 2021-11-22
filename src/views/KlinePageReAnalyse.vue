@@ -130,9 +130,10 @@ export default {
     * 量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView
     */
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
-      this.symbolRow = res.data[1].value//获取指标
-      // this.symbol= mapSymbol(res.data[1].value, 'dydx')//获取K线
-      this.symbol= res.data[1].value//获取K线
+      // this.symbolRow = res.data[1].value
+      // this.symbol= mres.data[1].value
+      this.symbolRow = mapSymbol(res.data[1].value, 'dydx')
+      this.symbol= mapSymbol(res.data[1].value, 'dydx')
       if(res.data[0].value == 'M1'){
         this.interval = '1'
       }else if(res.data[0].value == 'M5'){
