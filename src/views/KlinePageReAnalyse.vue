@@ -104,7 +104,8 @@ export default {
         MT4: ["EASYFOREX", "OANDA"],
       },
       DIYExchange: '/reAnalyse',
-      symbol:'',
+      symbol:'dydx_BTC-USD',
+      symbolRow: 'BTCUSD',
       interval:'',
       xkey:'reAnalyse',
       studyConfig:[],
@@ -129,7 +130,8 @@ export default {
     * 量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView
     */
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
-      this.symbol = mapSymbol(res.data[1].value, 'dydx')
+      this.symbolRow = res.data[1].value//获取指标
+      this.symbol = mapSymbol(res.data[1].value, 'dydx')//获取K线
       if(res.data[0].value == 'M1'){
         this.interval = '1'
       }else if(res.data[0].value == 'M5'){
@@ -216,7 +218,7 @@ export default {
             clearTimeout(this.timeOutFun)
             const eventFun = () => {
               const params = {
-                symbol:this.symbol,
+                symbol:this.symbolRow,
                 from,
                 to,
                 resolution: this.interval
