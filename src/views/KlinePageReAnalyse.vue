@@ -131,6 +131,7 @@ export default {
     */
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
       this.symbolRow = res.data[1].value//获取指标
+      // this.symbol= mapSymbol(res.data[1].value, 'dydx')//获取K线
       this.symbol= res.data[1].value//获取K线
       if(res.data[0].value == 'M1'){
         this.interval = '1'
