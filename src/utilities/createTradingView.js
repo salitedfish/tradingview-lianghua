@@ -223,7 +223,7 @@ const createTradingView = (vm, config = {}) => {
 
             //这些是空心k线图 mainSeriesProperties为9时生效
             "mainSeriesProperties.hollowCandleStyle.upColor": "#02C076",
-            "mainSeriesProperties.hollowCandleStyle.downColor": "#F84960",
+            "mainSeriesProperties.hollowCandleStyle.downColor": "rgba(0, 0, 0, 0)",
             "mainSeriesProperties.hollowCandleStyle.drawWick": true,
             "mainSeriesProperties.hollowCandleStyle.drawBorder": true,
             // "mainSeriesProperties.hollowCandleStyle.borderColor": "#02C076",

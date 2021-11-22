@@ -213,13 +213,13 @@ export default {
               if(this.markTimeCache.indexOf(this.marksObj.id[index]) != -1) return
               /**绘制标记 */
               if(this.marksObj.label[index] == '买'){
-                markShape('arrow_up', index, {color:"#006000", fontsize: 12})
+                markShape('arrow_up', index, {color:"#02C076", fontsize: 12})
               }else if(this.marksObj.label[index] == '卖'){
-                markShape('arrow_down', index, {color:"#EA0000", fontsize: 12})
+                markShape('arrow_down', index, {color:"#FF2D2D", fontsize: 12})
               }else if(this.marksObj.label[index] == '卖平'){
-                markShape('arrow_left', index, {color:"#0080FF", fontsize: 12})
+                markShape('arrow_left', index, {color:"#66B3FF", fontsize: 12})
               }else if(this.marksObj.label[index] == '买平'){
-                markShape('arrow_right', index, {color:"#0080FF", fontsize: 12})
+                markShape('arrow_right', index, {color:"#66B3FF", fontsize: 12})
               }
               /**标记绘制完后，缓存此标记的ID */
               this.markTimeCache.push(this.marksObj.id[index])
