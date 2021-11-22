@@ -128,10 +128,10 @@ export default {
     * 量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView
     */
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
-      this.symbol = res.data[0].value
-      if(res.data[1].value == 'M1'){
+      this.symbol = res.data[1].value
+      if(res.data[0].value == 'M1'){
         this.interval = '1'
-      }else if(res.data[1].value == 'M5'){
+      }else if(res.data[0].value == 'M5'){
         this.interval = '5'
       }
       searchConfig.reAnalyse_getStudyConfig().then((res)=>{
@@ -250,7 +250,7 @@ export default {
       setTimeout(()=>{
         location.reload()
       }, 2000)
-      
+
     },
     /**展示资产变化曲线 */
     showLine(){
