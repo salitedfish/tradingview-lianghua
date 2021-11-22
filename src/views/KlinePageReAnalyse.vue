@@ -197,7 +197,7 @@ export default {
            lock: true 
           });
       }
-      /**间隔5秒获取一次可见范围内的标记 */
+      /**间隔1秒获取一次可见范围内的标记 */
       setInterval(()=>{
         const { from, to} = this.widget.activeChart().getVisibleRange()
         const params = {
@@ -225,7 +225,7 @@ export default {
               this.markTimeCache.push(this.marksObj.id[index])
             });
         })
-      },5000)
+      },1000)
     },
     /**清除数据 */
     clearData(){

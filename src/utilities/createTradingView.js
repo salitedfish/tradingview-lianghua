@@ -34,7 +34,7 @@ const createTradingView = (vm, config = {}) => {
         //采用接口提供数据
         datafeed: new Datafeeds.UDFCompatibleDatafeed(
             vm.DIYExchange,
-            10000,//哈哈，量化回归分析100个小时请求一次数据,
+            2000,//哈哈，量化回归分析100个小时请求一次数据,
         ),
         //设置static文件夹路径
         library_path: `${vm.baseUrl}kline/charting_library/`,
