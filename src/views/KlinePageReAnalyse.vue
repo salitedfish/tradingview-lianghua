@@ -88,6 +88,7 @@ import { createTradingView } from "../utilities/createTradingView";
 import { createStudy } from "../utilities/createStudy";
 import searchConfig from "../service/searchConfig"
 import BrokenLine from "@/components/BrokenLine.vue"
+import { mapSymbol } from "@/utilities/dataMap" 
 // import overrides from "../utilities/overrides";
 Vue.use(Pagination)
 export default {
@@ -128,7 +129,7 @@ export default {
     * 量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView
     */
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
-      this.symbol = res.data[1].value
+      this.symbol = mapSymbol(res.data[1].value, 'dydx')
       if(res.data[0].value == 'M1'){
         this.interval = '1'
       }else if(res.data[0].value == 'M5'){

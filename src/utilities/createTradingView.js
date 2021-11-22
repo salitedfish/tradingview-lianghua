@@ -24,7 +24,7 @@ const createTradingView = (vm, config = {}) => {
         // interval:  "1D",
         interval: vm.interval || "60",
         //初始商品名
-        symbol: symbolInfo.name.toUpperCase(),
+        symbol: symbolInfo.name,
         //挂载的dom元素
         container_id: "kline_container_" + vm.xkey,
         // datafeed: new Datafeeds.UDFCompatibleDatafeed("http://172.16.103.31:15921/kdata",10000),

@@ -35,3 +35,21 @@ const rankDataMap = (count, data) => {
 }
 
 export {rankDataMap}
+
+export const mapSymbol = (symbol, type) => {
+    if(type == 'dydx') {
+      switch(symbol){
+        case "BTCUSD":
+          return "dydx_BTC-USD";
+        case "ETHUSD":
+          return "dydx_ETH-USD";
+      }
+    }else if(type == 'huobi') {
+      switch(symbol){
+        case "BTCUSD":
+          return "BTCUSDT";
+        case "ETHUSD":
+          return "ETHUSDT";
+      }
+    }
+}
