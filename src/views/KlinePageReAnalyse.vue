@@ -246,7 +246,11 @@ export default {
     /**清除数据 */
     clearData(){
       searchConfig.reAnalyse_clear()
-      location.reload()
+      
+      setTimeout(()=>{
+        location.reload()
+      }, 2000)
+      
     },
     /**展示资产变化曲线 */
     showLine(){
