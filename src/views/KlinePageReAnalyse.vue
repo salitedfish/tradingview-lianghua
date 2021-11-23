@@ -248,8 +248,16 @@ export default {
         this.widget.changeTheme(
           this.widget.getTheme() == "dark" ? "light" : "dark"
         );
-        this.widget.applyOverrides({
-          "hollowCandleStyle.downColor": "rgba(0, 0, 0, 0)",
+        this.$nextTick(()=>{
+          this.widget.applyOverrides({
+            "style": 9,
+            "hollowCandleStyle.upColor": "#02C076",
+            "hollowCandleStyle.downColor": "rgba(0, 0, 0, 0)",
+            "hollowCandleStyle.drawWick": true,
+            "hollowCandleStyle.drawBorder": true,
+            "hollowCandleStyle.borderUpColor": "#02C076",
+            "hollowCandleStyle.borderDownColor": "#F84960",
+          })
         })
       }
     },

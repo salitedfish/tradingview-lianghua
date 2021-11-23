@@ -46,7 +46,7 @@ const createTradingView = (vm, config = {}) => {
         debug: false,
         // loading_screen: { backgroundColor: "#000000", foregroundColor: "#000000", },//todo:do it
         allow_symbol_change: true,
-        theme: "Light",
+        theme: "Dark",
         // timeframe: isMobile()?"720":"1d",//设置初始的时间展示范围,
         timeframe:vm.xkey == 'reAnalyse'?'1d': isMobile()?"720":"1d",//设置初始的时间展示范围
         // toolbar_bg: "#FFF",
