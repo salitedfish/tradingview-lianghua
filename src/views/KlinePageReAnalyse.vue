@@ -229,7 +229,7 @@ export default {
               searchConfig.reAnalyse_getMarks(params).then((res)=>{
                 this.marksObj = res.data
                   this.marksObj.id.forEach((item,index) => {
-                    if(this.marksObj.id[index].indexOf(this.markTimeCache) != -1) return
+                    if(this.markTimeCache.indexOf(this.marksObj.id[index]) != -1) return
                     if(this.marksObj.label[index] == '买'){
                       markShape('arrow_up', index, {color:"#006000", fontsize: 12})
                     }else if(this.marksObj.label[index] == '卖'){
