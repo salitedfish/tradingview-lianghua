@@ -145,6 +145,7 @@ export default {
          * 获取完配置后再创建K线、指标、形状
          */
         this.createTradingView()
+        this.createBtn()
         this.createStudy()
         this.createMarks()
       })
@@ -247,6 +248,28 @@ export default {
           false
         )
       })
+    },
+    /**创建自定义按钮 */
+    createBtn(){
+      this.widget.onChartReady(()=>{
+        this.widget.headerReady().then(() => {
+          const themeChangeButton = this.widget.createButton();
+          themeChangeButton.textContent = "主题切换";
+          themeChangeButton.addEventListener("click", () => {
+            this.changeTheme();
+          });
+        });
+      })
+    },
+    /**改变主题 */
+    changeTheme(type) {
+      if (type) {
+        this.widget.changeTheme(type);
+      } else {
+        this.widget.changeTheme(
+          this.widget.getTheme() == "dark" ? "light" : "dark"
+        );
+      }
     },
     /**清除数据 */
     clearData(){
