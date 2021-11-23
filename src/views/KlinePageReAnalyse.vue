@@ -110,31 +110,31 @@ export default {
     };
   },
   mounted() {
-    // /**下面两个是获取账号何订单的接口 */
-    // // this.getCountList()
-    // // this.getOrderList(this.orderParams)
-    // /**量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView*/
-    // searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
-    //   /**获取指标的symbol,目前后端配置0为以太坊，1为比特币 */
-    //   this.symbolRow = res.data[1].value
-    //   /**获取K线的Symbol,目前后端配置0为以太坊，1为比特币 */
-    //   this.symbol = mapSymbol(res.data[1].value)
-    //   /**配置周期 */
-    //   if(res.data[0].value == 'M1'){
-    //     this.interval = '1'
-    //   }else if(res.data[0].value == 'M5'){
-    //     this.interval = '5'
-    //   }
-    //   /**获取指标配置 */
-    //   searchConfig.reAnalyse_getStudyConfig().then((res)=>{
-        // this.studyConfig = res.data
+    /**下面两个是获取账号何订单的接口 */
+    // this.getCountList()
+    // this.getOrderList(this.orderParams)
+    /**量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView*/
+    searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
+      /**获取指标的symbol,目前后端配置0为以太坊，1为比特币 */
+      this.symbolRow = res.data[1].value
+      /**获取K线的Symbol,目前后端配置0为以太坊，1为比特币 */
+      this.symbol = mapSymbol(res.data[1].value)
+      /**配置周期 */
+      if(res.data[0].value == 'M1'){
+        this.interval = '1'
+      }else if(res.data[0].value == 'M5'){
+        this.interval = '5'
+      }
+      /**获取指标配置 */
+      searchConfig.reAnalyse_getStudyConfig().then((res)=>{
+        this.studyConfig = res.data
          /** 获取完配置后再创建K线、按钮、指标、形状*/
         this.createTradingView()
         this.createBtn()
         this.createStudy()
         this.createMarks()
-    //   })
-    // })
+      })
+    })
   },
   methods: {
     /**获取账户列表 */
@@ -228,15 +228,6 @@ export default {
         })
       },1000)
     },
-    /**清除数据 */
-    clearData(){
-      searchConfig.reAnalyse_clear()
-      location.reload()
-    },
-    /**展示资产变化曲线 */
-    showLine(){
-      this.showBrokenLine = !this.showBrokenLine
-    },
     /**创建自定义按钮 */
     createBtn(){
       this.widget.onChartReady(()=>{
@@ -257,7 +248,19 @@ export default {
         this.widget.changeTheme(
           this.widget.getTheme() == "dark" ? "light" : "dark"
         );
+        this.widget.applyOverrides({
+          "hollowCandleStyle.downColor": "rgba(0, 0, 0, 0)",
+        })
       }
+    },
+    /**清除数据 */
+    clearData(){
+      searchConfig.reAnalyse_clear()
+      location.reload()
+    },
+    /**展示资产变化曲线 */
+    showLine(){
+      this.showBrokenLine = !this.showBrokenLine
     },
   },
   beforeDestroy() {
