@@ -192,7 +192,7 @@ const createTradingView = (vm, config = {}) => {
             // "volumePaneSize": "small",
             // "paneProperties.legendProperties.showLegend": false,
 
-            "mainSeriesProperties.style": 1, // k线图
+            "mainSeriesProperties.style": 9, // k线图
             // "paneProperties.background": "rgb(27,34,63)", // 背景色透明
             // "paneProperties.background": "#000000",
             // "paneProperties.background": "#ffffff",
@@ -223,7 +223,7 @@ const createTradingView = (vm, config = {}) => {
             "mainSeriesProperties.hollowCandleStyle.borderUpColor": "#02C076",
             "mainSeriesProperties.hollowCandleStyle.wickUpColor": "#02C076",
 
-            "mainSeriesProperties.hollowCandleStyle.downColor": "#F84960",
+            "mainSeriesProperties.hollowCandleStyle.downColor": "rgba(0, 0, 0, 0)",
             "mainSeriesProperties.hollowCandleStyle.wickDownColor": "#F84960",
             "mainSeriesProperties.hollowCandleStyle.borderDownColor": "#F84960",
 
