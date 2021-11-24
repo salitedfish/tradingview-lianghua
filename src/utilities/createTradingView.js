@@ -66,17 +66,17 @@ const createTradingView = (vm, config = {}) => {
                 {
                     // 将<study name>替换为您的指标名称
                     // 它将由图表库内部使用
-                    name: "holdKLine",
+                    name: "amplitude",
                     metainfo: {
                         "_metainfoVersion": 40,
-                        "id": "holdKLine@tv-basicstudies-1",
+                        "id": "amplitude@tv-basicstudies-1",
                         "scriptIdPart": "",
-                        "name": "holdKLine",
+                        "name": "amplitude",
                         // 此说明将显示在指标窗口中
                         // 当调用createStudy方法时，它也被用作“name”参数
-                        "description": "holdKLine",
+                        "description": "amplitude",
                         // 该描述将显示在图表上
-                        "shortDescription": "holdKLine",
+                        "shortDescription": "amplitude",
                         "is_hidden_study": true,
                         "is_price_study": false,
                         "isCustomIndicator": true,
@@ -114,7 +114,7 @@ const createTradingView = (vm, config = {}) => {
                         "styles": {
                             "plot_0": {
                                 // 输出的名字将在样式窗口显示
-                                "title": "holdKline",
+                                "title": "amplitude",
                                 "histogramBase": 0,
                             }
                         },
@@ -128,14 +128,10 @@ const createTradingView = (vm, config = {}) => {
                             // 商品应该是一个字符串。
                             // 您可以使用PineJS.Std.ticker（this._context）获取所选商品的代码。
                             // 例,
-                            //    var symbol = "AAPL";
-                            //    var symbol = "#EQUITY";
-                            //    var symbol = PineJS.Std.ticker(this._context) + "#TEST";
-                            var symbol = "HOLD:ETHUSDT";
+                            var symbol = symbolInfo.name.toUpperCase();
                             this._context.new_sym(symbol, PineJS.Std.period(this._context), PineJS.Std.period(this._context));
                         };
                         this.main = function (context, inputCallback) {
-                            // window.console.log(this._context)
                             this._context = context;
                             this._input = inputCallback;
                             this._context.select_sym(1);
@@ -146,18 +142,7 @@ const createTradingView = (vm, config = {}) => {
                             var h = PineJS.Std.high(this._context)
                             var l = PineJS.Std.low(this._context)
                             var c = PineJS.Std.close(this._context);
-                            // console.log('ooooooooooooo',o)
-                            // console.log('hhhhhhhhhhhhh',h)
-                            // console.log('lllllllllllll',l)
-                            // console.log('ccccccccccccc',c)
-                            return [0 - o, 0 - h, 0 - l, 0 - c];
-                            // return {
-                            //     open: [0 - o],
-                            //     high: [0 - h],
-                            //     low: [0 - l],
-                            //     close: [0 - c]
-                            // }
-
+                            return (h-l)/l*100;
                         }
                     }
                 }

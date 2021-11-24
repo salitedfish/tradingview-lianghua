@@ -92,6 +92,8 @@ export default {
         //这里选择overlay指标，该指标参数就是symbol
         createStudy(vm.widget, "Overlay", false, false,['HOLD:'+this.symbol]);
         createStudy(vm.widget, "Average Directional Index", false, false);
+        // createStudy(vm.widget, "amplitude", false, true);
+
         // this.config[symbolInfo.exchange] &&
         //   this.config[symbolInfo.exchange].forEach((val) => {
         //     vm.widget
