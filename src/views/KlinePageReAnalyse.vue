@@ -1,5 +1,10 @@
 <template>
   <div class="kline">
+    <div>
+      <audio id="buyMarkPlayer" src="https://hanyu-word-pinyin-short.cdn.bcebos.com/mai3.mp3" controls preload hidden></audio>
+      <audio id="saleMarkPlayer" src="https://hanyu-word-pinyin-short.cdn.bcebos.com/mai4.mp3" controls preload hidden></audio>
+      <audio id="balanceMarkPlayer" src="https://hanyu-word-pinyin-short.cdn.bcebos.com/ping2.mp3" controls preload hidden></audio>
+    </div>
     <div class="kline_container" id="kline_container_reAnalyse"></div>
     <!-- <div class="chart_container">
       <div class="count_container">
@@ -106,10 +111,16 @@ export default {
       showBrokenLine: false,
       marksObj:{},
       timeOutFun:null,
-      markTimeCache:[]//用于缓存指标ID，以免重复绘图
+      markTimeCache:[],//用于缓存指标ID，以免重复绘图
+      buyMarkPlayer:null,
+      markPlayerEnable:false
     };
   },
   mounted() {
+    /**获取音频播放dom */
+    this.buyMarkPlayer = document.getElementById("buyMarkPlayer")
+    this.saleMarkPlayer = document.getElementById("saleMarkPlayer")
+    this.balanceMarkPlayer = document.getElementById("balanceMarkPlayer")
     /**下面两个是获取账号何订单的接口 */
     // this.getCountList()
     // this.getOrderList(this.orderParams)
@@ -215,12 +226,16 @@ export default {
               /**绘制标记 */
               if(this.marksObj.label[index] == '买'){
                 markShape('arrow_up', index, {color:"#02C076", fontsize: 12})
+                if(this.markPlayerEnable) this.playAudio(0)
               }else if(this.marksObj.label[index] == '卖'){
                 markShape('arrow_down', index, {color:"#FF2D2D", fontsize: 12})
+                if(this.markPlayerEnable) this.playAudio(1)
               }else if(this.marksObj.label[index] == '卖平'){
                 markShape('arrow_left', index, {color:"#66B3FF", fontsize: 12})
+                if(this.markPlayerEnable) this.playAudio(2)
               }else if(this.marksObj.label[index] == '买平'){
                 markShape('arrow_right', index, {color:"#66B3FF", fontsize: 12})
+                if(this.markPlayerEnable) this.playAudio(2)
               }
               /**标记绘制完后，缓存此标记的ID */
               this.markTimeCache.push(this.marksObj.id[index])
@@ -232,10 +247,18 @@ export default {
     createBtn(){
       this.widget.onChartReady(()=>{
         this.widget.headerReady().then(() => {
+          /**创建改变主题按钮 */
           const themeChangeButton = this.widget.createButton();
           themeChangeButton.textContent = "主题切换";
           themeChangeButton.addEventListener("click", () => {
             this.changeTheme();
+          });
+          /**创建改变主题按钮 */
+          const audioPlayerEnableButton = this.widget.createButton();
+          audioPlayerEnableButton.textContent = "语音播报";
+          audioPlayerEnableButton.addEventListener("click", () => {
+            this.markPlayerEnable = !this.markPlayerEnable;
+            alert(this.markPlayerEnable?'语音播报开启':'语音播报关闭')
           });
         });
       })
@@ -259,6 +282,20 @@ export default {
             "hollowCandleStyle.borderDownColor": "#F84960",
           })
         })
+      }
+    },
+    /**播放音频 */
+    playAudio(type){
+      switch(type){
+        case 0:
+          this.buyMarkPlayer.play();
+          return
+        case 1:
+          this.saleMarkPlayer.play();
+          return
+        case 2:
+          this.balanceMarkPlayer.play();
+          return
       }
     },
     /**清除数据 */
