@@ -207,7 +207,7 @@ export default {
           price: Number(this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1)) 
           }, 
           { 
-           text: this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1) + "-" + this.marksObj.id[index].toString().slice(-2), 
+           text: this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1) + "---" + this.marksObj.id[index].toString().slice(-2), 
            overrides,
            shape,
            zOrder: "top", 
