@@ -36,20 +36,27 @@ const rankDataMap = (count, data) => {
 
 export {rankDataMap}
 
-export const mapSymbol = (symbol) => {
-    if(process.env.NODE_ENV == 'dydx') {
-      switch(symbol){
-        case "BTCUSD":
-          return "dydx_BTC-USD";
-        case "ETHUSD":
-          return "dydx_ETH-USD";
-      }
-    }else if(process.env.NODE_ENV == 'huobi') {
-      switch(symbol){
-        case "BTCUSD":
-          return "BTCUSDT";
-        case "ETHUSD":
-          return "ETHUSDT";
-      }
+export const mapSymbol = (symbol, type) => {
+    if(type == 'DYDX') {
+        switch(symbol){
+          case "BTCUSD":
+            return "dydx_BTC-USD";
+          case "ETHUSD":
+            return "dydx_ETH-USD";
+        }
+    }else if(type == 'OK') {
+        switch(symbol){
+            case "BTCUSD":
+              return "okcoin_BTC-USDT-SWAP";
+            case "ETHUSD":
+              return "okcoin_ETH-USD-SWAP";
+          }
+    }else if(type == 'HUOBI') {
+        switch(symbol){
+          case "BTCUSD":
+            return "BTCUSDT";
+          case "ETHUSD":
+            return "ETHUSDT";
+        }
     }
 }

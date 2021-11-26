@@ -189,8 +189,12 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 					if (response.s !== undefined) {
 						onError('unknown_symbol');
 					} else {
+						/**针对DYDX和OK因为后端ticker没有做相应处理，这里自行处理 */
 						if(response.exchange == 'dydx') {
 							response.ticker = 'dydx_' + response.ticker
+						}
+						if(response.exchange == 'okcoin') {
+							response.ticker = 'okcoin_' + response.ticker
 						}
 						onResultReady(response);//将获取到的币种信息传递给图表库
 					}

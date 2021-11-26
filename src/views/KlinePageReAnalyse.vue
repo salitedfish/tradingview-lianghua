@@ -95,7 +95,7 @@ export default {
       baseUrl: process.env.BASE_URL,
       DIYExchange: '/api',
       // DIYExchange: '/reAnalyse',
-      symbol:'dydx_BTC-USD',//这个是用来获取K线的，火币、dydx和找币名称都不一样，dydx要加dydx_
+      symbol:'dydx_BTC-USD',//这个是用来获取K线的，火币、dydx、找币和OK名称都不一样，dydx要加dydx_，ok要加okcoin_
       symbolRow:'BTCUSD',//这个是用来获取标记的，直接使用获取到的配置里的名称就行
       interval:'1',
       xkey:'reAnalyse',
@@ -111,9 +111,11 @@ export default {
       showBrokenLine: false,
       marksObj:{},
       timeOutFun:null,
+      getMarkInterval:null,
       markTimeCache:[],//用于缓存指标ID，以免重复绘图
       buyMarkPlayer:null,
-      markPlayerEnable:false
+      markPlayerEnable:false,
+      exchangeType: localStorage.getItem('exchangeType') || 'DYDX',
     };
   },
   mounted() {
@@ -129,7 +131,7 @@ export default {
       /**获取指标的symbol,目前后端配置0为以太坊，1为比特币 */
       this.symbolRow = res.data[1].value
       /**获取K线的Symbol,目前后端配置0为以太坊，1为比特币 */
-      this.symbol = mapSymbol(res.data[1].value)
+      this.symbol = mapSymbol(res.data[1].value, this.exchangeType)
       /**配置周期 */
       if(res.data[0].value == 'M1'){
         this.interval = '1'
@@ -210,7 +212,7 @@ export default {
           });
       }
       /**间隔1秒获取一次可见范围内的标记 */
-      setInterval(()=>{
+      this.getMarkInterval = setInterval(()=>{
         const { from, to} = this.widget.activeChart().getVisibleRange()
         const params = {
           symbol:this.symbolRow,
@@ -259,6 +261,19 @@ export default {
           audioPlayerEnableButton.addEventListener("click", () => {
             this.markPlayerEnable = !this.markPlayerEnable;
             alert(this.markPlayerEnable?'语音播报开启':'语音播报关闭')
+          });
+          /**切换交易所按钮 */
+          const okButton = this.widget.createButton();
+          okButton.textContent = "OK";
+          okButton.addEventListener("click", () => {
+            localStorage.setItem('exchangeType', 'OK')
+            location.reload()
+          });
+          const dydxButton = this.widget.createButton();
+          dydxButton.textContent = "DYDX";
+          dydxButton.addEventListener("click", () => {
+            localStorage.setItem('exchangeType', 'DYDX')
+            location.reload()
           });
         });
       })
@@ -310,6 +325,7 @@ export default {
   },
   beforeDestroy() {
     this.widget = null
+    clearInterval(this.getMarkInterval)
   },
 };
 </script>

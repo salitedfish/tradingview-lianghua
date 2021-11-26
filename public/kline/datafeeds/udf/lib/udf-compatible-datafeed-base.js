@@ -102,6 +102,9 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
                     if (response.exchange == 'dydx') {
                         response.ticker = 'dydx_' + response.ticker;
                     }
+                    if (response.exchange == 'okcoin') {
+                        response.ticker = 'okcoin_' + response.ticker;
+                    }
                     onResultReady(response); //将获取到的币种信息传递给图表库
                 }
             })

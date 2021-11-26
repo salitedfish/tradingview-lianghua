@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve_huobi": "vue-cli-service serve --mode huobi",
-    "serve_dydx": "vue-cli-service serve --mode dydx",
-    "build_dydx": "vue-cli-service build  --mode dydx"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
   },
   "dependencies": {
     "axios": "^0.21.1",
