@@ -11,7 +11,7 @@ module.exports = {
         // target:'http://119.8.37.55:5062',
         // dydx
         // target:'http://119.8.37.55:6062',
-        target:  process.env.VUE_APP_URL,
+        target:  "http://119.8.37.55:5062",
         pathRewrite: {
           '^/api': ''
         }
