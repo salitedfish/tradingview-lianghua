@@ -1,7 +1,7 @@
 <template>
   <div class="kline">
     <div class="kline_container" id="kline_container_reAnalyse"></div>
-    <div class="chart_container">
+    <div class="chart_container" v-if="false">
       <div class="count_container">
         <div class="head">
           <div class="clear" @click="clearData()">清除数据</div>
@@ -134,11 +134,7 @@ export default {
       // this.symbol= mres.data[1].value
       this.symbolRow = mapSymbol(res.data[1].value, 'dydx')
       this.symbol= mapSymbol(res.data[1].value, 'dydx')
-      if(res.data[0].value == 'M1'){
-        this.interval = '1'
-      }else if(res.data[0].value == 'M5'){
-        this.interval = '5'
-      }
+      this.interval = res.data[0].value.substr(1, res.data[0].value.length)
       searchConfig.reAnalyse_getStudyConfig().then((res)=>{
         this.studyConfig = res.data
          /**
@@ -214,6 +210,8 @@ export default {
            lock: true 
           });
       }
+
+
       this.widget.onChartReady(()=>{
         this.widget.chart().onVisibleRangeChanged().subscribe(
           null,
@@ -242,6 +240,8 @@ export default {
                     this.markTimeCache.push(this.marksObj.id[index])
                   });
               })
+
+
             }
             this.timeOutFun = setTimeout(eventFun,1000)
           },
