@@ -1,7 +1,7 @@
 <template>
   <div class="kline">
     <div class="kline_container" id="kline_container_reAnalyse"></div>
-    <div class="chart_container" v-if="false">
+    <div class="chart_container">
       <div class="count_container">
         <div class="head">
           <div class="clear" @click="clearData()">清除数据</div>
