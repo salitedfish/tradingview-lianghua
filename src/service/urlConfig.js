@@ -8,6 +8,6 @@ const urlConfig = {
     reAnalyse_getOrderList:'/reAnalyse/list/order',
     reAnalyse_clear:'/reAnalyse/clear',
     reAnalyse_broken_line: '/reAnalyse/balance',
-    reAnalyse_getMarks: '/reAnalyse/marks'
+    reAnalyse_getMarks: '/reAnalyse/market'
 }
 export default urlConfig

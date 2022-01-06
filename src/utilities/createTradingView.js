@@ -60,6 +60,9 @@ const createTradingView = (vm, config = {}) => {
             { text: "3d", resolution: "15", title: "3天" },
             { text: "1d", resolution: "5", title: "1天" },
         ],
+        favoeites: {
+            intervals: ['1D']
+        },
         // custom_indicators_getter: function (PineJS) {
         //     return Promise.resolve([
         //         {
@@ -185,8 +188,8 @@ const createTradingView = (vm, config = {}) => {
             // "legend_widget"
             // "show_chart_property_page"
             'header_settings',
-            'header_symbol_search',/**量化回归禁用搜索，symbol由后端配置，不可前端再选 */
-            'header_resolutions'
+            // 'header_symbol_search',/**量化回归禁用搜索，symbol由后端配置，不可前端再选 */
+            // 'header_resolutions'
         ],
         //设置开启哪些特性
         enabled_features: [

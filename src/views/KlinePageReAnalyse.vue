@@ -95,8 +95,9 @@ export default {
       baseUrl: process.env.BASE_URL,
       DIYExchange: '/api',
       // DIYExchange: '/reAnalyse',
-      symbol:'dydx_BTC-USD',//这个是用来获取K线的，火币、dydx、找币和OK名称都不一样，dydx要加dydx_，ok要加okcoin_
-      symbolRow:'BTCUSD',//这个是用来获取标记的，直接使用获取到的配置里的名称就行
+      symbol:'dydx_ETH-USD',//这个是用来获取K线的，火币、dydx、找币和OK名称都不一样，dydx要加dydx_，ok要加okcoin_
+      symbolRow:'ETH-USD',//这个是用来获取标记的，直接使用获取到的配置里的名称就行
+      exchange:'dydx',//这个是用来获取标记的交易所，
       interval:'1',
       xkey:'reAnalyse',
       studyConfig:[],
@@ -115,7 +116,8 @@ export default {
       markTimeCache:[],//用于缓存指标ID，以免重复绘图
       buyMarkPlayer:null,
       markPlayerEnable:false,
-      exchangeType: localStorage.getItem('exchangeType') || 'DYDX',
+      // exchangeType: localStorage.getItem('exchangeType') || 'dydx',
+      
     };
   },
   mounted() {
@@ -129,23 +131,21 @@ export default {
     /**量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView*/
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
       /**获取指标的symbol,目前后端配置0为以太坊，1为比特币 */
-      this.symbolRow = res.data[1].value
+      // this.symbolRow = res.data[1].value
       /**获取K线的Symbol,目前后端配置0为以太坊，1为比特币 */
-      this.symbol = mapSymbol(res.data[1].value, this.exchangeType)
-      /**配置周期 */
-      if(res.data[0].value == 'M1'){
-        this.interval = '1'
-      }else if(res.data[0].value == 'M5'){
-        this.interval = '5'
-      }
+      // this.symbol = mapSymbol(res.data[1].value, this.exchangeType)
+      /**初始化配置周期 */
+      this.interval = res.data[0].value.slice(1)
       /**获取指标配置 */
       searchConfig.reAnalyse_getStudyConfig().then((res)=>{
         this.studyConfig = res.data
-         /** 获取完配置后再创建K线、按钮、指标、形状*/
+         /** 获取完配置后再创建K线、按钮、指标、形状, 订阅交易对变化*/
         this.createTradingView()
         this.createBtn()
         this.createStudy()
         this.createMarks()
+        this.subscribeSymbol()
+        this.subscribeInterval()
       })
     })
   },
@@ -218,10 +218,12 @@ export default {
           symbol:this.symbolRow,
           from,
           to,
-          resolution: this.interval
+          resolution: this.interval,
+          exchange: this.exchange
         }
         searchConfig.reAnalyse_getMarks(params).then((res)=>{
           this.marksObj = res.data
+            if(this.marksObj.length <= 0 ) return
             this.marksObj.id.forEach((item,index) => {
               /**如果缓存中已经存在这个标记的ID，说明已经绘制过这个标记，则跳过 */
               if(this.markTimeCache.indexOf(this.marksObj.id[index]) != -1) return
@@ -263,18 +265,38 @@ export default {
             alert(this.markPlayerEnable?'语音播报开启':'语音播报关闭')
           });
           /**切换交易所按钮 */
-          const okButton = this.widget.createButton();
-          okButton.textContent = "OK";
-          okButton.addEventListener("click", () => {
-            localStorage.setItem('exchangeType', 'OK')
-            location.reload()
-          });
-          const dydxButton = this.widget.createButton();
-          dydxButton.textContent = "DYDX";
-          dydxButton.addEventListener("click", () => {
-            localStorage.setItem('exchangeType', 'DYDX')
-            location.reload()
-          });
+          // const okButton = this.widget.createButton();
+          // okButton.textContent = "OK";
+          // okButton.addEventListener("click", () => {
+          //   localStorage.setItem('exchangeType', 'okcoin')
+          //   location.reload()
+          // });
+          // const dydxButton = this.widget.createButton();
+          // dydxButton.textContent = "DYDX";
+          // dydxButton.addEventListener("click", () => {
+          //   localStorage.setItem('exchangeType', 'dydx')
+          //   location.reload()
+          // });
+        });
+      })
+    },
+    /**订阅交易对改变时，改变获取标记的交易对和交易所*/
+    subscribeSymbol() {
+      this.widget.onChartReady(()=>{
+        this.widget.chart().onSymbolChanged().subscribe( null, (Subscription) => {
+              const changedSymbolInfo = this.widget.activeChart().symbolExt();
+              this.exchange = changedSymbolInfo.exchange
+              this.symbolRow = changedSymbolInfo.symbol
+            },
+            false
+          );
+      })
+    },
+    /**订阅改变周期时，改变获取mark的周期*/
+    subscribeInterval() {
+      this.widget.onChartReady(()=>{
+        this.widget.chart().onIntervalChanged().subscribe(null, (interval, timeframeObj) => {
+          this.interval = interval
         });
       })
     },

@@ -33,6 +33,19 @@ function __extends(d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 }
 
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        var arguments$1 = arguments;
+
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments$1[i];
+            for (var p in s) { if (Object.prototype.hasOwnProperty.call(s, p)) { t[p] = s[p]; } }
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
 /**
  * If you want to enable logs from datafeed set it to `true`
  */
@@ -541,7 +554,10 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
                     onResult([]);
                     return;
                 }
-                onResult(response); //这是把请求的结果传递给图表库
+                var res = response.map(function (item) {
+                    return __assign(__assign({}, item), { ticker: item.exchange + '_' + item.ticker });
+                });
+                onResult(res); //这是把请求的结果传递给图表库
             })
                 .catch(function (reason) {
                 logMessage("UdfCompatibleDatafeed: Search symbols for '" + userInput + "' failed. Error=" + getErrorMessage(reason));
@@ -569,6 +585,11 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
             onResolve(symbolInfo); //将获取到的币种信息传递给图表库
         }
         if (!this._configuration.supports_group_request) {
+            // if(symbolName.indexOf('SWAP') != -1 && symbolName.indexOf('okcoin_' ) == -1 && symbolName.indexOf('dydx_') == -1) {
+            // 	symbolName = 'okcoin_'+symbolName
+            // } else if (symbolName.indexOf('-') != -1 && symbolName.indexOf('dydx_') == -1 && symbolName.indexOf('okcoin_' ) == -1) {
+            // 	symbolName = 'dydx_'+symbolName
+            // }
             var params = {
                 symbol: symbolName,
             };
@@ -581,6 +602,7 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
                     onError('unknown_symbol');
                 }
                 else {
+                    /**针对DYDX和OK因为后端ticker没有做相应处理，这里自行处理 */
                     if (response.exchange == 'dydx') {
                         response.ticker = 'dydx_' + response.ticker;
                     }
@@ -769,6 +791,9 @@ function defaultConfiguration() {
         supports_group_request: true,
         supported_resolutions: [
             '1',
+            '2',
+            '3',
+            '4',
             '5',
             '15',
             '30',
