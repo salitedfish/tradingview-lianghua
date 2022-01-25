@@ -61,6 +61,13 @@ const searchConfig = {
             url: urlConfig.reAnalyse_broken_line
         })
     },
+    reAnalyse_broken_line_symbol:(params) => {
+        return axios({
+            method: 'get',
+            url: urlConfig.reAnalyse_broken_line_symbol,
+            params
+        })
+    },
     reAnalyse_getMarks:(params) => {
         return axios({
             method: 'get',

@@ -6,6 +6,7 @@
       <audio id="balanceMarkPlayer" src="https://hanyu-word-pinyin-short.cdn.bcebos.com/ping2.mp3" controls preload hidden></audio>
     </div>
     <div class="kline_container" :id="'kline_container_'+xkey"></div>
+    <BrokenLineSymbol v-if="showBrokenLine" @hideDialog="showBrokenLine = false" :xkey="xkey" :symbol="symbolRow" :interval="interval"></BrokenLineSymbol>
   </div>
 </template>
 
@@ -24,6 +25,9 @@ export default {
     BrokenLine
   },
   props: ['xkey'],
+  components: {
+    BrokenLineSymbol: () => import('./BrokenLineSymbol.vue')
+  },
   data() {
     return {
       widget: null,
@@ -188,6 +192,19 @@ export default {
     createBtn(){
       this.widget.onChartReady(()=>{
         this.widget.headerReady().then(() => {
+          /**创建收益曲线按钮 */
+          const brokenLineButton = this.widget.createButton();
+          brokenLineButton.textContent = "收益曲线";
+          brokenLineButton.addEventListener("click", () => {
+            this.showLine()
+          });
+          /**创建清除标记按钮 */
+          const clearMarkButton = this.widget.createButton();
+          clearMarkButton.textContent = "刷新标记";
+          clearMarkButton.addEventListener("click", () => {
+            this.markTimeCache = []
+            this.widget.chart().removeAllShapes()
+          });
           /**创建改变主题按钮 */
           const themeChangeButton = this.widget.createButton();
           themeChangeButton.textContent = "主题切换";
@@ -201,13 +218,7 @@ export default {
             this.markPlayerEnable = !this.markPlayerEnable;
             alert(this.markPlayerEnable?'语音播报开启':'语音播报关闭')
           });
-          /**创建清除标记按钮 */
-          const clearMarkButton = this.widget.createButton();
-          clearMarkButton.textContent = "刷新标记";
-          clearMarkButton.addEventListener("click", () => {
-            this.markTimeCache = []
-            this.widget.chart().removeAllShapes()
-          });
+
           /**切换交易所按钮 */
           // const okButton = this.widget.createButton();
           // okButton.textContent = "OK";
@@ -307,10 +318,9 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-// .kline{
-//   display:flex;
-//   height: calc(100vh)
-// }
+.kline{
+  position: relative;
+}
 
 .kline_container {
   // width: 100%;
