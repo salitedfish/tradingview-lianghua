@@ -2,7 +2,7 @@
   <div id="app">
     <div id="banner-box">
       <div class="center-container">
-        <span @click="changeMode('screen')" class="btn" v-if="!isMobile">自定义模式</span>
+        <!-- <span @click="changeMode('screen')" class="btn" v-if="!isMobile">自定义模式</span>
         <span
           @click="showExchange = 'zhaobi'"
           v-if="showExchange == 'huobi'"
@@ -12,14 +12,14 @@
           @click="showExchange = 'huobi'"
           v-if="showExchange == 'zhaobi'"
           class="btn"
-        >找币</span>
+        >找币</span> -->
         <span @click="changeTheme('light')" class="btn" v-if="!isMobile">明亮</span>
         <span @click="changeTheme('dark')" class="btn" v-if="!isMobile">暗黑</span>
         <span @click="changeRowCount('less')" class="btn" v-if="!isMobile">减一列</span>
         <span @click="changeRowCount('more')" class="btn" v-if="!isMobile">加一列</span>
         <span @click="changeLineCount('less')" class="btn" v-if="!isMobile">减一行</span>
         <span @click="changeLineCount('more')" class="btn" v-if="!isMobile">加一行</span>
-        <div class="search-box" v-if="!isMobile">
+        <!-- <div class="search-box" v-if="!isMobile">
           <input
             type="text"
             class="input-box"
@@ -36,7 +36,7 @@
               {{ item.symbol }} -- {{item.exchange}}
             </li>
           </ul>
-        </div>
+        </div> -->
       </div>
     </div>
     <!-- 通过list循环展示k线图 -->
@@ -50,7 +50,7 @@
         :class="lineClassByCount"
       >
         <!-- 注意要保证每个k-line的xkey值不相同,不然会挂载在同一个地方 -->
-        <k-line
+        <KLineOntime
           :class="lineClassByCount + '-item'"
           :symbol="SymbolItem.symbol"
           :exchange="SymbolItem.exchange"
@@ -62,10 +62,10 @@
           :createDelay="KLineDelayTime(index, SymbolIndex)"
           @symbolChanged="symbolChanged"
           ref="kLine"
-        ></k-line>
+        ></KLineOntime>
       </div>
     </div>
-    <div
+    <!-- <div
       class="kline-box zhaobiBox"
       v-if="showExchange == 'zhaobi'"
     >
@@ -88,7 +88,7 @@
           ref="kLine"
         ></k-line-b>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -117,12 +117,13 @@ export default {
     };
   },
   components: {
-    KLine: () => {
-      return import("../components/KLine");
-    },
-    KLineB: () => {
-      return import("../components/KlineB.vue");
-    },
+    KLineOntime: () => { return import('../components/KlinePageReAnalyse.vue') }
+    // KLine: () => {
+    //   return import("../components/KLine");
+    // },
+    // KLineB: () => {
+    //   return import("../components/KlineB.vue");
+    // },
   },
   mounted() {
     //从其他页面跳转过来的路由获取参数

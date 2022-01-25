@@ -14,8 +14,8 @@ export default {
   name: "app",
   data() {
     return {
-      showMode: "reAnalyse",
-      // showMode: "custom",
+      // showMode: "reAnalyse",
+      showMode: "custom",
       // showMode: "screen",
     };
   },
@@ -27,7 +27,7 @@ export default {
       return import("./views/KLinePageScreen.vue");
     },
     KLinePageReAnalyse: () => {
-      return import("./views/KlinePageReAnalyse.vue")
+      return import("./components/KlinePageReAnalyse.vue")
     },
   },
   methods: {

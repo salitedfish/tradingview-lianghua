@@ -5,73 +5,7 @@
       <audio id="saleMarkPlayer" src="https://hanyu-word-pinyin-short.cdn.bcebos.com/mai4.mp3" controls preload hidden></audio>
       <audio id="balanceMarkPlayer" src="https://hanyu-word-pinyin-short.cdn.bcebos.com/ping2.mp3" controls preload hidden></audio>
     </div>
-    <div class="kline_container" id="kline_container_reAnalyse"></div>
-    <!-- <div class="chart_container">
-      <div class="count_container">
-        <div class="head">
-          <div class="clear" @click="clearData()">清除数据</div>
-          账户列表
-        </div>
-        <div class="chart_head">
-          <div class="child_one">InitBalance</div>
-          <div class="child_one">Balance</div>
-          <div class="child_one">Orders</div>
-          <div class="child_one">Margin</div>
-          <div class="child_two">SignalInfo</div>
-        </div>
-        <div class="count_chart">
-          <div v-for="item in countList" :key="item.Orders" class="chart_item" @click="searchOrdersByOrder(item.Orders)">
-            <div class="child_one">{{item.InitBalance}}</div>
-            <div class="child_one">{{item.Balance}}</div>
-            <div class="child_one">{{item.Orders}}</div>
-            <div class="child_one">{{item.Margin}}</div>
-            <div class="child_two" :title="item.SignalInfo">{{item.SignalInfo}}</div>
-          </div>
-        </div>
-      </div>
-      <div class="order_container">
-        <div class="order_banner">
-          <div class="show_line_btn" @click="showLine">资产变动曲线</div>
-        </div>
-        <div class="head">{{orderParams.orders || '全部'}} 订单列表</div>
-        <div class="chart_head">
-          <div>OpenTime</div>
-          <div>OpenPrice</div>
-          <div>CloseTime</div>
-          <div>ClosePrice</div>
-          <div>Point</div>
-          <div>Type</div>
-          <div>MaxPoint</div>
-          <div>MinPoint</div>
-          <div>Margin</div>
-        </div>
-        <div class="order_chart">
-          <div v-for="(item,index) in orderList" :key="index" class="chart_item">
-          <div :title="$moment(item.OpenTime*1000).format('MM-DD hh:mm:ss')">{{(item.OpenTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div>
-          <div>{{item.OpenPrice}}</div>
-          <div>{{(item.CloseTime*1000) | mapTime('MM-DD hh:mm:ss')}}</div>
-          <div>{{item.ClosePrice}}</div>
-          <div>{{item.Point}}</div>
-          <div>{{item.Type == 0?'买':'卖'}}</div>
-          <div>{{item.MaxPoint}}</div>
-          <div>{{item.MinPoint}}</div>
-          <div>{{item.Margin}}</div>
-          </div>
-        </div>
-        <div class="pagination">
-          <el-pagination 
-          :page-size="orderParams.pageSize" 
-          :current-page.sync="orderParams.pageNum"
-          @current-change="handleCurrentChange"
-          :total='orderTotal'
-          :pager-count="5"
-          layout=" prev, pager, next, total"
-          >
-          </el-pagination>
-        </div>
-      </div>
-    </div> -->
-    <!-- <broken-line v-if="showBrokenLine" @hideDialog="showLine"></broken-line> -->
+    <div class="kline_container" :id="'kline_container_'+xkey"></div>
   </div>
 </template>
 
@@ -89,17 +23,18 @@ export default {
   components: {
     BrokenLine
   },
+  props: ['xkey'],
   data() {
     return {
       widget: null,
       baseUrl: process.env.BASE_URL,
       DIYExchange: '/api',
       // DIYExchange: '/reAnalyse',
-      symbol:'dydx_ETH-USD',//这个是用来获取K线的，火币、dydx、找币和OK名称都不一样，dydx要加dydx_，ok要加okcoin_
-      symbolRow:'ETH-USD',//这个是用来获取标记的，直接使用获取到的配置里的名称就行
-      exchange:'dydx',//这个是用来获取标记的交易所，
-      interval:'1',
-      xkey:'reAnalyse',
+      symbol: localStorage.getItem('initSymbol')? JSON.parse(localStorage.getItem('initSymbol')).fullName : 'dydx_BTC-USD',//这个是用来获取K线的，火币、dydx、找币和OK名称都不一样，dydx要加dydx_，ok要加okcoin_
+      symbolRow: localStorage.getItem('initSymbol')? JSON.parse(localStorage.getItem('initSymbol')).markName : 'BTC-USD',//这个是用来获取标记的，直接使用获取到的配置里的名称就行
+      exchange: localStorage.getItem('initSymbol')? JSON.parse(localStorage.getItem('initSymbol')).exchange : 'dydx',//这个是用来获取标记的交易所，
+      interval: localStorage.getItem('initInterval')? localStorage.getItem('initInterval') : '1',
+      // xkey:'reAnalyse',
       studyConfig:[],
       countList:[],
       orderList:[],
@@ -129,13 +64,13 @@ export default {
     // this.getCountList()
     // this.getOrderList(this.orderParams)
     /**量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView*/
-    searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
+    // searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
       /**获取指标的symbol,目前后端配置0为以太坊，1为比特币 */
       // this.symbolRow = res.data[1].value
       /**获取K线的Symbol,目前后端配置0为以太坊，1为比特币 */
       // this.symbol = mapSymbol(res.data[1].value, this.exchangeType)
       /**初始化配置周期 */
-      this.interval = res.data[0].value.slice(1)
+      // this.interval = res.data[0].value.slice(1)
       /**获取指标配置 */
       searchConfig.reAnalyse_getStudyConfig().then((res)=>{
         this.studyConfig = res.data
@@ -147,7 +82,7 @@ export default {
         this.subscribeSymbol()
         this.subscribeInterval()
       })
-    })
+    // })
   },
   methods: {
     /**获取账户列表 */
@@ -195,11 +130,10 @@ export default {
 
       })
     },
-    /**创建标记点 */
-    createMarks(){
-      /**绘制标记 */
+    /**获取标记*/
+    getMarks(){
       const markShape = (shape, index, overrides) => {
-        this.widget.activeChart().createShape({ 
+        const id = this.widget.activeChart().createShape({ 
           time: this.marksObj.time[index], 
           price: Number(this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1)) 
           }, 
@@ -210,42 +144,45 @@ export default {
            zOrder: "top", 
            lock: true 
           });
+        this.widget.activeChart().getShapeById(id).setUserEditEnabled(true)
       }
-      /**间隔1秒获取一次可见范围内的标记 */
-      this.getMarkInterval = setInterval(()=>{
-        const { from, to} = this.widget.activeChart().getVisibleRange()
-        const params = {
-          symbol:this.symbolRow,
-          from,
-          to,
-          resolution: this.interval,
-          exchange: this.exchange
-        }
-        searchConfig.reAnalyse_getMarks(params).then((res)=>{
-          this.marksObj = res.data
-            if(this.marksObj.length <= 0 ) return
-            this.marksObj.id.forEach((item,index) => {
-              /**如果缓存中已经存在这个标记的ID，说明已经绘制过这个标记，则跳过 */
-              if(this.markTimeCache.indexOf(this.marksObj.id[index]) != -1) return
-              /**绘制标记 */
-              if(this.marksObj.label[index] == '买'){
-                markShape('arrow_up', index, {color:"#02C076", fontsize: 12})
-                if(this.markPlayerEnable) this.playAudio(0)
-              }else if(this.marksObj.label[index] == '卖'){
-                markShape('arrow_down', index, {color:"#FF2D2D", fontsize: 12})
-                if(this.markPlayerEnable) this.playAudio(1)
-              }else if(this.marksObj.label[index] == '卖平'){
-                markShape('arrow_left', index, {color:"#66B3FF", fontsize: 12})
-                if(this.markPlayerEnable) this.playAudio(2)
-              }else if(this.marksObj.label[index] == '买平'){
-                markShape('arrow_right', index, {color:"#66B3FF", fontsize: 12})
-                if(this.markPlayerEnable) this.playAudio(2)
-              }
-              /**标记绘制完后，缓存此标记的ID */
-              this.markTimeCache.push(this.marksObj.id[index])
-            });
-        })
-      },1000)
+      const { from, to} = this.widget.activeChart().getVisibleRange()
+      const params = {
+        symbol:this.symbolRow,
+        from,
+        to,
+        resolution: this.interval,
+        exchange: this.exchange
+      }
+      searchConfig.reAnalyse_getMarks(params).then((res)=>{
+        this.marksObj = res.data
+          if(!Array.isArray(this.marksObj.id) || this.marksObj.id.length <= 0 ) return
+          this.marksObj.id.forEach((item,index) => {
+            /**如果缓存中已经存在这个标记的ID，说明已经绘制过这个标记，则跳过 */
+            if(this.markTimeCache.indexOf(this.marksObj.id[index]) != -1) return
+            /**绘制标记 */
+            if(this.marksObj.label[index] == '买'){
+              markShape('arrow_up', index, {color:"#02C076", fontsize: 12})
+              if(this.markPlayerEnable) this.playAudio(0)
+            }else if(this.marksObj.label[index] == '卖'){
+              markShape('arrow_down', index, {color:"#FF2D2D", fontsize: 12})
+              if(this.markPlayerEnable) this.playAudio(1)
+            }else if(this.marksObj.label[index] == '卖平'){
+              markShape('arrow_left', index, {color:"#66B3FF", fontsize: 12})
+              if(this.markPlayerEnable) this.playAudio(2)
+            }else if(this.marksObj.label[index] == '买平'){
+              markShape('arrow_right', index, {color:"#66B3FF", fontsize: 12})
+              if(this.markPlayerEnable) this.playAudio(2)
+            }
+            /**标记绘制完后，缓存此标记的ID */
+            this.markTimeCache.push(this.marksObj.id[index])
+          });
+      })
+    },
+    /**创建标记点 */
+    createMarks(){
+      /**间隔10秒获取一次可见范围内的标记 */
+      this.getMarkInterval = setInterval(this.getMarks,2000)
     },
     /**创建自定义按钮 */
     createBtn(){
@@ -263,6 +200,13 @@ export default {
           audioPlayerEnableButton.addEventListener("click", () => {
             this.markPlayerEnable = !this.markPlayerEnable;
             alert(this.markPlayerEnable?'语音播报开启':'语音播报关闭')
+          });
+          /**创建清除标记按钮 */
+          const clearMarkButton = this.widget.createButton();
+          clearMarkButton.textContent = "刷新标记";
+          clearMarkButton.addEventListener("click", () => {
+            this.markTimeCache = []
+            this.widget.chart().removeAllShapes()
           });
           /**切换交易所按钮 */
           // const okButton = this.widget.createButton();
@@ -287,6 +231,12 @@ export default {
               const changedSymbolInfo = this.widget.activeChart().symbolExt();
               this.exchange = changedSymbolInfo.exchange
               this.symbolRow = changedSymbolInfo.symbol
+              const symbolInfo = {
+                fullName: changedSymbolInfo.exchange+'_'+changedSymbolInfo.symbol,
+                markName: changedSymbolInfo.symbol,
+                exchange: changedSymbolInfo.exchange
+              }
+              localStorage.setItem('initSymbol', JSON.stringify(symbolInfo))
             },
             false
           );
@@ -295,8 +245,13 @@ export default {
     /**订阅改变周期时，改变获取mark的周期*/
     subscribeInterval() {
       this.widget.onChartReady(()=>{
-        this.widget.chart().onIntervalChanged().subscribe(null, (interval, timeframeObj) => {
+        this.widget.chart().onIntervalChanged().subscribe(null,async (interval, timeframeObj) => {
+          // clearInterval(this.getMarkInterval)
+          // this.markTimeCache = []
+          // this.widget.chart().removeAllShapes()
           this.interval = interval
+          localStorage.setItem('initInterval', interval)
+          // this.getMarkInterval = setInterval(this.getMarks,10000)
         });
       })
     },
@@ -352,14 +307,14 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-.kline{
-  display:flex;
-  height: calc(100vh)
-}
+// .kline{
+//   display:flex;
+//   height: calc(100vh)
+// }
 
 .kline_container {
-  width: 100%;
-  height: calc(100vh);
+  // width: 100%;
+  height: 100%;
 }
 
 .chart_container {

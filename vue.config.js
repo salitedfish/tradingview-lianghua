@@ -33,6 +33,7 @@ module.exports = {
       },
       '/reAnalyse': {
         target: "http://159.138.40.136:8088",
+        // target: "http://192.168.20.251:8088",
         pathRewrite: {
           "^/reAnalyse": ''
         }
