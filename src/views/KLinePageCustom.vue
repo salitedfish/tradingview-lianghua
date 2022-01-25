@@ -19,6 +19,7 @@
         <span @click="changeRowCount('more')" class="btn" v-if="!isMobile">加一列</span>
         <span @click="changeLineCount('less')" class="btn" v-if="!isMobile">减一行</span>
         <span @click="changeLineCount('more')" class="btn" v-if="!isMobile">加一行</span>
+        <span @click="showBrokenLine = true" class="btn" v-if="!isMobile">盈利曲线</span>
         <!-- <div class="search-box" v-if="!isMobile">
           <input
             type="text"
@@ -65,6 +66,7 @@
         ></KLineOntime>
       </div>
     </div>
+    <BrokenLine v-if="showBrokenLine" @hideDialog="showBrokenLine = false"></BrokenLine>
     <!-- <div
       class="kline-box zhaobiBox"
       v-if="showExchange == 'zhaobi'"
@@ -113,11 +115,13 @@ export default {
       addSearchList: [],
       showExchange: this.$route.query.exchange?this.$route.query.exchange.toLowerCase():"huobi",
       isMobile: isMobile(),
-      routeInterval:this.$route.query.interval || null
+      routeInterval:this.$route.query.interval || null,
+      showBrokenLine: false
     };
   },
   components: {
-    KLineOntime: () => { return import('../components/KlinePageReAnalyse.vue') }
+    KLineOntime: () => { return import('../components/KlinePageReAnalyse.vue') },
+    BrokenLine: () => { return import('../components/BrokenLine.vue') }
     // KLine: () => {
     //   return import("../components/KLine");
     // },
