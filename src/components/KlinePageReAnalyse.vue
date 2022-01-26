@@ -24,7 +24,7 @@ export default {
   components: {
     BrokenLine
   },
-  props: ['xkey'],
+  props: ['symbolInfo', 'initInterval', 'yIndex', 'xIndex', 'xkey'],
   components: {
     BrokenLineSymbol: () => import('./BrokenLineSymbol.vue')
   },
@@ -34,10 +34,10 @@ export default {
       baseUrl: process.env.BASE_URL,
       DIYExchange: '/api',
       // DIYExchange: '/reAnalyse',
-      symbol: localStorage.getItem('initSymbol')? JSON.parse(localStorage.getItem('initSymbol')).fullName : 'dydx_BTC-USD',//这个是用来获取K线的，火币、dydx、找币和OK名称都不一样，dydx要加dydx_，ok要加okcoin_
-      symbolRow: localStorage.getItem('initSymbol')? JSON.parse(localStorage.getItem('initSymbol')).markName : 'BTC-USD',//这个是用来获取标记的，直接使用获取到的配置里的名称就行
-      exchange: localStorage.getItem('initSymbol')? JSON.parse(localStorage.getItem('initSymbol')).exchange : 'dydx',//这个是用来获取标记的交易所，
-      interval: localStorage.getItem('initInterval')? localStorage.getItem('initInterval') : '1',
+      symbol: this.symbolInfo.symbol || 'dydx_BTC-USD',//这个是用来获取K线的，火币、dydx、找币和OK名称都不一样，dydx要加dydx_，ok要加okcoin_
+      symbolRow: this.symbolInfo.symbolRow || 'BTC-USD',//这个是用来获取标记的，直接使用获取到的配置里的名称就行
+      exchange: this.symbolInfo.exchange || 'dydx',//这个是用来获取标记的交易所，
+      interval: this.symbolInfo.interval[this.xIndex] || '1',
       // xkey:'reAnalyse',
       studyConfig:[],
       countList:[],
@@ -242,12 +242,13 @@ export default {
               const changedSymbolInfo = this.widget.activeChart().symbolExt();
               this.exchange = changedSymbolInfo.exchange
               this.symbolRow = changedSymbolInfo.symbol
-              const symbolInfo = {
-                fullName: changedSymbolInfo.exchange+'_'+changedSymbolInfo.symbol,
-                markName: changedSymbolInfo.symbol,
-                exchange: changedSymbolInfo.exchange
+              const params = {
+                symbol: changedSymbolInfo.exchange+'_'+changedSymbolInfo.symbol,
+                symbolRow: changedSymbolInfo.symbol,
+                exchange: changedSymbolInfo.exchange,
+                index: this.yIndex,
               }
-              localStorage.setItem('initSymbol', JSON.stringify(symbolInfo))
+              this.$emit('symbolChanged', params)
             },
             false
           );
@@ -261,7 +262,13 @@ export default {
           // this.markTimeCache = []
           // this.widget.chart().removeAllShapes()
           this.interval = interval
-          localStorage.setItem('initInterval', interval)
+          const params = {
+            xIndex: this.xIndex,
+            yIndex: this.yIndex,
+            interval: this.interval
+          }
+          this.$emit('intervalChanged', params)
+          // localStorage.setItem('initInterval', interval)
           // this.getMarkInterval = setInterval(this.getMarks,10000)
         });
       })

@@ -53,15 +53,15 @@
         <!-- 注意要保证每个k-line的xkey值不相同,不然会挂载在同一个地方 -->
         <KLineOntime
           :class="lineClassByCount + '-item'"
-          :symbol="SymbolItem.symbol"
-          :exchange="SymbolItem.exchange"
-          :interval="routeInterval||item"
+          :symbolInfo="SymbolItem"
           :yIndex="SymbolIndex"
+          :xIndex="index"
           :xkey="SymbolItem.symbol + index.toString() + SymbolIndex.toString()"
           v-for="(item, index) in RowListDate[RowCount - 1]"
           :key="SymbolItem.symbol + item"
           :createDelay="KLineDelayTime(index, SymbolIndex)"
           @symbolChanged="symbolChanged"
+          @intervalChanged="intervalChanged"
           ref="kLine"
         ></KLineOntime>
       </div>
@@ -98,17 +98,25 @@
 import searchConfig from "../service/searchConfig";
 import { isMobile } from "../utilities/tools"
 const RowListDate = [
-  ["15"],
-  ["15", "60"],
-  ["15", "60", "240"],
-  ["15", "60", "240", "1D"],
+  ["1"],
+  ["1", "5"],
+  ["1", "5", "15"],
+  ["1", "5", "15", "30"],
 ];
+const list = JSON.parse(localStorage.getItem('symbolListConfig')) || [
+  {
+    symbol: 'dydx_ETH-USD',
+    symbolRow: 'ETH-USD',
+    exchange: 'dydx',
+    interval: ['1']
+  },
+]
 export default {
   name: "KLinePageCustom",
   data() {
     return {
-      list: [],
-      RowCount: 1,
+      list,
+      RowCount: localStorage.getItem('rowCount') || 1,
       RowListDate,
       addSymbol: "",
       addSymbolCase: "",
@@ -130,21 +138,21 @@ export default {
     // },
   },
   mounted() {
-    //从其他页面跳转过来的路由获取参数
-    const query = this.$route.query;
-    //如果路由中list存在
-    if (query.symbol) {
-        this.list = [{
-          symbol:query.symbol
-        }];
-    } else {
-      //如果路由中list不存在
-      this.list = [
-        {
-          symbol: "ETHUSDT",
-        },
-      ];
-    }
+    // //从其他页面跳转过来的路由获取参数
+    // const query = this.$route.query;
+    // //如果路由中list存在
+    // if (query.symbol) {
+    //     this.list = [{
+    //       symbol:query.symbol
+    //     }];
+    // } else {
+    //   //如果路由中list不存在
+    //   this.list = [
+    //     {
+    //       symbol: "ETHUSDT",
+    //     },
+    //   ];
+    // }
   },
   computed: {
     lineClassByCount() {
@@ -175,13 +183,21 @@ export default {
       } else if (this.list.length <= 3 && type == "more") {
         this.addSymbolCase = "addLine";
         //添加行的时候如果没有填对应的symbol，则使用前一个symbol
-        if (!this.addSymbol) {
-          const preSymbol = this.list[this.list.length - 1].symbol;
-          this.list.push({ symbol: preSymbol });
-        } else {
-          this.list.push({ symbol: this.addSymbol });
-        }
+        // if (!this.addSymbol) {
+        //   const preSymbol = this.list[this.list.length - 1].symbol;
+        //   this.list.push({ symbol: preSymbol });
+        // } else {
+        //   this.list.push({ symbol: this.addSymbol });
+        // }
+        this.list.push({
+                        symbol: 'dydx_ETH-USD',
+                        symbolRow: 'ETH-USD',
+                        exchange: 'dydx',
+                        interval: ['1']
+                      });
+
       }
+      this.saveSymbolList()
     },
     changeRowCount(type) {
       if (this.RowCount >= 2 && type == "less") {
@@ -190,6 +206,7 @@ export default {
         this.addSymbolCase = "addRow";
         this.RowCount++;
       }
+      localStorage.setItem('rowCount', this.RowCount)
     },
     //设置kline的延时创建时间,同时加载太多有可能会丢失样式覆盖
     KLineDelayTime(index, SymbolIndex) {
@@ -211,6 +228,13 @@ export default {
     //当K线的symbol改变时，对应index的list里面的对应项的symbol也改变，同时同一行的symbol变了导致key变了
     symbolChanged(param) {
       this.list[param.index].symbol = param.symbol;
+      this.list[param.index].symbolRow = param.symbolRow;
+      this.list[param.index].exchange = param.exchange;
+      this.saveSymbolList()
+    },
+    intervalChanged(params) {
+      this.list[params.yIndex].interval[params.xIndex] = params.interval
+      this.saveSymbolList()
     },
     changeMode(type) {
       this.$emit("changeMode", type);
@@ -242,6 +266,10 @@ export default {
       this.addSymbol = symbol;
       this.addSearchList = [];
     },
+    saveSymbolList(){
+      console.log(list)
+      localStorage.setItem('symbolListConfig', JSON.stringify(list))
+    }
   },
 };
 </script>
