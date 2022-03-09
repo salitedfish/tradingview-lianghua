@@ -1,6 +1,13 @@
 <template>
-  <div class="kline">
-    <div class="kline_container" id="kline_container_reAnalyse"></div>
+  <div class="klinePage">
+    <div class="kline_box">
+      <KlineReanalyse :klineID="key" :klineInfo="item" v-for="(item, key) in KLineList" :key="key"></KlineReanalyse>
+
+
+      <!-- <KlineReanalyse klineID="0"></KlineReanalyse>
+      <KlineReanalyse klineID="1"></KlineReanalyse>
+      <KlineReanalyse klineID="2"></KlineReanalyse> -->
+    </div>
     <div class="chart_container">
       <div class="count_container">
         <div class="head">
@@ -75,7 +82,7 @@
         </div>
       </div>
     </div>
-    <broken-line v-if="showBrokenLine" @hideDialog="showLine"></broken-line>
+    <BrokenLine v-if="showBrokenLine" @hideDialog="showLine"></BrokenLine>
   </div>
 </template>
 
@@ -89,12 +96,11 @@ import { createStudy } from "../utilities/createStudy";
 import searchConfig from "../service/searchConfig"
 import BrokenLine from "@/components/BrokenLine.vue"
 import { mapSymbol } from "@/utilities/dataMap" 
+import KlineReanalyse from "@/components/KlineReanalyse.vue"
+
 // import overrides from "../utilities/overrides";
 Vue.use(Pagination)
 export default {
-  components: {
-    BrokenLine
-  },
   data() {
     return {
       widget: null,
@@ -120,8 +126,14 @@ export default {
       showBrokenLine: false,
       marksObj:{},
       timeOutFun:null,
-      markTimeCache:[]
+      markTimeCache:[],
+      markLineCache:[],
+      KLineList: [],
     };
+  },
+  components: {
+    BrokenLine,
+    KlineReanalyse
   },
   mounted() {
     this.getCountList()
@@ -130,21 +142,7 @@ export default {
     * 量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView
     */
     searchConfig.reAnalyse_getSymbolConfig().then((res)=>{
-      // this.symbolRow = res.data[1].value
-      // this.symbol= mres.data[1].value
-      this.symbolRow = mapSymbol(res.data[1].value, 'dydx')
-      this.symbol= mapSymbol(res.data[1].value, 'dydx')
-      this.interval = res.data[0].value.substr(1, res.data[0].value.length)
-      searchConfig.reAnalyse_getStudyConfig().then((res)=>{
-        this.studyConfig = res.data
-         /**
-         * 获取完配置后再创建K线、指标、形状
-         */
-        this.createTradingView()
-        this.createBtn()
-        this.createStudy()
-        this.createMarks()
-      })
+      this.KLineList = res.data
     })
   },
   methods: {
@@ -171,117 +169,6 @@ export default {
       this.orderParams.orders = orders
       this.getOrderList(this.orderParams)
     },
-    /**创建图表 */
-    createTradingView(){
-      this.widget = createTradingView(this);
-    },
-    /**创建指标 */
-    createStudy(){
-      this.widget.onChartReady(() => {
-        for(let item of this.studyConfig) {
-          /**
-           * 根据指标配置循环创建bolling和ma
-           */
-          if(item.type.indexOf('Bolling') != -1){
-            for(let i of item.period){
-              createStudy(this.widget, "Bollinger Bands", false, false, [i, 2]);
-            }
-          }else if(item.type.indexOf('Ma') != -1){
-            for(let i of item.period){
-              createStudy( this.widget,"Moving Average",false,false,[i, "close", 0],null);
-            }
-          }
-        }
-
-      })
-    },
-    /**创建标记点 */
-    createMarks(){
-      const markShape = (shape, index, overrides) => {
-        this.widget.activeChart().createShape({ 
-          time: this.marksObj.time[index], 
-          price: Number(this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1)) 
-          }, 
-          { 
-           text: this.marksObj.text[index].slice(this.marksObj.text[index].indexOf(' ') + 1) + "---" + this.marksObj.id[index].toString().slice(-2), 
-           overrides,
-           shape,
-           zOrder: "top", 
-           lock: true 
-          });
-      }
-
-
-      this.widget.onChartReady(()=>{
-        this.widget.chart().onVisibleRangeChanged().subscribe(
-          null,
-          ({from, to}) => {
-            clearTimeout(this.timeOutFun)
-            const eventFun = () => {
-              const params = {
-                symbol:this.symbolRow,
-                from,
-                to,
-                resolution: this.interval
-              }
-              searchConfig.reAnalyse_getMarks(params).then((res)=>{
-                this.marksObj = res.data
-                  this.marksObj.id.forEach((item,index) => {
-                    if(this.markTimeCache.indexOf(this.marksObj.id[index]) != -1) return
-                    if(this.marksObj.label[index] == '买'){
-                      markShape('arrow_up', index, {color:"#02C076", fontsize: 12})
-                    }else if(this.marksObj.label[index] == '卖'){
-                      markShape('arrow_down', index, {color:"#FF2D2D", fontsize: 12})
-                    }else if(this.marksObj.label[index] == '卖平'){
-                      markShape('arrow_left', index, {color:"#66B3FF", fontsize: 12})
-                    }else if(this.marksObj.label[index] == '买平'){
-                      markShape('arrow_right', index, {color:"#66B3FF", fontsize: 12})
-                    }
-                    this.markTimeCache.push(this.marksObj.id[index])
-                  });
-              })
-
-
-            }
-            this.timeOutFun = setTimeout(eventFun,1000)
-          },
-          false
-        )
-      })
-    },
-    /**创建自定义按钮 */
-    createBtn(){
-      this.widget.onChartReady(()=>{
-        this.widget.headerReady().then(() => {
-          const themeChangeButton = this.widget.createButton();
-          themeChangeButton.textContent = "主题切换";
-          themeChangeButton.addEventListener("click", () => {
-            this.changeTheme();
-          });
-        });
-      })
-    },
-    /**改变主题 */
-    changeTheme(type) {
-      if (type) {
-        this.widget.changeTheme(type);
-      } else {
-        this.widget.changeTheme(
-          this.widget.getTheme() == "dark" ? "light" : "dark"
-        );
-        this.$nextTick(()=>{
-          this.widget.applyOverrides({
-            "style": 9,
-            "hollowCandleStyle.upColor": "#02C076",
-            "hollowCandleStyle.downColor": "rgba(0, 0, 0, 0)",
-            "hollowCandleStyle.drawWick": true,
-            "hollowCandleStyle.drawBorder": true,
-            "hollowCandleStyle.borderUpColor": "#02C076",
-            "hollowCandleStyle.borderDownColor": "#F84960",
-          })
-        })
-      }
-    },
     /**清除数据 */
     clearData(){
       searchConfig.reAnalyse_clear()
@@ -302,14 +189,15 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-.kline{
+.klinePage{
   display:flex;
   height: calc(100vh)
 }
 
-.kline_container {
-  width: 60%;
-  height: calc(100vh);
+.kline_box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 .chart_container {

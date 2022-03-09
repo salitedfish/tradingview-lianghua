@@ -1,4 +1,5 @@
 module.exports = {
+  productionSourceMap: false,
   devServer: {
     proxy: {
       '/api': {
@@ -30,7 +31,7 @@ module.exports = {
       },
       '/reAnalyse': {
         // target: "http://159.138.40.136:8088",
-        target: "http://192.168.22.248:8088",
+        target: "http://159.138.40.136:8080/reAnalyse",
         pathRewrite: {
           "^/reAnalyse": ''
         }
