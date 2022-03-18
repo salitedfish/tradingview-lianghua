@@ -1,14 +1,14 @@
 <template>
   <div class="klinePage">
     <div class="kline_box">
-      <KlineReanalyse :klineID="key" :klineInfo="item" v-for="(item, key) in KLineList" :key="key"></KlineReanalyse>
+      <KlineReanalyse :klineID="key" :klineInfo="item" v-for="(item, key) in KLineList" :key="key" @changeFormVisibity="changeFormVisibity"></KlineReanalyse>
 
 
       <!-- <KlineReanalyse klineID="0"></KlineReanalyse>
       <KlineReanalyse klineID="1"></KlineReanalyse>
       <KlineReanalyse klineID="2"></KlineReanalyse> -->
     </div>
-    <div class="chart_container">
+    <div class="chart_container" v-if="formVisibity">
       <div class="count_container">
         <div class="head">
           <div class="clear" @click="clearData()">清除数据</div>
@@ -129,6 +129,7 @@ export default {
       markTimeCache:[],
       markLineCache:[],
       KLineList: [],
+      formVisibity: localStorage.getItem('formVisibity') == 'true'? true : false,
     };
   },
   components: {
@@ -146,6 +147,11 @@ export default {
     })
   },
   methods: {
+    /**显示、隐藏列表 */
+    changeFormVisibity(){
+      this.formVisibity = !this.formVisibity
+      localStorage.setItem('formVisibity', this.formVisibity)
+    },
     /**获取账户列表 */
     getCountList(){
       searchConfig.reAnalyse_getCountList().then((res) => {
@@ -195,6 +201,7 @@ export default {
 }
 
 .kline_box {
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -202,6 +209,8 @@ export default {
 
 .chart_container {
   // padding: 5px;
+  // display: none;
+  width: 50vw;
   flex: 1;
   border-right: 1px solid #888;
   border-left: 1px solid #888;

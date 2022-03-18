@@ -45,7 +45,7 @@ const createTradingView = (vm, config = {}) => {
         allow_symbol_change: true,
         theme: "Dark",
         // timeframe: isMobile()?"720":"1d",//设置初始的时间展示范围,
-        timeframe:vm.xkey == 'reAnalyse'?'1d': isMobile()?"720":"1d",//设置初始的时间展示范围
+        // timeframe:vm.xkey == 'reAnalyse'?'1d': isMobile()?"720":"1d",//设置初始的时间展示范围
         // toolbar_bg: "#FFF",
         //点击改变周期，将周期转化为resolution写的周期
         time_frames: vm.xkey == 'reAnalyse'?[]:[
@@ -163,7 +163,7 @@ const createTradingView = (vm, config = {}) => {
         //设置禁用哪些特性
         disabled_features: [
             // "edit_buttons_in_legend",
-            "header_widget", 
+            // "header_widget", 
             isMobile()?"left_toolbar":'',
             // "edit_buttons_in_legend",
             "use_localstorage_for_settings",//禁用此功能，否则更改图表一些样式无法及时生效
@@ -191,7 +191,9 @@ const createTradingView = (vm, config = {}) => {
         enabled_features: [
             // "study_templates",
             "hide_left_toolbar_by_default",
-            "hide_resolution_in_legend"
+            "hide_resolution_in_legend",
+            "hide_last_na_study_output",
+            "disable_resolution_rebuild"
         ],
         overrides: {
             // "has_no_volume":false,

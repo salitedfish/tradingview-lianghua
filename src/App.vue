@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <div></div>
     <!-- 量化回归分析 -->
     <k-line-page-re-analyse v-if="showMode == 'reAnalyse'"></k-line-page-re-analyse>
     <!-- 自定义页面 -->
@@ -10,6 +11,8 @@
 </template>
 
 <script>
+import lodash from "lodash"
+
 export default {
   name: "app",
   data() {
@@ -29,6 +32,9 @@ export default {
     KLinePageReAnalyse: () => {
       return import("./views/KlinePageReAnalyse.vue")
     },
+  },
+  mounted(){
+    // console.log(lodash.throttle)
   },
   methods: {
     changeMode(type) {

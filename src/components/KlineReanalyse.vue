@@ -72,11 +72,12 @@ export default {
        * 获取完配置后再创建K线、指标、形状
        */
       this.createTradingView()
-      // this.createBtn()
+      this.createStudy()
+      this.createBtn()
       if(this.xkey == 0) {  
-          this.createStudy()
-          this.createMarks()
+        this.createMarks()
       }
+
     })
   },
   methods: {
@@ -101,7 +102,6 @@ export default {
             }
           }
         }
-
       })
     },
     /**创建标记 */
@@ -193,6 +193,12 @@ export default {
           themeChangeButton.addEventListener("click", () => {
             this.changeTheme();
           });
+
+          const showFormButton = this.widget.createButton();
+          showFormButton.textContent = "显示图表";
+          showFormButton.addEventListener('click', () => {
+            this.$emit('changeFormVisibity')
+          })
         });
       })
     },
@@ -239,11 +245,11 @@ export default {
 <style lang="less" scoped>
 
 .main {
-  width: 50vw;
+  // width: 50vw;
   flex: 2;
 }
 .minor {
-  width: 50vw;
+  // width: 50vw;
   flex: 1;
 }
 .chart_container {
