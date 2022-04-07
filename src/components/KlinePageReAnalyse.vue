@@ -122,11 +122,11 @@ export default {
         for(let item of this.studyConfig) {
           /**根据指标配置循环创建bolling和ma*/
           if(item.type.indexOf('Bolling') != -1){
-            for(let i of item.period){
+            for(let i of Array.from(new Set(item.period))){
               createStudy(this.widget, "Bollinger Bands", false, false, [i, 2]);
             }
           }else if(item.type.indexOf('Ma') != -1){
-            for(let i of item.period){
+            for(let i of Array.from(new Set(item.period))){
               createStudy( this.widget,"Moving Average",false,false,[i, "close", 0],null);
             }
           }
