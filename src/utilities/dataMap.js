@@ -50,6 +50,8 @@ export const mapSymbol = (symbol, type) => {
           return "BTCUSDT";
         case "ETHUSD":
           return "ETHUSDT";
+        case "ETHBTC":
+          return "ETHBTC";
       }
     // }
 }

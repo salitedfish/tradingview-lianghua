@@ -64,7 +64,9 @@ export default {
     * 量化回归项目这里先请求配置，获取到symbol和interval还有bolling线配置传给tradingView
     */
     this.symbolRow = mapSymbol(this.klineInfo[0].value, 'dydx')
+    // this.symbolRow = 'ETHBTC'
     this.symbol= mapSymbol(this.klineInfo[0].value, 'dydx')
+    // this.symbol= 'ETHBTC'
     this.interval = this.klineInfo[1].value.substr(1, this.klineInfo[1].value.length)
     searchConfig.reAnalyse_getStudyConfig().then((res)=>{
       this.studyConfig = res.data
@@ -88,24 +90,31 @@ export default {
     /**创建指标 */
     createStudy(){
       this.widget.onChartReady(() => {
-        for(let item of this.studyConfig) {
           /**
            * 根据指标配置循环创建bolling和ma
            */
-          if(item.type.indexOf('Bolling') != -1){
-            for(let i of item.period){
-              createStudy(this.widget, "Bollinger Bands", false, false, [i, 2]);
+          if(this.klineID == 0) {
+            if(this.studyConfig[0].type.indexOf('Bolling') != -1){
+              for(let i of Array.from(new Set(this.studyConfig[0].period))){
+                createStudy(this.widget, "Bollinger Bands", false, false, [i, 2]);
+              }
+            }else if(this.studyConfig[0].type.indexOf('Ma') != -1){
+              for(let i of Array.from(new Set(this.studyConfig[0].period))){
+                createStudy( this.widget,"Moving Average",false,false,[i, "close", 0],null);
+              }
             }
-          }else if(item.type.indexOf('Ma') != -1){
-            for(let i of item.period){
-              createStudy( this.widget,"Moving Average",false,false,[i, "close", 0],null);
+          } else {
+            if(this.studyConfig[0].type.indexOf('Bolling') != -1){
+              createStudy(this.widget, "Bollinger Bands", false, false, [Array.from(new Set(this.studyConfig[0].period))[0], 2]);
+            }else if(this.studyConfig[0].type.indexOf('Ma') != -1){
+              createStudy( this.widget,"Moving Average",false,false,[Array.from(new Set(this.studyConfig[0].period))[0], "close", 0],null);
             }
           }
-        }
       })
     },
     /**创建标记 */
     createMarks(){
+      
       /**创建单点形状 */
       const markShape = (shape, index, overrides) => {
         this.widget.activeChart().createShape({ 
