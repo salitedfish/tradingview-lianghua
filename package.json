@@ -2,9 +2,14 @@
   "name": "quantitative-trading-v3",
   "version": "0.1.0",
   "private": true,
+  "description": "tradingview_app",
+  "author": "GeXK",
+  "main": "main.js",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "start": "electron .",
+    "pack": "electron-builder"
   },
   "dependencies": {
     "axios": "^0.21.1",
@@ -20,6 +25,8 @@
     "@vue/cli-plugin-babel": "^4.5.0",
     "@vue/cli-plugin-router": "^4.5.0",
     "@vue/cli-service": "^4.5.0",
+    "electron": "^18.0.3",
+    "electron-builder": "^23.0.3",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
     "vue-template-compiler": "^2.6.11"
@@ -28,5 +35,21 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "build": {
+    "appId": "com.hangge.demo",
+    "copyright": "Copyright © 2019 hangge.com",
+    "nsis": {
+      "oneClick": true,
+      "perMachine": true,
+      "runAfterFinish": true
+    },
+    "files": [
+      "dist",
+      "main.js"
+    ],
+    "directories": {
+      "output": "app"
+    }
+  }
 }

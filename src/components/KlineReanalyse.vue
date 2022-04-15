@@ -76,9 +76,9 @@ export default {
       this.createTradingView()
       this.createStudy()
       this.createBtn()
-      if(this.xkey == 0) {  
+      // if(this.xkey == 0) {  
         this.createMarks()
-      }
+      // }
 
     })
   },
@@ -93,21 +93,24 @@ export default {
           /**
            * 根据指标配置循环创建bolling和ma
            */
-          if(this.klineID == 0) {
-            if(this.studyConfig[0].type.indexOf('Bolling') != -1){
-              for(let i of Array.from(new Set(this.studyConfig[0].period))){
-                createStudy(this.widget, "Bollinger Bands", false, false, [i, 2]);
+          const colors = ['#F44336', '#FF9800', '#FFE83B', '#4CAF50', '#00BCD4', '#2196F3', '#673AB7', '#E91E63', '#FFCDD2', '#B2EBF2']
+          const newStudys = this.studyConfig.filter((item) => {
+            return this.klineInfo[0].value == item.symbol && this.klineInfo[1].value == item.symbolperiod
+          })
+          for(let key in newStudys) {
+            if(newStudys[key].type.indexOf('Bolling') != -1){
+              for(let i in Array.from(new Set(newStudys[key].period))){
+                createStudy(this.widget, "bollinger bands", false, false, [Array.from(new Set(newStudys[key].period))[i], 2], {
+                  "upper.color": colors[Number(key) + Number(i)],
+                  "median.color": colors[Number(key) + Number(i)],
+                  "lower.color": colors[Number(key) + Number(i)],
+                  "Plots Background.color": colors[Number(key) + Number(i)]
+                });
               }
-            }else if(this.studyConfig[0].type.indexOf('Ma') != -1){
-              for(let i of Array.from(new Set(this.studyConfig[0].period))){
-                createStudy( this.widget,"Moving Average",false,false,[i, "close", 0],null);
+            }else if(newStudys[key].type.indexOf('Ma') != -1){
+              for(let i in Array.from(new Set(newStudys[key].period))){
+                createStudy( this.widget, "Moving Average", false, false, [Array.from(new Set(newStudys[key].period))[i], "close", 0], null);
               }
-            }
-          } else {
-            if(this.studyConfig[0].type.indexOf('Bolling') != -1){
-              createStudy(this.widget, "Bollinger Bands", false, false, [Array.from(new Set(this.studyConfig[0].period))[0], 2]);
-            }else if(this.studyConfig[0].type.indexOf('Ma') != -1){
-              createStudy( this.widget,"Moving Average",false,false,[Array.from(new Set(this.studyConfig[0].period))[0], "close", 0],null);
             }
           }
       })

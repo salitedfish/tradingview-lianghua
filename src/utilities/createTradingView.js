@@ -272,7 +272,10 @@ const createTradingView = (vm, config = {}) => {
 
 
 
-            // "bollinger bands.upper.linewidth": 10,//用来设置布林带的上规宽度
+            "bollinger bands.upper.transparency": 0,
+            "bollinger bands.median.transparency": 0,
+            "bollinger bands.lower.transparency": 0,
+            "bollinger bands.Plots Background.transparency": 95,
             // "bollinger bands.lower.linewidth": 10,
             // "Moving Average.plot.color": "#333333",//设置全部均线的默认颜色，后续每次创建均线指标时可以覆盖
         },
