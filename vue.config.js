@@ -3,40 +3,40 @@ module.exports = {
   productionSourceMap: false,
   devServer: {
     proxy: {
-      '/api': {
+      "/api": {
         // target: 'http://fd.33.cn:1293',
         // 找币接口
         // target: 'http://47.56.83.226:5062',
         // PHP接口
         // target:'http://119.8.239.24:5062',
         // golang接口
-        target:'http://119.8.37.55:5062',
+        target: "http://119.8.37.55:5062",
         pathRewrite: {
-          '^/api': ''
-        }
+          "^/api": "",
+        },
       },
       //代理到正式的筛选接口
-      '/rank': {
+      "/rank": {
         target: "http://123.60.6.107:18079",
         pathRewrite: {
-          "^/rank": ''
-        }
+          "^/rank": "",
+        },
       },
       //这个找币接口支持持仓量
-      '/zhaobiapi': {
+      "/zhaobiapi": {
         // target: "https://api.33.cn/kdata",
         target: "http://47.56.83.226:5062",
         pathRewrite: {
-          "^/zhaobiapi": ''
-        }
+          "^/zhaobiapi": "",
+        },
       },
-      '/reAnalyse': {
-        target: "http://159.138.40.136:8088",
+      "/reAnalyse": {
+        target: "http://192.168.23.152:8088",
         // target: "http://192.168.22.248:8088",
         pathRewrite: {
-          "^/reAnalyse": ''
-        }
-      }
-    }
+          "^/reAnalyse": "",
+        },
+      },
+    },
   },
-}
+};
