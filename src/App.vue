@@ -40,9 +40,6 @@ export default {
       return import("./views/KlinePageReAnalyse.vue");
     },
   },
-  mounted() {
-    // console.log(lodash.throttle)
-  },
   methods: {
     changeMode(type) {
       this.showMode = type;
