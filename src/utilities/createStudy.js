@@ -55,23 +55,23 @@ const createMultipointShapeCommonClear = (
     /**第一个点不画线 */
     if (key >= 1) {
       /**画连接线 */
-      const shapeId = that.widget.chart().createMultipointShape(
-        [
-          {
-            time: list[key].time,
-            price: list[key].price,
-          },
-          {
-            time: list[key - 1].time,
-            price: list[key - 1].price,
-          },
-        ],
-        {
-          shape: shape,
-          lock: true,
-          overrides,
-        }
-      );
+      //   const shapeId = that.widget.chart().createMultipointShape(
+      //     [
+      //       {
+      //         time: list[key].time,
+      //         price: list[key].price,
+      //       },
+      //       {
+      //         time: list[key - 1].time,
+      //         price: list[key - 1].price,
+      //       },
+      //     ],
+      //     {
+      //       shape: shape,
+      //       lock: true,
+      //       overrides,
+      //     }
+      //   );
       /**画延长线，需要计算出延长线的终点 */
       const shapeIdMore = that.widget.chart().createMultipointShape(
         [
@@ -84,8 +84,8 @@ const createMultipointShapeCommonClear = (
               list[key - 1].price,
           },
           {
-            time: list[key].time,
-            price: list[key].price,
+            time: list[key - 1].time,
+            price: list[key - 1].price,
           },
         ],
         {
@@ -95,7 +95,7 @@ const createMultipointShapeCommonClear = (
         }
       );
       /**缓存已画过的点和形状ID以便后续清除 */
-      list[key].shapeId = shapeId;
+      //   list[key].shapeId = shapeId;
       list[key].shapeIdMore = shapeIdMore;
       that[cacheList].set(list[key].id, list[key]);
     }

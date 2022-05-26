@@ -69,6 +69,7 @@ export default {
       interval: this.symbolInfo.interval[this.xIndex] || "1",
       // xkey:'reAnalyse',
       studyConfig: [],
+      currentStudyConfig: [],
       countList: [],
       orderList: [],
       orderParams: {
@@ -85,6 +86,20 @@ export default {
       buyMarkPlayer: null,
       markPlayerEnable: false,
       // exchangeType: localStorage.getItem('exchangeType') || 'dydx',
+      waveList: [],
+      waveLineCache: new Map(),
+      showWave:
+        localStorage.getItem(`${this.xkey}_showWave`) == "false"
+          ? "false"
+          : "true",
+      waveUpList: [],
+      waveUpLineCache: new Map(),
+      waveDownList: [],
+      waveDownLineCache: new Map(),
+      showWaveLine:
+        localStorage.getItem(`${this.xkey}_showWaveLine`) == "false"
+          ? "false"
+          : "true",
     };
   },
   mounted() {
@@ -106,6 +121,9 @@ export default {
     /**获取指标配置 */
     searchConfig.reAnalyse_getStudyConfig().then((res) => {
       this.studyConfig = res.data;
+      // this.currentStudyConfig = this.studyConfig.filter((item) => {
+      //   return this.symbolRow == item.symbol;
+      // });
       /** 获取完配置后再创建K线、按钮、指标、形状, 订阅交易对变化*/
       this.createTradingView();
       this.createBtn();
@@ -168,7 +186,7 @@ export default {
         }
       });
     },
-    /**获取标记*/
+    /**获取标记及其他自定义画线*/
     getMarks() {
       const markShape = (shape, index, overrides) => {
         const id = this.widget.activeChart().createShape(
@@ -231,11 +249,73 @@ export default {
           this.markTimeCache.push(this.marksObj.id[index]);
         });
       });
+      /**上面主要是画买卖标记点，下面画wave和waveLine */
+      for (let item of this.studyConfig) {
+        /**单条线 */
+        if (item.type == "Wave" && this.showWave == "true") {
+          this.getCustomLine(
+            params,
+            item.type,
+            this.waveList,
+            this.waveLineCache
+          );
+        }
+        /**通道线，有上下两条 */
+        if (item.type == "WaveLine" && this.showWaveLine == "true") {
+          this.getWaveLine(params, item.type);
+        }
+      }
     },
     /**创建标记点 */
     createMarks() {
       /**间隔10秒获取一次可见范围内的标记 */
       this.getMarkInterval = setInterval(this.getMarks, 2000);
+    },
+    /**获取自定义画线数据 */
+    getCustomLine(params, name, list, cacheList) {
+      const waveParams = {
+        from: params.from,
+        to: params.to,
+        indName: name,
+      };
+      searchConfig.reAnalyse_getWave(waveParams).then((res) => {
+        list = res.data;
+        createMultipointShapeCommon(this, "trend_line", list, cacheList, {
+          linecolor: "#FBC62D",
+        });
+      });
+    },
+    /**绘制WaveLine */
+    getWaveLine(params, name) {
+      const waveLineParams = {
+        from: params.from,
+        to: params.to,
+        indName: name,
+      };
+      searchConfig.reAnalyse_getWave(waveLineParams).then((res) => {
+        const listUp = res.data[0].up;
+        const listDown = res.data[0].down;
+        createMultipointShapeCommonClear(
+          this,
+          "trend_line",
+          listUp,
+          "waveUpLineCache",
+          {
+            linecolor: "#FBC62D",
+          },
+          params.to
+        );
+        createMultipointShapeCommonClear(
+          this,
+          "trend_line",
+          listDown,
+          "waveDownLineCache",
+          {
+            linecolor: "#3F79FE",
+          },
+          params.to
+        );
+      });
     },
     /**创建自定义按钮 */
     createBtn() {
