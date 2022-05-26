@@ -1,17 +1,24 @@
 <template>
   <div id="app">
-    <div></div>
     <!-- 量化回归分析 -->
-    <k-line-page-re-analyse v-if="showMode == 'reAnalyse'"></k-line-page-re-analyse>
+    <k-line-page-re-analyse
+      v-if="showMode == 'reAnalyse'"
+    ></k-line-page-re-analyse>
     <!-- 自定义页面 -->
-    <k-line-page-custom @changeMode="changeMode" v-if="showMode == 'custom'"></k-line-page-custom>
+    <k-line-page-custom
+      @changeMode="changeMode"
+      v-if="showMode == 'custom'"
+    ></k-line-page-custom>
     <!-- 删选页面 -->
-    <k-line-page-screen @changeMode="changeMode" v-if="showMode == 'screen'"></k-line-page-screen>
+    <k-line-page-screen
+      @changeMode="changeMode"
+      v-if="showMode == 'screen'"
+    ></k-line-page-screen>
   </div>
 </template>
 
 <script>
-import lodash from "lodash"
+import lodash from "lodash";
 
 export default {
   name: "app",
@@ -30,10 +37,10 @@ export default {
       return import("./views/KLinePageScreen.vue");
     },
     KLinePageReAnalyse: () => {
-      return import("./views/KlinePageReAnalyse.vue")
+      return import("./views/KlinePageReAnalyse.vue");
     },
   },
-  mounted(){
+  mounted() {
     // console.log(lodash.throttle)
   },
   methods: {
@@ -43,7 +50,6 @@ export default {
   },
 };
 </script>
-
 
 <style lang="less" scope>
 html,

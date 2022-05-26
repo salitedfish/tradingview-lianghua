@@ -13,42 +13,16 @@ import { Pagination } from "element-ui";
 import { time } from "echarts/core";
 import { MarkPointComponent } from "echarts/components";
 import { createTradingView } from "../utilities/createTradingView";
-import { createStudy } from "../utilities/createStudy";
+import {
+  createStudy,
+  createMultipointShapeCommon,
+  createMultipointShapeCommonClear,
+  clearCache,
+} from "../utilities/createStudy";
 import searchConfig from "../service/searchConfig";
 import BrokenLine from "@/components/BrokenLine.vue";
 
 import { mapSymbol } from "@/utilities/dataMap";
-
-const createMultipointShapeCommon = (
-  that,
-  shape,
-  list,
-  cacheList,
-  overrides
-) => {
-  for (let key in list) {
-    if (key >= 1 && !cacheList.has(list[key].id)) {
-      that.widget.chart().createMultipointShape(
-        [
-          {
-            time: list[key].time,
-            price: list[key].price,
-          },
-          {
-            time: list[key - 1].time,
-            price: list[key - 1].price,
-          },
-        ],
-        {
-          shape: shape,
-          lock: true,
-          overrides,
-        }
-      );
-      cacheList.set(list[key].id, list[key]);
-    }
-  }
-};
 
 Vue.use(Pagination);
 export default {
@@ -78,6 +52,7 @@ export default {
       interval: "",
       xkey: this.klineID,
       studyConfig: [],
+      currentStudyConfig: [],
       countList: [],
       orderList: [],
       orderParams: {
@@ -93,6 +68,18 @@ export default {
       markLineCache: [],
       waveList: [],
       waveLineCache: new Map(),
+      showWave:
+        localStorage.getItem(`${this.klineID}_showWave`) == "false"
+          ? "false"
+          : "true",
+      waveUpList: [],
+      waveUpLineCache: new Map(),
+      waveDownList: [],
+      waveDownLineCache: new Map(),
+      showWaveLine:
+        localStorage.getItem(`${this.klineID}_showWaveLine`) == "false"
+          ? "false"
+          : "true",
     };
   },
 
@@ -110,6 +97,12 @@ export default {
     );
     searchConfig.reAnalyse_getStudyConfig().then((res) => {
       this.studyConfig = res.data;
+      this.currentStudyConfig = this.studyConfig.filter((item) => {
+        return (
+          this.klineInfo[0].value == item.symbol &&
+          this.klineInfo[1].value == item.symbolperiod
+        );
+      });
       /**
        * 获取完配置后再创建K线、指标、形状
        */
@@ -132,49 +125,30 @@ export default {
         /**
          * 根据指标配置循环创建bolling和ma
          */
-        const colors = [
-          "#F44336",
-          "#FF9800",
-          "#FFE83B",
-          "#4CAF50",
-          "#00BCD4",
-          "#2196F3",
-          "#673AB7",
-          "#E91E63",
-          "#FFCDD2",
-          "#B2EBF2",
-        ];
-        const newStudys = this.studyConfig.filter((item) => {
-          return (
-            this.klineInfo[0].value == item.symbol &&
-            this.klineInfo[1].value == item.symbolperiod
-          );
-        });
-        for (let key in newStudys) {
-          if (newStudys[key].type.indexOf("Bolling") != -1) {
-            for (let i in Array.from(new Set(newStudys[key].period))) {
-              createStudy(
-                this.widget,
-                "bollinger bands",
-                false,
-                false,
-                [Array.from(new Set(newStudys[key].period))[i], 2]
-                // {
-                //   "upper.color": colors[Number(key) + Number(i)],
-                //   "median.color": colors[Number(key) + Number(i)],
-                //   "lower.color": colors[Number(key) + Number(i)],
-                //   "Plots Background.color": colors[Number(key) + Number(i)],
-                // }
-              );
+        for (let key in this.currentStudyConfig) {
+          if (this.currentStudyConfig[key].type.indexOf("Bolling") != -1) {
+            for (let i in Array.from(
+              new Set(this.currentStudyConfig[key].period)
+            )) {
+              createStudy(this.widget, "bollinger bands", false, false, [
+                Array.from(new Set(this.currentStudyConfig[key].period))[i],
+                2,
+              ]);
             }
-          } else if (newStudys[key].type.indexOf("Ma") != -1) {
-            for (let i in Array.from(new Set(newStudys[key].period))) {
+          } else if (this.currentStudyConfig[key].type.indexOf("Ma") != -1) {
+            for (let i in Array.from(
+              new Set(this.currentStudyConfig[key].period)
+            )) {
               createStudy(
                 this.widget,
                 "Moving Average",
                 false,
                 false,
-                [Array.from(new Set(newStudys[key].period))[i], "close", 0],
+                [
+                  Array.from(new Set(this.currentStudyConfig[key].period))[i],
+                  "close",
+                  0,
+                ],
                 null
               );
             }
@@ -211,33 +185,33 @@ export default {
       };
 
       /**创建多点形状 */
-      const markMultiShape = (shape, index, overrides) => {
-        this.widget.chart().createMultipointShape(
-          [
-            {
-              time: this.marksObj.time[index - 1],
-              price: Number(
-                this.marksObj.text[index - 1].slice(
-                  this.marksObj.text[index - 1].indexOf(" ") + 1
-                )
-              ),
-            },
-            {
-              time: this.marksObj.time[index],
-              price: Number(
-                this.marksObj.text[index].slice(
-                  this.marksObj.text[index].indexOf(" ") + 1
-                )
-              ),
-            },
-          ],
-          {
-            shape: shape,
-            lock: true,
-            overrides,
-          }
-        );
-      };
+      // const markMultiShape = (shape, index, overrides) => {
+      //   this.widget.chart().createMultipointShape(
+      //     [
+      //       {
+      //         time: this.marksObj.time[index - 1],
+      //         price: Number(
+      //           this.marksObj.text[index - 1].slice(
+      //             this.marksObj.text[index - 1].indexOf(" ") + 1
+      //           )
+      //         ),
+      //       },
+      //       {
+      //         time: this.marksObj.time[index],
+      //         price: Number(
+      //           this.marksObj.text[index].slice(
+      //             this.marksObj.text[index].indexOf(" ") + 1
+      //           )
+      //         ),
+      //       },
+      //     ],
+      //     {
+      //       shape: shape,
+      //       lock: true,
+      //       overrides,
+      //     }
+      //   );
+      // };
 
       this.widget.onChartReady(() => {
         this.widget
@@ -254,7 +228,7 @@ export default {
                   to,
                   resolution: this.interval,
                 };
-                /**画箭头 */
+                /**画买卖箭头 */
                 searchConfig.reAnalyse_getMarks(params).then((res) => {
                   this.marksObj = res.data;
                   this.marksObj.id.forEach((item, index) => {
@@ -285,42 +259,88 @@ export default {
                     }
                     this.markTimeCache.push(this.marksObj.id[index]);
                   });
-                  /**画线 */
-                  this.marksObj.id.forEach((item, index) => {
-                    if (
-                      this.markLineCache.indexOf(this.marksObj.id[index]) != -1
-                    )
-                      return;
-                    if (this.marksObj.time[index - 1]) {
-                      markMultiShape("trend_line", index, {});
-                      this.markLineCache.push(this.marksObj.id[index]);
-                    }
-                  });
+                  /**买卖标记点连线 */
+                  // if (this.paintWave) {
+                  //   this.marksObj.id.forEach((item, index) => {
+                  //     if (
+                  //       this.markLineCache.indexOf(this.marksObj.id[index]) !=
+                  //       -1
+                  //     )
+                  //       return;
+                  //     if (this.marksObj.time[index - 1]) {
+                  //       markMultiShape("trend_line", index, {});
+                  //       this.markLineCache.push(this.marksObj.id[index]);
+                  //     }
+                  //   });
+                  // }
                 });
 
-                /**主图画wave */
-                if (this.xkey == 0) {
-                  const waveParams = {
-                    from: params.from,
-                    to: params.to,
-                    indName: "Wave",
-                  };
-                  searchConfig.reAnalyse_getWave(waveParams).then((res) => {
-                    this.waveList = res.data;
-                    createMultipointShapeCommon(
-                      this,
-                      "trend_line",
+                for (let item of this.currentStudyConfig) {
+                  /**单条线 */
+                  if (item.type == "Wave" && this.showWave == "true") {
+                    this.getCustomLine(
+                      params,
+                      item.type,
                       this.waveList,
-                      this.waveLineCache,
-                      {}
+                      this.waveLineCache
                     );
-                  });
+                  }
+                  /**通道线，有上下两条 */
+                  if (item.type == "WaveLine" && this.showWaveLine == "true") {
+                    this.getWaveLine(params, item.type);
+                  }
                 }
               };
               this.timeOutFun = setTimeout(eventFun, 1000);
             },
             false
           );
+      });
+    },
+    /**获取自定义画线数据 */
+    getCustomLine(params, name, list, cacheList) {
+      const waveParams = {
+        from: params.from,
+        to: params.to,
+        indName: name,
+      };
+      searchConfig.reAnalyse_getWave(waveParams).then((res) => {
+        list = res.data;
+        createMultipointShapeCommon(this, "trend_line", list, cacheList, {
+          linecolor: "#FBC62D",
+        });
+      });
+    },
+    /**绘制WaveLine */
+    getWaveLine(params, name) {
+      const waveLineParams = {
+        from: params.from,
+        to: params.to,
+        indName: name,
+      };
+      searchConfig.reAnalyse_getWave(waveLineParams).then((res) => {
+        const listUp = res.data[0].up;
+        const listDown = res.data[0].down;
+        createMultipointShapeCommonClear(
+          this,
+          "trend_line",
+          listUp,
+          "waveUpLineCache",
+          {
+            linecolor: "#FBC62D",
+          },
+          params.to
+        );
+        createMultipointShapeCommonClear(
+          this,
+          "trend_line",
+          listDown,
+          "waveDownLineCache",
+          {
+            linecolor: "#3F79FE",
+          },
+          params.to
+        );
       });
     },
     /**创建自定义按钮 */
@@ -337,6 +357,35 @@ export default {
           showFormButton.textContent = "显示图表";
           showFormButton.addEventListener("click", () => {
             this.$emit("changeFormVisibity");
+          });
+          /**wave按钮 */
+          const showWaveButton = this.widget.createButton();
+          showWaveButton.textContent = "显示Wave";
+          showWaveButton.addEventListener("click", () => {
+            this.showWave = this.showWave == "true" ? "false" : "true";
+            localStorage.setItem(`${this.klineID}_showWave`, this.showWave);
+            /**根据缓存中的形状ID清除形状 */
+            if (this.showWave == "false") {
+              clearCache(this, this.waveLineCache);
+              this.waveLineCache = new Map();
+            }
+          });
+          /**waveline按钮 */
+          const showWaveLineButton = this.widget.createButton();
+          showWaveLineButton.textContent = "显示WaveLine";
+          showWaveLineButton.addEventListener("click", () => {
+            this.showWaveLine = this.showWaveLine == "true" ? "false" : "true";
+            localStorage.setItem(
+              `${this.klineID}_showWaveLine`,
+              this.showWaveLine
+            );
+            /**根据缓存中的形状ID清除形状 */
+            if (this.showWaveLine == "false") {
+              clearCache(this, this.waveUpLineCache);
+              this.waveUpLineCache = new Map();
+              clearCache(this, this.waveDownLineCache);
+              this.waveDownLineCache = new Map();
+            }
           });
         });
       });
