@@ -66,18 +66,25 @@ export default {
       timeOutFun: null,
       markTimeCache: [],
       markLineCache: [],
+      /**wave */
       waveList: [],
       waveLineCache: new Map(),
       showWave:
         localStorage.getItem(`${this.klineID}_showWave`) == "false"
           ? "false"
           : "true",
-      waveUpList: [],
+      /**waveLine */
       waveUpLineCache: new Map(),
-      waveDownList: [],
       waveDownLineCache: new Map(),
       showWaveLine:
         localStorage.getItem(`${this.klineID}_showWaveLine`) == "false"
+          ? "false"
+          : "true",
+      /**waveBand */
+      waveUpBandCache: new Map(),
+      waveDownBandCache: new Map(),
+      showWaveBand:
+        localStorage.getItem(`${this.klineID}_showWaveBand`) == "false"
           ? "false"
           : "true",
     };
@@ -275,20 +282,34 @@ export default {
                   // }
                 });
 
-                for (let item of this.currentStudyConfig) {
-                  /**单条线 */
-                  if (item.type == "Wave" && this.showWave == "true") {
-                    this.getCustomLine(
-                      params,
-                      item.type,
-                      this.waveList,
-                      this.waveLineCache
-                    );
-                  }
-                  /**通道线，有上下两条 */
-                  if (item.type == "WaveLine" && this.showWaveLine == "true") {
-                    this.getWaveLine(params, item.type);
-                  }
+                /**单条线 */
+                if (this.showWave == "true") {
+                  this.getCustomLine(
+                    params,
+                    "Wave",
+                    this.waveList,
+                    this.waveLineCache
+                  );
+                }
+                /**通道线，有上下两条 */
+                if (this.showWaveLine == "true") {
+                  this.getWaveLine(
+                    params,
+                    "WaveLine",
+                    0,
+                    "waveUpLineCache",
+                    "waveDownLineCache"
+                  );
+                }
+                /**通道平行线，有上下两条 */
+                if (this.showWaveBand == "true") {
+                  this.getWaveLine(
+                    params,
+                    "WaveBand",
+                    1,
+                    "waveUpBandCache",
+                    "waveDownBandCache"
+                  );
                 }
               };
               this.timeOutFun = setTimeout(eventFun, 1000);
@@ -305,41 +326,50 @@ export default {
         indName: name,
       };
       searchConfig.reAnalyse_getWave(waveParams).then((res) => {
+        if (res.data.length <= 0) {
+          return;
+        }
         list = res.data;
         createMultipointShapeCommon(this, "trend_line", list, cacheList, {
           linecolor: "#FBC62D",
         });
       });
     },
-    /**绘制WaveLine */
-    getWaveLine(params, name) {
+    /**绘制WaveLine或WaveBand */
+    getWaveLine(params, name, linestyle, cacheUp, cacheDown) {
       const waveLineParams = {
         from: params.from,
         to: params.to,
         indName: name,
       };
       searchConfig.reAnalyse_getWave(waveLineParams).then((res) => {
+        console.log(res);
+        if (res.data.length <= 0) {
+          return;
+        }
         const listUp = res.data[0].up;
         const listDown = res.data[0].down;
         createMultipointShapeCommonClear(
           this,
-          "trend_line",
           listUp,
-          "waveUpLineCache",
+          cacheUp,
           {
             linecolor: "#FBC62D",
+            linestyle,
           },
-          params.to
+          params.to,
+          name
         );
         createMultipointShapeCommonClear(
           this,
-          "trend_line",
           listDown,
-          "waveDownLineCache",
+          cacheDown,
           {
             linecolor: "#3F79FE",
+            linestyle,
           },
-          params.to
+          params.to,
+          name
         );
       });
     },
@@ -360,10 +390,13 @@ export default {
           });
           /**wave按钮 */
           const showWaveButton = this.widget.createButton();
-          showWaveButton.textContent = "显示Wave";
+          showWaveButton.textContent =
+            this.showWave == "true" ? "显示Wave" : "影藏Wave";
           showWaveButton.addEventListener("click", () => {
             this.showWave = this.showWave == "true" ? "false" : "true";
             localStorage.setItem(`${this.klineID}_showWave`, this.showWave);
+            showWaveButton.textContent =
+              this.showWave == "true" ? "显示Wave" : "影藏Wave";
             /**根据缓存中的形状ID清除形状 */
             if (this.showWave == "false") {
               clearCache(this, this.waveLineCache);
@@ -372,9 +405,12 @@ export default {
           });
           /**waveline按钮 */
           const showWaveLineButton = this.widget.createButton();
-          showWaveLineButton.textContent = "显示WaveLine";
+          showWaveLineButton.textContent =
+            this.showWaveLine == "true" ? "显示WaveLine" : "影藏WaveBand";
           showWaveLineButton.addEventListener("click", () => {
             this.showWaveLine = this.showWaveLine == "true" ? "false" : "true";
+            showWaveLineButton.textContent =
+              this.showWaveLine == "true" ? "显示WaveLine" : "影藏WaveBand";
             localStorage.setItem(
               `${this.klineID}_showWaveLine`,
               this.showWaveLine
@@ -385,6 +421,26 @@ export default {
               this.waveUpLineCache = new Map();
               clearCache(this, this.waveDownLineCache);
               this.waveDownLineCache = new Map();
+            }
+          });
+          /**waveband按钮 */
+          const showWaveBandButton = this.widget.createButton();
+          showWaveBandButton.textContent =
+            this.showWaveBand == "true" ? "显示WaveBand" : "影藏WaveBand";
+          showWaveBandButton.addEventListener("click", () => {
+            this.showWaveBand = this.showWaveBand == "true" ? "false" : "true";
+            showWaveBandButton.textContent =
+              this.showWaveBand == "true" ? "显示WaveBand" : "影藏WaveBand";
+            localStorage.setItem(
+              `${this.klineID}_showWaveBand`,
+              this.showWaveBand
+            );
+            /**根据缓存中的形状ID清除形状 */
+            if (this.showWaveBand == "false") {
+              clearCache(this, this.waveUpBandCache);
+              this.waveUpBandCache = new Map();
+              clearCache(this, this.waveDownBandCache);
+              this.waveDownBandCache = new Map();
             }
           });
         });
