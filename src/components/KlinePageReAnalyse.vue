@@ -349,9 +349,12 @@ export default {
           });
           /**wave按钮 */
           const showWaveButton = this.widget.createButton();
-          showWaveButton.textContent = "显示Wave";
+          showWaveButton.textContent =
+            this.showWave == "true" ? "显示Wave" : "影藏Wave";
           showWaveButton.addEventListener("click", () => {
             this.showWave = this.showWave == "true" ? "false" : "true";
+            showWaveButton.textContent =
+              this.showWave == "true" ? "显示Wave" : "影藏Wave";
             localStorage.setItem(`${this.xkey}_showWave`, this.showWave);
             /**根据缓存中的形状ID清除形状 */
             if (this.showWave == "false") {
@@ -361,9 +364,13 @@ export default {
           });
           /**waveline按钮 */
           const showWaveLineButton = this.widget.createButton();
-          showWaveLineButton.textContent = "显示WaveLine";
+          showWaveLineButton.textContent =
+            this.showWaveLine == "true" ? "显示WaveLine" : "影藏WaveLine";
           showWaveLineButton.addEventListener("click", () => {
             this.showWaveLine = this.showWaveLine == "true" ? "false" : "true";
+            showWaveLineButton.textContent =
+              this.showWaveLine == "true" ? "显示WaveLine" : "影藏WaveLine";
+
             localStorage.setItem(
               `${this.xkey}_showWaveLine`,
               this.showWaveLine
