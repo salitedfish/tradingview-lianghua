@@ -86,18 +86,25 @@ export default {
       buyMarkPlayer: null,
       markPlayerEnable: false,
       // exchangeType: localStorage.getItem('exchangeType') || 'dydx',
+      /**wave */
       waveList: [],
       waveLineCache: new Map(),
       showWave:
         localStorage.getItem(`${this.xkey}_showWave`) == "false"
           ? "false"
           : "true",
-      waveUpList: [],
+      /**waveLine */
       waveUpLineCache: new Map(),
-      waveDownList: [],
       waveDownLineCache: new Map(),
       showWaveLine:
         localStorage.getItem(`${this.xkey}_showWaveLine`) == "false"
+          ? "false"
+          : "true",
+      /**waveBand */
+      waveUpBandCache: new Map(),
+      waveDownBandCache: new Map(),
+      showWaveBand:
+        localStorage.getItem(`${this.xkey}_showWaveBand`) == "false"
           ? "false"
           : "true",
     };
@@ -250,21 +257,32 @@ export default {
         });
       });
       /**上面主要是画买卖标记点，下面画wave和waveLine */
-      for (let item of this.studyConfig) {
-        /**单条线 */
-        if (item.type == "Wave" && this.showWave == "true") {
-          this.getCustomLine(
-            params,
-            item.type,
-            this.waveList,
-            this.waveLineCache
-          );
-        }
-        /**通道线，有上下两条 */
-        if (item.type == "WaveLine" && this.showWaveLine == "true") {
-          this.getWaveLine(params, item.type);
-        }
+      // for (let item of this.studyConfig) {
+      /**单条线 */
+      if (this.showWave == "true") {
+        this.getCustomLine(params, "Wave", this.waveList, this.waveLineCache);
       }
+      /**通道线，有上下两条 */
+      if (this.showWaveLine == "true") {
+        this.getWaveLine(
+          params,
+          "WaveLine",
+          "0",
+          "waveUpLineCache",
+          "waveDownLineCache"
+        );
+      }
+      /**平行通道线，有上下两条 */
+      // if (this.showWaveBand == "true") {
+      //   this.getWaveLine(
+      //     params,
+      //     "WaveBand",
+      //     "1",
+      //     "waveUpBandCache",
+      //     "waveDownBandCache"
+      //   );
+      // }
+      // }
     },
     /**创建标记点 */
     createMarks() {
@@ -286,7 +304,7 @@ export default {
       });
     },
     /**绘制WaveLine */
-    getWaveLine(params, name) {
+    getWaveLine(params, name, lineStyle, upCache, downCache) {
       const waveLineParams = {
         from: params.from,
         to: params.to,
@@ -299,21 +317,25 @@ export default {
           this,
           "trend_line",
           listUp,
-          "waveUpLineCache",
+          upCache,
           {
             linecolor: "#FBC62D",
+            linestyle: lineStyle,
           },
-          params.to
+          params.to,
+          name
         );
         createMultipointShapeCommonClear(
           this,
           "trend_line",
           listDown,
-          "waveDownLineCache",
+          downCache,
           {
             linecolor: "#3F79FE",
+            linestyle: lineStyle,
           },
-          params.to
+          params.to,
+          name
         );
       });
     },
@@ -383,7 +405,27 @@ export default {
               this.waveDownLineCache = new Map();
             }
           });
+          /**waveband按钮 */
+          const showWaveBandButton = this.widget.createButton();
+          showWaveBandButton.textContent =
+            this.showWaveBand == "true" ? "显示WaveBand" : "影藏WaveBand";
+          showWaveBandButton.addEventListener("click", () => {
+            this.showWaveBand = this.showWaveBand == "true" ? "false" : "true";
+            showWaveBandButton.textContent =
+              this.showWaveBand == "true" ? "显示WaveBand" : "影藏WaveBand";
 
+            localStorage.setItem(
+              `${this.xkey}_showWaveBand`,
+              this.showWaveLine
+            );
+            /**根据缓存中的形状ID清除形状 */
+            if (this.showWaveBand == "false") {
+              clearCache(this, this.waveUpBandCache);
+              this.waveUpBandCache = new Map();
+              clearCache(this, this.waveDownBandCache);
+              this.waveDownBandCache = new Map();
+            }
+          });
           /**切换交易所按钮 */
           // const okButton = this.widget.createButton();
           // okButton.textContent = "OK";
