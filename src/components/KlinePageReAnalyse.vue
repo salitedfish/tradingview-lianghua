@@ -31,24 +31,30 @@
       :symbol="symbolRow"
       :interval="interval"
     ></BrokenLineSymbol>
+    <StrategyBox
+      :strategys="strategys"
+      v-show="showStrategyBox"
+      @hiddenStrategyBox="showStrategyBox = false"
+      @selectStrategy="selectStrategy"
+    ></StrategyBox>
   </div>
 </template>
 
 <script>
-import Vue from "vue";
-import { Pagination } from "element-ui";
-import { createTradingView } from "../utilities/createTradingView";
+import Vue from "vue"
+import { Pagination } from "element-ui"
+import { createTradingView } from "../utilities/createTradingView"
 import {
   createStudy,
   createMultipointShapeCommon,
   createMultipointShapeCommonClear,
   clearCache,
-} from "../utilities/createStudy";
-import searchConfig from "../service/searchConfig";
-import BrokenLine from "@/components/BrokenLine.vue";
-import { mapSymbol } from "@/utilities/dataMap.js";
+} from "../utilities/createStudy"
+import searchConfig from "../service/searchConfig"
+import BrokenLine from "@/components/BrokenLine.vue"
+import { mapSymbol } from "@/utilities/dataMap.js"
 // import overrides from "../utilities/overrides";
-Vue.use(Pagination);
+Vue.use(Pagination)
 export default {
   components: {
     BrokenLine,
@@ -56,6 +62,7 @@ export default {
   props: ["symbolInfo", "initInterval", "yIndex", "xIndex", "xkey"],
   components: {
     BrokenLineSymbol: () => import("./BrokenLineSymbol.vue"),
+    StrategyBox: () => import("./StrategyBox.vue"),
   },
   data() {
     return {
@@ -107,13 +114,19 @@ export default {
         localStorage.getItem(`${this.xkey}_showWaveBand`) == "false"
           ? "false"
           : "true",
-    };
+      /**策略 */
+      strategys: [],
+      currentStrategy: "",
+      showStrategyBox: false,
+      /**按钮 */
+      clearMarkButton: null,
+    }
   },
   mounted() {
     /**获取音频播放dom */
-    this.buyMarkPlayer = document.getElementById("buyMarkPlayer");
-    this.saleMarkPlayer = document.getElementById("saleMarkPlayer");
-    this.balanceMarkPlayer = document.getElementById("balanceMarkPlayer");
+    this.buyMarkPlayer = document.getElementById("buyMarkPlayer")
+    this.saleMarkPlayer = document.getElementById("saleMarkPlayer")
+    this.balanceMarkPlayer = document.getElementById("balanceMarkPlayer")
     /**下面两个是获取账号何订单的接口 */
     // this.getCountList()
     // this.getOrderList(this.orderParams)
@@ -127,47 +140,48 @@ export default {
     // this.interval = res.data[0].value.slice(1)
     /**获取指标配置 */
     searchConfig.reAnalyse_getStudyConfig().then((res) => {
-      this.studyConfig = res.data;
+      this.studyConfig = res.data
       // this.currentStudyConfig = this.studyConfig.filter((item) => {
       //   return this.symbolRow == item.symbol;
       // });
-      /** 获取完配置后再创建K线、按钮、指标、形状, 订阅交易对变化*/
-      this.createTradingView();
-      this.createBtn();
-      this.createStudy();
-      this.createMarks();
-      this.subscribeSymbol();
-      this.subscribeInterval();
-    });
+      /** 获取完配置后再创建K线、按钮、策略列表、指标、形状, 订阅交易对变化,*/
+      this.createTradingView()
+      this.createBtn()
+      this.getStrategys()
+      this.createStudy()
+      this.createMarks()
+      this.subscribeSymbol()
+      this.subscribeInterval()
+    })
     // })
   },
   methods: {
     /**获取账户列表 */
     getCountList() {
       searchConfig.reAnalyse_getCountList().then((res) => {
-        this.countList = res.data;
-      });
+        this.countList = res.data
+      })
     },
     /**获取订单列表 */
     getOrderList(params) {
       searchConfig.reAnalyse_getOrderList(params).then((res) => {
-        this.orderList = res.data.data;
-        this.orderTotal = res.data.totalNum;
-      });
+        this.orderList = res.data.data
+        this.orderTotal = res.data.totalNum
+      })
     },
     /**分页 */
     handleCurrentChange(pageNum) {
-      this.orderParams.pageNum = pageNum;
-      this.getOrderList(this.orderParams);
+      this.orderParams.pageNum = pageNum
+      this.getOrderList(this.orderParams)
     },
     /**根据账号查找订单列表 */
     searchOrdersByOrder(orders) {
-      this.orderParams.orders = orders;
-      this.getOrderList(this.orderParams);
+      this.orderParams.orders = orders
+      this.getOrderList(this.orderParams)
     },
     /**创建图表 */
     createTradingView() {
-      this.widget = createTradingView(this);
+      this.widget = createTradingView(this)
     },
     /**创建指标 */
     createStudy() {
@@ -176,7 +190,7 @@ export default {
           /**根据指标配置循环创建bolling和ma*/
           if (item.type.indexOf("Bolling") != -1) {
             for (let i of Array.from(new Set(item.period))) {
-              createStudy(this.widget, "Bollinger Bands", false, false, [i, 2]);
+              createStudy(this.widget, "Bollinger Bands", false, false, [i, 2])
             }
           } else if (item.type.indexOf("Ma") != -1) {
             for (let i of Array.from(new Set(item.period))) {
@@ -187,11 +201,31 @@ export default {
                 false,
                 [i, "close", 0],
                 null
-              );
+              )
             }
           }
         }
-      });
+      })
+    },
+    /**获取策略列表 */
+    getStrategys() {
+      const params = {
+        exchange: "dydx",
+        symbol: this.symbolRow,
+        period: this.interval,
+      }
+      searchConfig.reAnalyse_getStrategys(params).then((res) => {
+        if (res.data.id) {
+          this.strategys = res.data.id
+          this.strategys.unshift("全部")
+        }
+      })
+    },
+    /**选择策略后 */
+    selectStrategy(id) {
+      this.showStrategyBox = false
+      this.currentStrategy = id === "全部" ? "" : id
+      this.clearMarkButton.click()
     },
     /**获取标记及其他自定义画线*/
     getMarks() {
@@ -217,50 +251,51 @@ export default {
             zOrder: "top",
             lock: true,
           }
-        );
+        )
         this.widget
           .activeChart()
           .getShapeById(id)
-          .setUserEditEnabled(true);
-      };
-      const { from, to } = this.widget.activeChart().getVisibleRange();
+          .setUserEditEnabled(true)
+      }
+      const { from, to } = this.widget.activeChart().getVisibleRange()
       const params = {
         symbol: this.symbolRow,
         from,
         to,
         resolution: this.interval,
         exchange: this.exchange,
-      };
+        strategyId: this.currentStrategy,
+      }
       searchConfig.reAnalyse_getMarks(params).then((res) => {
-        this.marksObj = res.data;
+        this.marksObj = res.data
         if (!Array.isArray(this.marksObj.id) || this.marksObj.id.length <= 0)
-          return;
+          return
         this.marksObj.id.forEach((item, index) => {
           /**如果缓存中已经存在这个标记的ID，说明已经绘制过这个标记，则跳过 */
-          if (this.markTimeCache.indexOf(this.marksObj.id[index]) != -1) return;
+          if (this.markTimeCache.indexOf(this.marksObj.id[index]) != -1) return
           /**绘制标记 */
           if (this.marksObj.label[index] == "买") {
-            markShape("arrow_up", index, { color: "#02C076", fontsize: 12 });
-            if (this.markPlayerEnable) this.playAudio(0);
+            markShape("arrow_up", index, { color: "#02C076", fontsize: 12 })
+            if (this.markPlayerEnable) this.playAudio(0)
           } else if (this.marksObj.label[index] == "卖") {
-            markShape("arrow_down", index, { color: "#FF2D2D", fontsize: 12 });
-            if (this.markPlayerEnable) this.playAudio(1);
+            markShape("arrow_down", index, { color: "#FF2D2D", fontsize: 12 })
+            if (this.markPlayerEnable) this.playAudio(1)
           } else if (this.marksObj.label[index] == "卖平") {
-            markShape("arrow_left", index, { color: "#66B3FF", fontsize: 12 });
-            if (this.markPlayerEnable) this.playAudio(2);
+            markShape("arrow_left", index, { color: "#66B3FF", fontsize: 12 })
+            if (this.markPlayerEnable) this.playAudio(2)
           } else if (this.marksObj.label[index] == "买平") {
-            markShape("arrow_right", index, { color: "#66B3FF", fontsize: 12 });
-            if (this.markPlayerEnable) this.playAudio(2);
+            markShape("arrow_right", index, { color: "#66B3FF", fontsize: 12 })
+            if (this.markPlayerEnable) this.playAudio(2)
           }
           /**标记绘制完后，缓存此标记的ID */
-          this.markTimeCache.push(this.marksObj.id[index]);
-        });
-      });
+          this.markTimeCache.push(this.marksObj.id[index])
+        })
+      })
       /**上面主要是画买卖标记点，下面画wave和waveLine */
       // for (let item of this.studyConfig) {
       /**单条线 */
       if (this.showWave == "true") {
-        this.getCustomLine(params, "Wave", this.waveList, this.waveLineCache);
+        this.getCustomLine(params, "Wave", this.waveList, this.waveLineCache)
       }
       /**通道线，有上下两条 */
       if (this.showWaveLine == "true") {
@@ -270,7 +305,7 @@ export default {
           "0",
           "waveUpLineCache",
           "waveDownLineCache"
-        );
+        )
       }
       /**平行通道线，有上下两条 */
       // if (this.showWaveBand == "true") {
@@ -286,8 +321,8 @@ export default {
     },
     /**创建标记点 */
     createMarks() {
-      /**间隔10秒获取一次可见范围内的标记 */
-      this.getMarkInterval = setInterval(this.getMarks, 2000);
+      /**间隔2秒获取一次可见范围内的标记 */
+      this.getMarkInterval = setInterval(this.getMarks, 2000)
     },
     /**获取自定义画线数据 */
     getCustomLine(params, name, list, cacheList) {
@@ -295,13 +330,13 @@ export default {
         from: params.from,
         to: params.to,
         indName: name,
-      };
+      }
       searchConfig.reAnalyse_getWave(waveParams).then((res) => {
-        list = res.data;
+        list = res.data
         createMultipointShapeCommon(this, "trend_line", list, cacheList, {
           linecolor: "#FBC62D",
-        });
-      });
+        })
+      })
     },
     /**绘制WaveLine */
     getWaveLine(params, name, lineStyle, upCache, downCache) {
@@ -309,10 +344,13 @@ export default {
         from: params.from,
         to: params.to,
         indName: name,
-      };
+      }
       searchConfig.reAnalyse_getWave(waveLineParams).then((res) => {
-        const listUp = res.data[0].up;
-        const listDown = res.data[0].down;
+        if (!res.data[0]) {
+          return
+        }
+        const listUp = res.data[0].up
+        const listDown = res.data[0].down
         createMultipointShapeCommonClear(
           this,
           "trend_line",
@@ -324,7 +362,7 @@ export default {
           },
           params.to,
           name
-        );
+        )
         createMultipointShapeCommonClear(
           this,
           "trend_line",
@@ -336,96 +374,96 @@ export default {
           },
           params.to,
           name
-        );
-      });
+        )
+      })
     },
     /**创建自定义按钮 */
     createBtn() {
       this.widget.onChartReady(() => {
         this.widget.headerReady().then(() => {
           /**创建收益曲线按钮 */
-          const brokenLineButton = this.widget.createButton();
-          brokenLineButton.textContent = "收益曲线";
+          const strategyButton = this.widget.createButton()
+          strategyButton.textContent = "策略"
+          strategyButton.addEventListener("click", () => {
+            this.showStrategyBox = !this.showStrategyBox
+          })
+          /**创建收益曲线按钮 */
+          const brokenLineButton = this.widget.createButton()
+          brokenLineButton.textContent = "收益曲线"
           brokenLineButton.addEventListener("click", () => {
-            this.showLine();
-          });
+            this.showLine()
+          })
           /**创建清除标记按钮 */
-          const clearMarkButton = this.widget.createButton();
-          clearMarkButton.textContent = "刷新标记";
-          clearMarkButton.addEventListener("click", () => {
-            this.markTimeCache = [];
-            this.widget.chart().removeAllShapes();
-          });
+          this.clearMarkButton = this.widget.createButton()
+          this.clearMarkButton.textContent = "刷新标记"
+          this.clearMarkButton.addEventListener("click", () => {
+            this.markTimeCache = []
+            this.widget.chart().removeAllShapes()
+          })
           /**创建改变主题按钮 */
-          const themeChangeButton = this.widget.createButton();
-          themeChangeButton.textContent = "主题切换";
+          const themeChangeButton = this.widget.createButton()
+          themeChangeButton.textContent = "主题切换"
           themeChangeButton.addEventListener("click", () => {
-            this.changeTheme();
-          });
+            this.changeTheme()
+          })
           /**创建改变主题按钮 */
-          const audioPlayerEnableButton = this.widget.createButton();
-          audioPlayerEnableButton.textContent = "语音播报";
+          const audioPlayerEnableButton = this.widget.createButton()
+          audioPlayerEnableButton.textContent = "语音播报"
           audioPlayerEnableButton.addEventListener("click", () => {
-            this.markPlayerEnable = !this.markPlayerEnable;
-            alert(this.markPlayerEnable ? "语音播报开启" : "语音播报关闭");
-          });
+            this.markPlayerEnable = !this.markPlayerEnable
+            alert(this.markPlayerEnable ? "语音播报开启" : "语音播报关闭")
+          })
           /**wave按钮 */
-          const showWaveButton = this.widget.createButton();
+          const showWaveButton = this.widget.createButton()
           showWaveButton.textContent =
-            this.showWave == "true" ? "显示Wave" : "影藏Wave";
+            this.showWave == "true" ? "显示Wave" : "影藏Wave"
           showWaveButton.addEventListener("click", () => {
-            this.showWave = this.showWave == "true" ? "false" : "true";
+            this.showWave = this.showWave == "true" ? "false" : "true"
             showWaveButton.textContent =
-              this.showWave == "true" ? "显示Wave" : "影藏Wave";
-            localStorage.setItem(`${this.xkey}_showWave`, this.showWave);
+              this.showWave == "true" ? "显示Wave" : "影藏Wave"
+            localStorage.setItem(`${this.xkey}_showWave`, this.showWave)
             /**根据缓存中的形状ID清除形状 */
             if (this.showWave == "false") {
-              clearCache(this, this.waveLineCache);
-              this.waveLineCache = new Map();
+              clearCache(this, this.waveLineCache)
+              this.waveLineCache = new Map()
             }
-          });
+          })
           /**waveline按钮 */
-          const showWaveLineButton = this.widget.createButton();
+          const showWaveLineButton = this.widget.createButton()
           showWaveLineButton.textContent =
-            this.showWaveLine == "true" ? "显示WaveLine" : "影藏WaveLine";
+            this.showWaveLine == "true" ? "显示WaveLine" : "影藏WaveLine"
           showWaveLineButton.addEventListener("click", () => {
-            this.showWaveLine = this.showWaveLine == "true" ? "false" : "true";
+            this.showWaveLine = this.showWaveLine == "true" ? "false" : "true"
             showWaveLineButton.textContent =
-              this.showWaveLine == "true" ? "显示WaveLine" : "影藏WaveLine";
+              this.showWaveLine == "true" ? "显示WaveLine" : "影藏WaveLine"
 
-            localStorage.setItem(
-              `${this.xkey}_showWaveLine`,
-              this.showWaveLine
-            );
+            localStorage.setItem(`${this.xkey}_showWaveLine`, this.showWaveLine)
             /**根据缓存中的形状ID清除形状 */
             if (this.showWaveLine == "false") {
-              clearCache(this, this.waveUpLineCache);
-              this.waveUpLineCache = new Map();
-              clearCache(this, this.waveDownLineCache);
-              this.waveDownLineCache = new Map();
+              clearCache(this, this.waveUpLineCache)
+              this.waveUpLineCache = new Map()
+              clearCache(this, this.waveDownLineCache)
+              this.waveDownLineCache = new Map()
             }
-          });
+          })
           /**waveband按钮 */
-          const showWaveBandButton = this.widget.createButton();
+          const showWaveBandButton = this.widget.createButton()
           showWaveBandButton.textContent =
-            this.showWaveBand == "true" ? "显示WaveBand" : "影藏WaveBand";
+            this.showWaveBand == "true" ? "显示WaveBand" : "影藏WaveBand"
           showWaveBandButton.addEventListener("click", () => {
-            this.showWaveBand = this.showWaveBand == "true" ? "false" : "true";
+            this.showWaveBand = this.showWaveBand == "true" ? "false" : "true"
             showWaveBandButton.textContent =
-              this.showWaveBand == "true" ? "显示WaveBand" : "影藏WaveBand";
+              this.showWaveBand == "true" ? "显示WaveBand" : "影藏WaveBand"
 
-            localStorage.setItem(
-              `${this.xkey}_showWaveBand`,
-              this.showWaveLine
-            );
+            localStorage.setItem(`${this.xkey}_showWaveBand`, this.showWaveLine)
             /**根据缓存中的形状ID清除形状 */
             if (this.showWaveBand == "false") {
-              clearCache(this, this.waveUpBandCache);
-              this.waveUpBandCache = new Map();
-              clearCache(this, this.waveDownBandCache);
-              this.waveDownBandCache = new Map();
+              clearCache(this, this.waveUpBandCache)
+              this.waveUpBandCache = new Map()
+              clearCache(this, this.waveDownBandCache)
+              this.waveDownBandCache = new Map()
             }
-          });
+          })
           /**切换交易所按钮 */
           // const okButton = this.widget.createButton();
           // okButton.textContent = "OK";
@@ -439,8 +477,8 @@ export default {
           //   localStorage.setItem('exchangeType', 'dydx')
           //   location.reload()
           // });
-        });
-      });
+        })
+      })
     },
     /**订阅交易对改变时，改变获取标记的交易对和交易所*/
     subscribeSymbol() {
@@ -451,21 +489,22 @@ export default {
           .subscribe(
             null,
             (Subscription) => {
-              const changedSymbolInfo = this.widget.activeChart().symbolExt();
-              this.exchange = changedSymbolInfo.exchange;
-              this.symbolRow = changedSymbolInfo.symbol;
+              const changedSymbolInfo = this.widget.activeChart().symbolExt()
+              this.exchange = changedSymbolInfo.exchange
+              this.symbolRow = changedSymbolInfo.symbol
+              this.getStrategys()
               const params = {
                 symbol:
                   changedSymbolInfo.exchange + "_" + changedSymbolInfo.symbol,
                 symbolRow: changedSymbolInfo.symbol,
                 exchange: changedSymbolInfo.exchange,
                 index: this.yIndex,
-              };
-              this.$emit("symbolChanged", params);
+              }
+              this.$emit("symbolChanged", params)
             },
             false
-          );
-      });
+          )
+      })
     },
     /**订阅改变周期时，改变获取mark的周期*/
     subscribeInterval() {
@@ -477,26 +516,27 @@ export default {
             // clearInterval(this.getMarkInterval)
             // this.markTimeCache = []
             // this.widget.chart().removeAllShapes()
-            this.interval = interval;
+            this.interval = interval
+            this.getStrategys()
             const params = {
               xIndex: this.xIndex,
               yIndex: this.yIndex,
               interval: this.interval,
-            };
-            this.$emit("intervalChanged", params);
+            }
+            this.$emit("intervalChanged", params)
             // localStorage.setItem('initInterval', interval)
             // this.getMarkInterval = setInterval(this.getMarks,10000)
-          });
-      });
+          })
+      })
     },
     /**改变主题 */
     changeTheme(type) {
       if (type) {
-        this.widget.changeTheme(type);
+        this.widget.changeTheme(type)
       } else {
         this.widget.changeTheme(
           this.widget.getTheme() == "dark" ? "light" : "dark"
-        );
+        )
         this.$nextTick(() => {
           this.widget.applyOverrides({
             style: 9,
@@ -506,39 +546,39 @@ export default {
             "hollowCandleStyle.drawBorder": true,
             "hollowCandleStyle.borderUpColor": "#02C076",
             "hollowCandleStyle.borderDownColor": "#F84960",
-          });
-        });
+          })
+        })
       }
     },
     /**播放音频 */
     playAudio(type) {
       switch (type) {
         case 0:
-          this.buyMarkPlayer.play();
-          return;
+          this.buyMarkPlayer.play()
+          return
         case 1:
-          this.saleMarkPlayer.play();
-          return;
+          this.saleMarkPlayer.play()
+          return
         case 2:
-          this.balanceMarkPlayer.play();
-          return;
+          this.balanceMarkPlayer.play()
+          return
       }
     },
     /**清除数据 */
     clearData() {
-      searchConfig.reAnalyse_clear();
-      location.reload();
+      searchConfig.reAnalyse_clear()
+      location.reload()
     },
     /**展示资产变化曲线 */
     showLine() {
-      this.showBrokenLine = !this.showBrokenLine;
+      this.showBrokenLine = !this.showBrokenLine
     },
   },
   beforeDestroy() {
-    this.widget = null;
-    clearInterval(this.getMarkInterval);
+    this.widget = null
+    clearInterval(this.getMarkInterval)
   },
-};
+}
 </script>
 <style lang="less" scoped>
 .kline {

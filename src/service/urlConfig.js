@@ -8,7 +8,8 @@ const urlConfig = {
   reAnalyse_clear: "/reAnalyse/clear",
   reAnalyse_broken_line: "/reAnalyse/balance",
   reAnalyse_broken_line_symbol: "/reAnalyse/profit",
-  reAnalyse_getMarks: "/reAnalyse/market",
+  reAnalyse_getMarks: "/reAnalyse/indSignal",
   reAnalyse_getWave: "/reAnalyse/ind",
-};
-export default urlConfig;
+  reAnalyse_getStrategys: "/reAnalyse/strategyIdList",
+}
+export default urlConfig

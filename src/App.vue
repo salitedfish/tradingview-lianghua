@@ -1,11 +1,19 @@
 <template>
   <div id="app">
     <!-- 量化回归分析 -->
-    <k-line-page-re-analyse v-if="showMode == 'reAnalyse'"></k-line-page-re-analyse>
+    <k-line-page-re-analyse
+      v-if="showMode == 'reAnalyse'"
+    ></k-line-page-re-analyse>
     <!-- 自定义页面 -->
-    <k-line-page-custom @changeMode="changeMode" v-if="showMode == 'custom'"></k-line-page-custom>
-    <!-- 删选页面 -->
-    <k-line-page-screen @changeMode="changeMode" v-if="showMode == 'screen'"></k-line-page-screen>
+    <k-line-page-custom
+      @changeMode="changeMode"
+      v-if="showMode == 'custom'"
+    ></k-line-page-custom>
+    <!-- 筛选页面 -->
+    <k-line-page-screen
+      @changeMode="changeMode"
+      v-if="showMode == 'screen'"
+    ></k-line-page-screen>
   </div>
 </template>
 
@@ -17,14 +25,14 @@ export default {
       // showMode: "reAnalyse",
       showMode: "custom",
       // showMode: "screen",
-    };
+    }
   },
   components: {
     KLinePageCustom: () => {
-      return import("./views/KLinePageCustom.vue");
+      return import("./views/KLinePageCustom.vue")
     },
     KLinePageScreen: () => {
-      return import("./views/KLinePageScreen.vue");
+      return import("./views/KLinePageScreen.vue")
     },
     KLinePageReAnalyse: () => {
       return import("./components/KlinePageReAnalyse.vue")
@@ -32,12 +40,11 @@ export default {
   },
   methods: {
     changeMode(type) {
-      this.showMode = type;
+      this.showMode = type
     },
   },
-};
+}
 </script>
-
 
 <style lang="less" scope>
 html,
